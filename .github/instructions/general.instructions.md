@@ -56,9 +56,13 @@ applyTo: '**'
 .
 ├── pkgs
 │   ├── frontend
-│   └── contracts
+│   └── contract
 ├── .github
+│   ├── workflows
+│   │   └── ci.yml
 │   └── instructions
+│       ├── frontend.instructions.md
+│       ├── contracts.instructions.md
 │       └── general.instructions.md
 ├── .gitignore
 ├── package.json
@@ -76,3 +80,12 @@ applyTo: '**'
 **/node_modules
 **/.DS_Store
 ```
+
+# READMEについて
+
+READMEファイルには、誰が見てもどんなGitHubリポジトリなのかわかるように以下の内容をわかりやすく簡潔に記述するようにしてください。
+
+- プロジェクトの概要
+- セットアップ手順(APIキーなどの環境変数の設定を含む)
+- 動かすためのコマンド一覧の紹介
+- 使用している技術スタックの紹介
