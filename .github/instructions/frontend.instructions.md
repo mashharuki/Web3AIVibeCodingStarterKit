@@ -12,7 +12,7 @@ applyTo: './pkgs/frontend/**'
 
 - TypeScript
 - pnpm
-- Next.js (App Router)
+- Next.js (App Router) (Version 15以降)
 - PWA
 - Tailwind CSS
 - Shadcn / UI
@@ -28,7 +28,7 @@ applyTo: './pkgs/frontend/**'
 
 # shadcn / UIの設定ファイル
 
-components.jsonの中身は以下のような設定にしてください。
+components.jsonの中身は以下のような設定に必ずしてください。
 
 ```json
 {
@@ -52,4 +52,29 @@ components.jsonの中身は以下のような設定にしてください。
   },
   "iconLibrary": "lucide"
 }
+```
+
+# フロントエンドアプリケーションのディレクトリ構成
+
+ディレクトリ構成は以下のような構成に必ずしてください。
+
+```bash
+pkgs/frontend/
+├── app/                # Next.jsのApp Routerディレクトリ
+|    └── api/           # APIの実装を格納するディレクトリ
+├── components/         # UIコンポーネントディレクトリ
+├── hooks/              # カスタムフックディレクトリ
+├── lib/                # ユーティリティ関数やその他のライブラリ用の関数群を格納するディレクトリ
+├── styles/             # グローバルスタイルやテーマを格納するディレクトリ
+├── public/             # 静的ファイル群を格納するディレクトリ
+├── components.json     # shadcn / UIの設定ファイル
+├── package.json        # パッケージ設定ファイル
+├── tsconfig.json       # TypeScript設定ファイル
+├── tailwind.config.js  # Tailwind CSS設定ファイル
+├── postcss.config.js   # PostCSS設定ファイル
+├── next.config.js      # Next.js設定ファイル
+├── next-env.d.ts       # Next.jsの型定義ファイル
+├── .env.local          # 環境変数設定ファイル
+├── .env.example        # 環境変数のサンプルファイル
+└── .gitignore          # Gitの無視設定ファイル
 ```
