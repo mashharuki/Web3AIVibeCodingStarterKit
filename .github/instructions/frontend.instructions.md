@@ -12,7 +12,7 @@ applyTo: './pkgs/frontend/**'
 
 - TypeScript
 - pnpm
-- Next.js (App Router) (Version 15以降)
+- Next.js (Page Router)
 - PWA
 - Tailwind CSS
 - Shadcn / UI
@@ -20,10 +20,9 @@ applyTo: './pkgs/frontend/**'
 # 使用する技術スタック(Web3に関連するもの)
 
 - viem
-- ethers.js
+- ethers
 - privy
 - Account Abstraction
-- ERC4337
 - Biconomy
 
 # shadcn / UIの設定ファイル
@@ -78,3 +77,15 @@ pkgs/frontend/
 ├── .env.example        # 環境変数のサンプルファイル
 └── .gitignore          # Gitの無視設定ファイル
 ```
+
+# Biconomy と Privyインテグレーション例
+
+以下のドキュメントを参考にしてください。
+
+🔐 EIP-7702 Gas Abstracted Transactions with Privy
+https://github.com/bcnmy/abstract-docs/blob/main/docs/pages/new/integration-guides/wallets-and-signers/privy.mdx
+
+# Next.js と Privyインテグレーション例
+
+以下のリポジトリを参考にしてください。
+https://github.com/privy-io/create-next-app

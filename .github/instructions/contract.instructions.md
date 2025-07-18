@@ -17,6 +17,7 @@ applyTo: './pkgs/contract/**'
 - hardhat-gas-reporter
 - solhint
 - viem
+- OpenZeppelin 
 - AlchemyのRPC エンドポイント
 
 # フォルダ構成
