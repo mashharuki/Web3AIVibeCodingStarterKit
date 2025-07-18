@@ -17,6 +17,7 @@ applyTo: './pkgs/contract/**'
 - hardhat-gas-reporter
 - solhint
 - viem
+- OpenZeppelin 
 - AlchemyのRPC エンドポイント
 
 # フォルダ構成
@@ -324,3 +325,14 @@ node_modules/
 デプロイ後にスマートコントラクトの機能を呼び出せるようにスマートコントラクトごとに `tasks` フォルダ配下に`<スマートコントラクト名>`のフォルダを作成し、そこにタスクファイルを作成するようにしてください。
 
 主要な関数は全てタスク化してください。
+
+# セキュリティとガス最適化
+
+スマートコントラクトの開発時には、セキュリティとガス最適化を必ず考慮して実装してください。
+
+セキュリティのベストプラクティスについては、以下のGitHubリポジトリを参考にしてください。
+https://github.com/ConsenSysDiligence/smart-contract-best-practices
+
+Solidityの言語の仕様については以下のリポジトリを参照してください。
+https://github.com/ethereum/solidity
+
