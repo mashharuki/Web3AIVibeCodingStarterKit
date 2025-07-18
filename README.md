@@ -1,5 +1,6 @@
-# Web3AIVibeCodingStarterKit
-This repo is for Web3DApp AI Vibe Coding Starter Kit !!!!
+# Web3 AI Vibe Coding Starter Kit - NFT Marketplace
+
+完全なWeb3 NFTマーケットプレイスのモノレポプロジェクト
 
 ## NFTマーケットプレイスの開発を依頼したときのプロンプト
 
