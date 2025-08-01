@@ -109,21 +109,6 @@ npx hardhat deploy:marketplace \
 }
 ```
 
-### Hardhat Ignitionを直接使用したデプロイ
-
-従来の方法でデプロイする場合：
-
-```bash
-# NFTコントラクトのみデプロイ
-npx hardhat ignition deploy ignition/modules/NFTContract.ts --network sepolia
-
-# マーケットプレイスのみデプロイ
-npx hardhat ignition deploy ignition/modules/NFTMarketplace.ts --network sepolia
-
-# 両方を一度にデプロイ
-npx hardhat ignition deploy ignition/modules/FullDeployment.ts --network sepolia
-```
-
 ### パラメーター仕様
 
 #### NFTコントラクト
@@ -187,34 +172,6 @@ npx hardhat marketplace:offer-info --contract 0x... --offer-id 1 --network sepol
 npx hardhat marketplace:sales-history --contract 0x... --network sepolia
 ```
 
-### ユーティリティタスク
-
-```bash
-# 特定ネットワークのコントラクトアドレスJSONファイルをリセット
-npx hardhat reset-contracts --net localhost
-npx hardhat reset-contracts --net sepolia
-npx hardhat reset-contracts --net mainnet
-
-# 全ネットワークのコントラクトアドレスJSONファイルをリセット
-npx hardhat reset-all-contracts
-
-# パッケージスクリプト経由での実行
-pnpm reset-contracts localhost
-pnpm reset-all-contracts
-```
-
-### デプロイタスク
-
-```bash
-# NFTコントラクトをデプロイ（パラメーター指定可能）
-npx hardhat deploy-nft --network sepolia
-npx hardhat deploy-nft --network sepolia --name "CustomNFT" --symbol "CNFT" --mint-fee "0.02"
-
-# マーケットプレイスをデプロイ（オーナー指定可能）
-npx hardhat deploy-marketplace --network sepolia
-npx hardhat deploy-marketplace --network sepolia --owner "0x1234..."
-```
-
 ## コントラクト仕様
 
 ### NFTContract
@@ -256,48 +213,3 @@ npx hardhat deploy-marketplace --network sepolia --owner "0x1234..."
 - Ownable による権限管理
 - 適切な入力値検証
 - ガス効率の最適化
-
-## 実用例
-
-### 1. 完全なデプロイメントフロー
-
-```bash
-# 1. コントラクトアドレスをリセット
-npx hardhat reset-contracts --net sepolia
-
-# 2. NFTコントラクトをデプロイ
-npx hardhat deploy-nft \
-  --network sepolia \
-  --name "MyArtCollection" \
-  --symbol "MAC" \
-  --mint-fee "0.05"
-
-# 3. マーケットプレイスをデプロイ
-npx hardhat deploy-marketplace --network sepolia
-
-# 4. デプロイされたアドレスを確認
-cat outputs/contracts-sepolia.json
-```
-
-### 2. パラメーターファイルを使用したデプロイ
-
-```bash
-# パラメーターファイルをコピー
-cp parameters.example.json parameters.json
-
-# パラメーターファイルを編集してからデプロイ
-npx hardhat ignition deploy ignition/modules/NFTContract.ts \
-  --network sepolia \
-  --parameters parameters.json
-```
-
-### 3. コントラクト検証
-
-```bash
-# デプロイ後にコントラクトを検証
-npx hardhat verify --network sepolia <CONTRACT_ADDRESS> "MyArtCollection" "MAC" "50000000000000000" "0x..."
-```
-
-## ライセンス
-
-MIT
