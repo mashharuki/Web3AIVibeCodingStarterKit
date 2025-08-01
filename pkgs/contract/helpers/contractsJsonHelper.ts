@@ -65,7 +65,27 @@ const resetContractAddressesJson = ({ network }: { network: string }): void => {
  */
 const loadDeployedContractAddresses = (network: string) => {
   const filePath = getFilePath({ network: network });
+  if (!fs.existsSync(filePath)) {
+    return {};
+  }
   return jsonfile.readFileSync(filePath);
+};
+
+/**
+ * 特定のコントラクトアドレスを取得する
+ *
+ * @param network ネットワーク名
+ * @param contractName コントラクト名
+ * @returns コントラクトアドレス（存在しない場合はnull）
+ */
+const getContractAddress = (network: string, contractName: string): string | null => {
+  try {
+    const addresses = loadDeployedContractAddresses(network);
+    return addresses?.contracts?.[contractName] || null;
+  } catch (error) {
+    console.log(`Error loading contract address for ${contractName} on ${network}:`, error);
+    return null;
+  }
 };
 
 /**
@@ -92,7 +112,7 @@ const _updateJson = ({
     obj[group] = value as Record<string, string>;
   } else {
     if (obj[group][name] === undefined) obj[group][name] = "";
-    obj[group][name] = JSON.stringify(value);
+    obj[group][name] = value as string;
   }
 };
 
@@ -117,7 +137,17 @@ const writeContractAddress = ({
 }) => {
   try {
     const filePath = getFilePath({ network: network });
-    const base = jsonfile.readFileSync(filePath);
+    
+    // ディレクトリが存在しない場合は作成
+    const dir = filePath.substring(0, filePath.lastIndexOf('/'));
+    fs.mkdirSync(dir, { recursive: true });
+    
+    // ファイルが存在しない場合は空のオブジェクトで初期化
+    let base: Record<string, Record<string, string>> = {};
+    if (fs.existsSync(filePath)) {
+      base = jsonfile.readFileSync(filePath);
+    }
+    
     _updateJson({
       group: group,
       name: name,
@@ -162,5 +192,6 @@ export {
   loadDeployedContractAddresses,
   resetContractAddressesJson,
   writeContractAddress,
-  writeValueToGroup,
+  writeValueToGroup
 };
+

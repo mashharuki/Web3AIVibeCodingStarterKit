@@ -11,7 +11,7 @@ import "./tasks";
 
 dotenv.config();
 
-const { PRIVATE_KEY, ALCHEMY_API_KEY, COINMARKETCAP_API_KEY, ETHERSCAN_API_KEY, GAS_REPORT } =
+const { PRIVATE_KEY, ALCHEMY_API_KEY, COINMARKETCAP_API_KEY, ETHERSCAN_API_KEY } =
   process.env;
 
 const config: HardhatUserConfig = {

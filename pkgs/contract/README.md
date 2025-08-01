@@ -34,6 +34,20 @@ pnpm install
 cp .env.example .env
 ```
 
+`.env`ファイルの設定項目：
+
+```bash
+# 必須設定
+PRIVATE_KEY="your-private-key-here"              # デプロイ用の秘密鍵
+ALCHEMY_API_KEY="your-alchemy-api-key-here"      # AlchemyのAPIキー
+
+# オプション設定
+OWNER_ADDRESS="your-owner-address-here"          # デフォルトのオーナーアドレス
+ETHERSCAN_API_KEY="your-etherscan-api-key-here"  # コントラクト検証用
+COINMARKETCAP_API_KEY="your-api-key-here"        # ガスレポート用
+GAS_REPORT=true                                  # ガスレポートの有効化
+```
+
 ### 3. コンパイル
 
 ```bash
@@ -48,18 +62,78 @@ pnpm test
 
 ## デプロイメント
 
-### Sepoliaテストネットへのデプロイ
+### 自動コントラクトアドレス管理付きデプロイ（推奨）
+
+本プロジェクトでは、デプロイ後に自動的にコントラクトアドレスを保存する機能を提供しています。
+
+#### 基本的なデプロイ
 
 ```bash
 # NFTコントラクトのみデプロイ
-pnpm run deploy:nft --network sepolia
+pnpm deploy:nft --network sepolia
 
 # マーケットプレイスのみデプロイ
-pnpm run deploy:marketplace --network sepolia
+pnpm deploy:marketplace --network sepolia
+
+# 全てのコントラクトをデプロイ
+pnpm deploy:full --network sepolia
+```
+
+#### カスタムパラメータでのデプロイ
+
+```bash
+# カスタムパラメータでNFTコントラクトをデプロイ
+npx hardhat deploy:nft \
+  --token-name "MyCustomNFT" \
+  --token-symbol "MNFT" \
+  --mint-fee "0.005" \
+  --owner "0x51908F598A5e0d8F1A3bAbFa6DF76F9704daD072" \
+  --network sepolia
+
+# 特定のオーナーでマーケットプレイスをデプロイ
+npx hardhat deploy:marketplace \
+  --owner "0x51908F598A5e0d8F1A3bAbFa6DF76F9704daD072" \
+  --network sepolia
+```
+
+#### コントラクトアドレスの自動管理
+
+デプロイ後、コントラクトアドレスは`outputs/contracts-{network}.json`に自動保存されます：
+
+```json
+{
+  "contracts": {
+    "NFTContract": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+    "NFTMarketplace": "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512"
+  }
+}
+```
+
+### Hardhat Ignitionを直接使用したデプロイ
+
+従来の方法でデプロイする場合：
+
+```bash
+# NFTコントラクトのみデプロイ
+npx hardhat ignition deploy ignition/modules/NFTContract.ts --network sepolia
+
+# マーケットプレイスのみデプロイ
+npx hardhat ignition deploy ignition/modules/NFTMarketplace.ts --network sepolia
 
 # 両方を一度にデプロイ
-pnpm run deploy:all --network sepolia
+npx hardhat ignition deploy ignition/modules/FullDeployment.ts --network sepolia
 ```
+
+### パラメーター仕様
+
+#### NFTコントラクト
+- `tokenName` (string): NFTコレクションの名前（デフォルト: "VibeNFT"）
+- `tokenSymbol` (string): NFTのシンボル（デフォルト: "VNFT"）
+- `mintFee` (string): ミント手数料（wei単位、デフォルト: "10000000000000000" = 0.01 ETH）
+- `owner` (address): コントラクトオーナーのアドレス（デフォルト: デプロイヤーアドレス）
+
+#### マーケットプレイス
+- `owner` (address): コントラクトオーナーのアドレス（デフォルト: デプロイヤーアドレス）
 
 ## タスクの使用方法
 
@@ -117,10 +191,28 @@ npx hardhat marketplace:sales-history --contract 0x... --network sepolia
 
 ```bash
 # 特定ネットワークのコントラクトアドレスJSONファイルをリセット
+npx hardhat reset-contracts --net localhost
 npx hardhat reset-contracts --net sepolia
+npx hardhat reset-contracts --net mainnet
 
 # 全ネットワークのコントラクトアドレスJSONファイルをリセット
 npx hardhat reset-all-contracts
+
+# パッケージスクリプト経由での実行
+pnpm reset-contracts localhost
+pnpm reset-all-contracts
+```
+
+### デプロイタスク
+
+```bash
+# NFTコントラクトをデプロイ（パラメーター指定可能）
+npx hardhat deploy-nft --network sepolia
+npx hardhat deploy-nft --network sepolia --name "CustomNFT" --symbol "CNFT" --mint-fee "0.02"
+
+# マーケットプレイスをデプロイ（オーナー指定可能）
+npx hardhat deploy-marketplace --network sepolia
+npx hardhat deploy-marketplace --network sepolia --owner "0x1234..."
 ```
 
 ## コントラクト仕様
@@ -164,6 +256,47 @@ npx hardhat reset-all-contracts
 - Ownable による権限管理
 - 適切な入力値検証
 - ガス効率の最適化
+
+## 実用例
+
+### 1. 完全なデプロイメントフロー
+
+```bash
+# 1. コントラクトアドレスをリセット
+npx hardhat reset-contracts --net sepolia
+
+# 2. NFTコントラクトをデプロイ
+npx hardhat deploy-nft \
+  --network sepolia \
+  --name "MyArtCollection" \
+  --symbol "MAC" \
+  --mint-fee "0.05"
+
+# 3. マーケットプレイスをデプロイ
+npx hardhat deploy-marketplace --network sepolia
+
+# 4. デプロイされたアドレスを確認
+cat outputs/contracts-sepolia.json
+```
+
+### 2. パラメーターファイルを使用したデプロイ
+
+```bash
+# パラメーターファイルをコピー
+cp parameters.example.json parameters.json
+
+# パラメーターファイルを編集してからデプロイ
+npx hardhat ignition deploy ignition/modules/NFTContract.ts \
+  --network sepolia \
+  --parameters parameters.json
+```
+
+### 3. コントラクト検証
+
+```bash
+# デプロイ後にコントラクトを検証
+npx hardhat verify --network sepolia <CONTRACT_ADDRESS> "MyArtCollection" "MAC" "50000000000000000" "0x..."
+```
 
 ## ライセンス
 

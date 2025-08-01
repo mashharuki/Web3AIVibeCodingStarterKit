@@ -1,1 +1,6 @@
-{}
+{
+  "contracts": {
+    "NFTContract": "0x953ae606af2B695EEdF012c0358eB65233CFc4c1",
+    "NFTMarketplace": "0x452D352bc79B7c1eF23AF28D4CF841267b55DE1B"
+  }
+}
