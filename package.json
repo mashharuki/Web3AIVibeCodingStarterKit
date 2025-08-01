@@ -1,0 +1,24 @@
+{
+  "name": "web3-ai-vibe-coding-starter-kit",
+  "version": "1.0.0",
+  "description": "NFTマーケットプレイス開発のためのスターターキット",
+  "main": "index.js",
+  "scripts": {
+    "contract": "pnpm --filter contract",
+    "build": "pnpm -r build",
+    "dev": "pnpm -r dev",
+    "lint": "biome check .",
+    "lint:fix": "biome check --fix .",
+    "format": "biome format --write ."
+  },
+  "keywords": ["web3", "nft", "marketplace", "ethereum"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@biomejs/biome": "^1.8.3"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  }
+}

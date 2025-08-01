@@ -12,7 +12,7 @@ applyTo: './pkgs/frontend/**'
 
 - TypeScript
 - pnpm
-- Next.js (Page Router)
+- Next.js (App Router / `app/` ディレクトリ構成)
 - PWA
 - Tailwind CSS
 - Shadcn / UI
@@ -27,7 +27,7 @@ applyTo: './pkgs/frontend/**'
 
 # shadcn / UIの設定ファイル
 
-components.jsonの中身は以下のような設定に必ずしてください。
+`components.json` は以下の設定を厳守してください：
 
 ```json
 {
@@ -53,9 +53,9 @@ components.jsonの中身は以下のような設定に必ずしてください�
 }
 ```
 
-# フロントエンドアプリケーションのディレクトリ構成
+# ディレクトリ構成ルール
 
-ディレクトリ構成は以下のような構成に必ずしてください。
+以下の構成を必ず守ってください：
 
 ```bash
 pkgs/frontend/
@@ -78,14 +78,28 @@ pkgs/frontend/
 └── .gitignore          # Gitの無視設定ファイル
 ```
 
+# 実装について
+
+- lib/配下には共通的なユーティリティ関数（fetchラッパー、フォーマッター、定数定義など）を格納してください。
+- hooks/配下には再利用可能なカスタムフックを設計単位で整理してください。命名は`use`から始めること。
+- public/ には以下のような静的ファイルを配置します：
+  - OG画像
+  - サイトのファビコン
+  - マニフェストファイル（PWA用）
+
 # Biconomy と Privyインテグレーション例
 
-以下のドキュメントを参考にしてください。
+以下のGitHubリポジトリを参考にしてください。
 
-🔐 EIP-7702 Gas Abstracted Transactions with Privy
-https://github.com/bcnmy/abstract-docs/blob/main/docs/pages/new/integration-guides/wallets-and-signers/privy.mdx
+GitHub mashharuki/serverless_zk_nft_app
+https://github.com/mashharuki/serverless_zk_nft_app/tree/main/pkgs/frontend
 
 # Next.js と Privyインテグレーション例
 
 以下のリポジトリを参考にしてください。
 https://github.com/privy-io/create-next-app
+
+# Tailwind のカスタマイズガイドへのリンク
+
+https://tailwindcss.com/docs/theme
+https://ui.shadcn.com/docs/theming

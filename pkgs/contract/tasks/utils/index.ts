@@ -1,0 +1,2 @@
+// Utilsタスクのインデックスファイル
+import "./reset-contracts";

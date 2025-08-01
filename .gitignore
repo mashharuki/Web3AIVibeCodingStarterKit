@@ -1,0 +1,12 @@
+**/node_modules
+**/.DS_Store
+**/dist
+**/build
+**/coverage
+**/.env
+**/.env.local
+**/cache
+**/artifacts
+**/typechain-types
+**/ignition/deployments
+**/tmp

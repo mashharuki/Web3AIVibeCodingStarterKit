@@ -19,6 +19,8 @@ applyTo: './pkgs/contract/**'
 - viem
 - OpenZeppelin 
 - AlchemyのRPC エンドポイント
+- prettier
+- prettier-plugin-solidity
 
 # フォルダ構成
 
@@ -104,6 +106,24 @@ const config: HardhatUserConfig = {
 };
 
 export default config;
+```
+
+## package.jsonの設定
+
+`scripts` セクションに以下のスクリプトを必ず追加してください。
+
+また、scriptには `network` は含めないように実装してください。
+
+```json
+"scripts": {
+  "clean": "npx hardhat clean",
+  "compile": "npx hardhat compile",
+  "test": "npx hardhat test",
+  "gas-report": "REPORT_GAS=true npx hardhat test",
+  "lint": "solhint contracts/**/*.sol --fix && npx prettier --write contracts/**/*.sol",
+  "reset-contracts": "npx hardhat reset-contracts --net",
+  "reset-all-contracts": "npx hardhat reset-all-contracts"
+},
 ```
 
 # デプロイ用のヘルパー関数
@@ -283,6 +303,68 @@ const deploy = async () => {
 deploy();
 ```
 
+また、デプロイ前に `resetContractAddressesJson` を呼び出して、デプロイ先のネットワークのアドレスJSONファイルをリセットするタスクファイルを実装してください。
+
+タスクファイルの内容は以下となります。
+
+```typescript
+import { task } from "hardhat/config";
+import { resetContractAddressesJson } from "../../helpers/contractsJsonHelper";
+
+/**
+ * コントラクトアドレスJSONファイルをリセットするタスク
+ */
+task("reset-contracts", "コントラクトアドレスJSONファイルをリセットします")
+  .addParam("net", "リセット対象のネットワーク名")
+  .setAction(async (taskArgs, hre) => {
+    const { net: networkName } = taskArgs;
+
+    console.log("📄 コントラクトアドレスJSONファイルをリセットします...");
+    console.log(`🌐 対象ネットワーク: ${networkName}`);
+
+    try {
+      // コントラクトアドレスJSONファイルをリセット
+      resetContractAddressesJson({ network: networkName });
+      
+      console.log(`✅ ${networkName}ネットワークのコントラクトアドレスJSONファイルがリセットされました`);
+      console.log(`📁 ファイル場所: outputs/contracts-${networkName}.json`);
+      
+      // バックアップファイルの作成について通知
+      console.log("💾 既存のファイルは tmp/ ディレクトリにバックアップされました");
+      
+    } catch (error) {
+      console.error("❌ リセット処理中にエラーが発生しました:", error);
+      process.exit(1);
+    }
+  });
+
+/**
+ * 全ネットワークのコントラクトアドレスJSONファイルをリセットするタスク
+ */
+task("reset-all-contracts", "全ネットワークのコントラクトアドレスJSONファイルをリセットします")
+  .setAction(async (taskArgs, hre) => {
+    const networks = ["localhost", "sepolia", "mainnet"];
+
+    console.log("📄 全ネットワークのコントラクトアドレスJSONファイルをリセットします...");
+
+    try {
+      for (const networkName of networks) {
+        console.log(`🌐 処理中: ${networkName}`);
+        resetContractAddressesJson({ network: networkName });
+        console.log(`✅ ${networkName} - 完了`);
+      }
+      
+      console.log("🎉 全ネットワークのリセットが完了しました");
+      console.log("💾 既存のファイルは tmp/ ディレクトリにバックアップされました");
+      
+    } catch (error) {
+      console.error("❌ リセット処理中にエラーが発生しました:", error);
+      process.exit(1);
+    }
+  });
+
+```
+
 # .solhint.json の設定
 
 `.solhint.json` ファイルを作成し、以下の内容で設定してください。
@@ -290,7 +372,7 @@ deploy();
 ```json
 {
   "extends": "solhint:recommended",
-  "plugins": [],
+  "plugins": ["prettier"],
   "rules": {
     "avoid-suicide": "error",
     "avoid-sha3": "warn"
@@ -311,6 +393,8 @@ node_modules/
 そしてスマートコントラクトのテストコードは、網羅性を考慮し全てのテストパターンを試すようにユニットテストコードを生成してください。
 
 また、テストコードにはわかりやすいコメントを必ず記載してください。
+
+複数のコントラクトのテストで共通して使用するユーティリティ関数は、`helpers` フォルダを作成し、そこに実装してください。
 
 # デプロイ用のスクリプト
 
