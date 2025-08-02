@@ -188,9 +188,8 @@ const writeValueToGroup = ({
 };
 
 export {
-  getFilePath,
-  loadDeployedContractAddresses,
-  resetContractAddressesJson,
+  getContractAddress, getFilePath,
+  loadDeployedContractAddresses, resetContractAddressesJson,
   writeContractAddress,
   writeValueToGroup
 };

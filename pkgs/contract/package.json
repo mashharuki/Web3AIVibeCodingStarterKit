@@ -14,7 +14,21 @@
     "lint": "solhint contracts/**/*.sol --fix && npx prettier --write contracts/**/*.sol",
     "clean": "npx hardhat clean",
     "reset-contracts": "npx hardhat reset-contracts",
-    "reset-all-contracts": "npx hardhat reset-all-contracts"
+    "reset-all-contracts": "npx hardhat reset-all-contracts",
+    "nft:mint": "npx hardhat nft:mint",
+    "nft:info": "npx hardhat nft:info",
+    "nft:update-mint-fee": "npx hardhat nft:update-mint-fee",
+    "nft:update-royalty": "npx hardhat nft:update-royalty",
+    "nft:withdraw-fees": "npx hardhat nft:withdraw-fees",
+    "marketplace:list": "npx hardhat marketplace:list",
+    "marketplace:buy": "npx hardhat marketplace:buy",
+    "marketplace:cancel": "npx hardhat marketplace:cancel",
+    "marketplace:offer": "npx hardhat marketplace:offer",
+    "marketplace:accept-offer": "npx hardhat marketplace:accept-offer",
+    "marketplace:cancel-offer": "npx hardhat marketplace:cancel-offer",
+    "marketplace:listing-info": "npx hardhat marketplace:listing-info",
+    "marketplace:offer-info": "npx hardhat marketplace:offer-info",
+    "marketplace:sales-history": "npx hardhat marketplace:sales-history"
   },
   "keywords": [
     "hardhat",

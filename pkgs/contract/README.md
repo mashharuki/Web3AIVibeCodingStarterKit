@@ -122,10 +122,33 @@ npx hardhat deploy:marketplace \
 
 ## タスクの使用方法
 
+**注意**: v2.0.0以降、すべてのタスクでコントラクトアドレスがオプションになりました。アドレスを指定しない場合、`outputs/contracts-{network}.json`から自動的に取得されます。
+
 ### NFTコントラクト関連
 
+#### 自動アドレス取得使用時（推奨）
+
 ```bash
-# NFTをミント
+# NFTをミント（コントラクトアドレスは自動取得）
+npx hardhat nft:mint --to 0x... --token-uri "https://..." --royalty-recipient 0x... --network sepolia
+
+# NFT情報を取得
+npx hardhat nft:info --token-id 1 --network sepolia
+
+# ミント手数料を更新
+npx hardhat nft:update-mint-fee --new-fee 0.02 --network sepolia
+
+# ロイヤリティを更新
+npx hardhat nft:update-royalty --token-id 1 --recipient 0x... --fee-numerator 750 --network sepolia
+
+# 手数料を引き出し
+npx hardhat nft:withdraw-fees --network sepolia
+```
+
+#### 手動でコントラクトアドレスを指定する場合
+
+```bash
+# NFTをミント（コントラクトアドレスを指定）
 npx hardhat nft:mint --contract 0x... --to 0x... --token-uri "https://..." --royalty-recipient 0x... --network sepolia
 
 # NFT情報を取得
@@ -143,8 +166,41 @@ npx hardhat nft:withdraw-fees --contract 0x... --network sepolia
 
 ### マーケットプレイス関連
 
+#### 自動アドレス取得使用時（推奨）
+
 ```bash
-# NFTを出品
+# NFTを出品（コントラクトアドレスは自動取得）
+npx hardhat marketplace:list --token-id 1 --price 1.0 --network sepolia
+
+# NFTを購入
+npx hardhat marketplace:buy --listing-id 1 --price 1.0 --network sepolia
+
+# 出品をキャンセル
+npx hardhat marketplace:cancel --listing-id 1 --network sepolia
+
+# オファーを作成
+npx hardhat marketplace:offer --token-id 1 --amount 0.8 --network sepolia
+
+# オファーを受諾
+npx hardhat marketplace:accept-offer --offer-id 1 --network sepolia
+
+# オファーをキャンセル
+npx hardhat marketplace:cancel-offer --offer-id 1 --network sepolia
+
+# 出品情報を取得
+npx hardhat marketplace:listing-info --listing-id 1 --network sepolia
+
+# オファー情報を取得
+npx hardhat marketplace:offer-info --offer-id 1 --network sepolia
+
+# 販売履歴を取得
+npx hardhat marketplace:sales-history --network sepolia
+```
+
+#### 手動でコントラクトアドレスを指定する場合
+
+```bash
+# NFTを出品（コントラクトアドレスを指定）
 npx hardhat marketplace:list --contract 0x... --nft-contract 0x... --token-id 1 --price 1.0 --network sepolia
 
 # NFTを購入
@@ -168,8 +224,27 @@ npx hardhat marketplace:listing-info --contract 0x... --listing-id 1 --network s
 # オファー情報を取得
 npx hardhat marketplace:offer-info --contract 0x... --offer-id 1 --network sepolia
 
-# 販売履歴を取得
-npx hardhat marketplace:sales-history --contract 0x... --network sepolia
+# 販売履歴を取得（件数指定可能）
+npx hardhat marketplace:sales-history --contract 0x... --count 20 --network sepolia
+```
+
+### コントラクトアドレス自動取得の仕組み
+
+タスク実行時にコントラクトアドレスが指定されていない場合、以下の流れで自動取得されます：
+
+1. `outputs/contracts-{network}.json`ファイルを確認
+2. 該当するコントラクト名（`NFTContract`または`NFTMarketplace`）のアドレスを取得
+3. アドレスが見つからない場合は、エラーメッセージと共に処理を停止
+
+例：
+```json
+// outputs/contracts-sepolia.json
+{
+  "contracts": {
+    "NFTContract": "0x953ae606af2B695EEdF012c0358eB65233CFc4c1",
+    "NFTMarketplace": "0x452D352bc79B7c1eF23AF28D4CF841267b55DE1B"
+  }
+}
 ```
 
 ## コントラクト仕様
