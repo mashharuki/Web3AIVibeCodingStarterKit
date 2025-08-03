@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "contract": "pnpm --filter contract",
+    "frontend": "pnpm --filter frontend",
     "build": "pnpm -r build",
     "dev": "pnpm -r dev",
     "lint": "biome check .",

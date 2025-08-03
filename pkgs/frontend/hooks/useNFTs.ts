@@ -8,13 +8,16 @@ import { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { encodeFunctionData } from "viem";
 import { useBiconomy } from "./useBiconomy";
+import { useDirectWallet } from "./useDirectWallet";
 import { useWallet } from "./useWallet";
 
 export function useNFTs() {
   const { authenticated, address } = useWallet();
   const { smartAccount, initializeBiconomyAccount, executeUserOp } = useBiconomy();
+  const { executeTransaction, isLoading: directWalletLoading } = useDirectWallet();
   const [nfts, setNfts] = useState<NFT[]>([]);
   const [loading, setLoading] = useState(false);
+  const [useAccountAbstraction, setUseAccountAbstraction] = useState(false); // AA使用フラグ
 
   /**
    * NFTメタデータを取得する
@@ -140,11 +143,162 @@ export function useNFTs() {
     try {
       setLoading(true);
 
-      // Biconomyアカウントを初期化（まだの場合）
-      let nexusClient = smartAccount;
-      if (!nexusClient) {
-        const result = await initializeBiconomyAccount();
-        nexusClient = result.nexusClient;
+      // 関数呼び出しデータをエンコード
+      const functionCallData = encodeFunctionData({
+        abi: MARKETPLACE_CONTRACT_ABI,
+        functionName: "buyNFT",
+        args: [BigInt(listingId)],
+      });
+
+      let txHash: string;
+
+      if (useAccountAbstraction) {
+        // Account Abstraction使用
+        let nexusClient = smartAccount;
+        if (!nexusClient) {
+          console.log("Biconomyアカウントを初期化中...");
+          const result = await initializeBiconomyAccount();
+          nexusClient = result.nexusClient;
+        }
+
+        // ガスレストランザクションを実行
+        console.log("Biconomyでガスレス購入を実行中...");
+        const hash = await executeUserOp(
+          nexusClient,
+          CONTRACT_ADDRESSES.MARKETPLACE_CONTRACT,
+          functionCallData
+        );
+        
+        if (!hash) {
+          throw new Error("トランザクションの実行に失敗しました");
+        }
+        
+        txHash = hash;
+      } else {
+        // 直接ウォレット接続使用
+        console.log("直接ウォレットで購入を実行中...");
+        txHash = await executeTransaction(
+          CONTRACT_ADDRESSES.MARKETPLACE_CONTRACT,
+          functionCallData
+        );
+      }
+
+      toast.success(`NFTを購入しました！ tx: ${txHash.slice(0, 10)}...`);
+      
+      // NFTリストを更新
+      await fetchNFTs();
+      
+      return true;
+    } catch (error) {
+      console.error("NFT購入エラー:", error);
+      const errorMessage = error instanceof Error ? error.message : "購入に失敗しました";
+      toast.error(`購入エラー: ${errorMessage}`);
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  /**
+   * NFTを出品する
+   */
+  const listNFT = async (tokenId: string, price: string) => {
+    if (!authenticated || !address) {
+      toast.error("ウォレットが接続されていません");
+      return false;
+    }
+
+    try {
+      setLoading(true);
+
+      // 価格をweiに変換
+      const priceInWei = BigInt(Math.floor(parseFloat(price) * 1e18));
+
+      // 関数呼び出しデータをエンコード
+      const functionCallData = encodeFunctionData({
+        abi: MARKETPLACE_CONTRACT_ABI,
+        functionName: "listNFT",
+        args: [
+          CONTRACT_ADDRESSES.NFT_CONTRACT,
+          BigInt(tokenId),
+          priceInWei,
+        ],
+      });
+
+      let txHash: string;
+
+      if (useAccountAbstraction) {
+        // Account Abstraction使用
+        let nexusClient = smartAccount;
+        if (!nexusClient) {
+          const result = await initializeBiconomyAccount();
+          nexusClient = result.nexusClient;
+        }
+
+        // ガスレストランザクションを実行
+        const hash = await executeUserOp(
+          nexusClient,
+          CONTRACT_ADDRESSES.MARKETPLACE_CONTRACT,
+          functionCallData
+        );
+        
+        if (!hash) {
+          throw new Error("トランザクションの実行に失敗しました");
+        }
+        
+        txHash = hash;
+      } else {
+        // 直接ウォレット接続使用
+        txHash = await executeTransaction(
+          CONTRACT_ADDRESSES.MARKETPLACE_CONTRACT,
+          functionCallData
+        );
+      }
+
+      toast.success(`NFTを出品しました！ tx: ${txHash.slice(0, 10)}...`);
+      return true;
+    } catch (error) {
+      console.error("NFT出品エラー:", error);
+      const errorMessage = error instanceof Error ? error.message : "出品に失敗しました";
+      toast.error(`出品エラー: ${errorMessage}`);
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  /**
+   * NFTリストを取得・更新する
+   */
+  const fetchNFTs = useCallback(async () => {
+    try {
+      setLoading(true);
+      const listedNFTs = await fetchListedNFTs();
+      setNfts(listedNFTs);
+    } catch (error) {
+      console.error("NFT取得エラー:", error);
+      toast.error("NFTの取得に失敗しました");
+    } finally {
+      setLoading(false);
+    }
+  }, [fetchListedNFTs]);
+
+  // 初期化時にNFTを取得
+  useEffect(() => {
+    fetchNFTs();
+  }, [fetchNFTs]);
+
+  return {
+    nfts,
+    loading: loading || directWalletLoading,
+    fetchNFTs,
+    buyNFT,
+    listNFT,
+    fetchUserNFTs,
+    useAccountAbstraction,
+    setUseAccountAbstraction,
+  };
+}
       }
 
       // function call dataを作成
