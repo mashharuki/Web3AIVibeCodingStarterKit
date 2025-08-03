@@ -150,21 +150,23 @@ export default function CreatePage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto">
-          <div className="mb-8">
-            <h1 className="text-4xl font-bold mb-2">NFTを作成</h1>
-            <p className="text-muted-foreground">
+        <div className="max-w-6xl mx-auto">
+          <div className="mb-8 text-center">
+            <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-purple-600 to-blue-500 bg-clip-text text-transparent">
+              NFTを作成
+            </h1>
+            <p className="text-gray-600 text-lg max-w-2xl mx-auto">
               あなたのデジタルアート作品をNFTとして世界に発信しましょう
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
             {/* フォーム */}
-            <Card>
-              <CardHeader>
-                <CardTitle>NFT情報</CardTitle>
+            <Card className="shadow-lg">
+              <CardHeader className="bg-gradient-to-r from-purple-50 to-blue-50">
+                <CardTitle className="text-xl">NFT情報</CardTitle>
                 <CardDescription>
                   NFTの詳細情報を入力してください
                 </CardDescription>
@@ -172,7 +174,7 @@ export default function CreatePage() {
               <CardContent className="space-y-6">
                 {/* 名前 */}
                 <div>
-                  <label htmlFor="nftName" className="block text-sm font-medium mb-2">
+                  <label htmlFor="nftName" className="block text-sm font-medium mb-2 text-gray-700">
                     名前 <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -180,14 +182,14 @@ export default function CreatePage() {
                     type="text"
                     value={formData.name}
                     onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                    className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                     placeholder="NFTの名前を入力"
                   />
                 </div>
 
                 {/* 説明 */}
                 <div>
-                  <label htmlFor="nftDescription" className="block text-sm font-medium mb-2">
+                  <label htmlFor="nftDescription" className="block text-sm font-medium mb-2 text-gray-700">
                     説明 <span className="text-red-500">*</span>
                   </label>
                   <textarea
@@ -195,14 +197,14 @@ export default function CreatePage() {
                     value={formData.description}
                     onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
                     rows={4}
-                    className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all resize-none"
                     placeholder="NFTについて説明してください"
                   />
                 </div>
 
                 {/* 画像アップロード */}
                 <div>
-                  <label htmlFor="nftImage" className="block text-sm font-medium mb-2">
+                  <label htmlFor="nftImage" className="block text-sm font-medium mb-2 text-gray-700">
                     画像 <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -210,18 +212,18 @@ export default function CreatePage() {
                     type="file"
                     accept="image/*"
                     onChange={handleImageChange}
-                    className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100"
                   />
                 </div>
 
                 {/* 属性 */}
                 <div>
-                  <div className="block text-sm font-medium mb-2">属性 (オプション)</div>
+                  <div className="block text-sm font-medium mb-3 text-gray-700">属性 (オプション)</div>
                   
                   {/* 既存の属性 */}
                   {formData.attributes.map((attr) => (
-                    <div key={`${attr.trait_type}-${attr.value}`} className="flex items-center gap-2 mb-2">
-                      <span className="bg-gray-100 px-3 py-1 rounded text-sm flex-1">
+                    <div key={`${attr.trait_type}-${attr.value}`} className="flex items-center gap-3 mb-3 p-3 bg-gray-50 rounded-lg">
+                      <span className="bg-white border border-gray-200 px-3 py-2 rounded-md text-sm flex-1 font-medium">
                         {attr.trait_type}: {attr.value}
                       </span>
                       <Button
@@ -229,6 +231,7 @@ export default function CreatePage() {
                         variant="outline"
                         size="sm"
                         onClick={() => removeAttribute(formData.attributes.indexOf(attr))}
+                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
                       >
                         削除
                       </Button>
@@ -236,13 +239,13 @@ export default function CreatePage() {
                   ))}
 
                   {/* 新しい属性追加 */}
-                  <div className="flex gap-2">
+                  <div className="flex gap-3">
                     <input
                       type="text"
                       value={newAttribute.trait_type}
                       onChange={(e) => setNewAttribute(prev => ({ ...prev, trait_type: e.target.value }))}
                       placeholder="属性名"
-                      className="flex-1 px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
+                      className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                       aria-label="属性名"
                     />
                     <input
@@ -250,10 +253,15 @@ export default function CreatePage() {
                       value={newAttribute.value}
                       onChange={(e) => setNewAttribute(prev => ({ ...prev, value: e.target.value }))}
                       placeholder="値"
-                      className="flex-1 px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
+                      className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                       aria-label="属性値"
                     />
-                    <Button type="button" onClick={addAttribute} size="sm">
+                    <Button 
+                      type="button" 
+                      onClick={addAttribute} 
+                      size="sm"
+                      className="bg-purple-600 hover:bg-purple-700 text-white px-6"
+                    >
                       追加
                     </Button>
                   </div>
@@ -263,7 +271,10 @@ export default function CreatePage() {
                 <Button
                   onClick={mintNFT}
                   disabled={isCreating}
-                  className="w-full bg-gradient-to-r from-nft-primary to-nft-secondary hover:opacity-90"
+                  className="w-full text-white font-semibold"
+                  style={{
+                    background: 'linear-gradient(to right, #8B5CF6, #06B6D4)',
+                  }}
                 >
                   {isCreating ? 'NFT作成中...' : 'NFTを作成する (0.01 ETH)'}
                 </Button>
@@ -271,50 +282,63 @@ export default function CreatePage() {
             </Card>
 
             {/* プレビュー */}
-            <Card>
-              <CardHeader>
-                <CardTitle>プレビュー</CardTitle>
+            <Card className="shadow-lg">
+              <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50">
+                <CardTitle className="text-xl">プレビュー</CardTitle>
                 <CardDescription>
                   作成されるNFTのプレビューです
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
+                <div className="space-y-6">
                   {/* 画像プレビュー */}
-                  <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden">
-                    {previewUrl ? (
-                      <Image
-                        src={previewUrl}
-                        alt="NFT Preview"
-                        width={400}
-                        height={400}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-gray-400">
-                        画像を選択してください
-                      </div>
-                    )}
+                  <div className="w-full max-w-md mx-auto">
+                    <div className="aspect-square bg-gray-50 border-2 border-dashed border-gray-200 rounded-xl overflow-hidden">
+                      {previewUrl ? (
+                        <Image
+                          src={previewUrl}
+                          alt="NFT Preview"
+                          width={400}
+                          height={400}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex flex-col items-center justify-center text-gray-400">
+                          <svg className="w-12 h-12 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-label="画像アップロード">
+                            <title>画像アップロード</title>
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                          </svg>
+                          <p className="text-sm">画像を選択してください</p>
+                        </div>
+                      )}
+                    </div>
                   </div>
 
                   {/* メタデータプレビュー */}
-                  <div>
-                    <h3 className="font-semibold text-lg">{formData.name || 'NFT名'}</h3>
-                    <p className="text-muted-foreground text-sm mt-1">
-                      {formData.description || 'NFTの説明がここに表示されます'}
-                    </p>
+                  <div className="space-y-4">
+                    <div>
+                      <h3 className="font-bold text-xl text-gray-900">{formData.name || 'NFT名'}</h3>
+                      <p className="text-gray-600 text-sm mt-2 leading-relaxed">
+                        {formData.description || 'NFTの説明がここに表示されます'}
+                      </p>
+                    </div>
                     
                     {formData.attributes.length > 0 && (
-                      <div className="mt-4">
-                        <p className="text-sm font-medium mb-2">属性</p>
-                        <div className="flex flex-wrap gap-2">
+                      <div>
+                        <p className="text-sm font-semibold text-gray-700 mb-3">属性</p>
+                        <div className="grid grid-cols-2 gap-2">
                           {formData.attributes.map((attr) => (
-                            <span
+                            <div
                               key={`preview-${attr.trait_type}-${attr.value}`}
-                              className="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded"
+                              className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-3"
                             >
-                              {attr.trait_type}: {attr.value}
-                            </span>
+                              <p className="text-xs font-medium text-gray-600 uppercase tracking-wide">
+                                {attr.trait_type}
+                              </p>
+                              <p className="text-sm font-semibold text-gray-900 mt-1">
+                                {attr.value}
+                              </p>
+                            </div>
                           ))}
                         </div>
                       </div>
