@@ -1,3 +1,4 @@
+import { Header } from '@/components/header';
 import { Providers } from '@/components/providers';
 import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
@@ -34,7 +35,10 @@ export default function RootLayout({
     <html lang="ja" suppressHydrationWarning>
       <body className={inter.className}>
         <Providers>
-          {children}
+          <Header />
+          <main className="min-h-screen">
+            {children}
+          </main>
         </Providers>
       </body>
     </html>

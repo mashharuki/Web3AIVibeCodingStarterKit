@@ -11,7 +11,12 @@
     "lint:fix": "biome check --fix .",
     "format": "biome format --write ."
   },
-  "keywords": ["web3", "nft", "marketplace", "ethereum"],
+  "keywords": [
+    "web3",
+    "nft",
+    "marketplace",
+    "ethereum"
+  ],
   "author": "",
   "license": "MIT",
   "devDependencies": {
@@ -20,5 +25,8 @@
   "engines": {
     "node": ">=18.0.0",
     "pnpm": ">=8.0.0"
+  },
+  "dependencies": {
+    "@radix-ui/react-tabs": "^1.1.1"
   }
 }
