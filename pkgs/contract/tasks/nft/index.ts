@@ -216,3 +216,153 @@ task("nft:withdraw-fees", "Withdraw accumulated fees")
     console.log("Transaction hash:", tx.hash);
     console.log("Fees withdrawn successfully!");
   });
+
+/**
+ * マーケットプレイスにNFTの操作権限を承認するタスク
+ */
+task("nft:approve", "Approve marketplace to transfer NFT")
+  .addOptionalParam("contract", "NFT contract address (if not provided, will load from outputs)")
+  .addOptionalParam("marketplace", "Marketplace contract address (if not provided, will load from outputs)")
+  .addParam("tokenId", "Token ID to approve")
+  .setAction(async (taskArgs, hre) => {
+    const { ethers } = hre;
+
+    // NFTコントラクトアドレスの取得
+    let nftContractAddress = taskArgs.contract;
+    if (!nftContractAddress) {
+      nftContractAddress = getContractAddress(hre.network.name, "NFTContract");
+      if (!nftContractAddress) {
+        throw new Error(
+          `NFTContract address not found for network ${hre.network.name}. Please deploy the contract first or provide the address manually.`
+        );
+      }
+    }
+
+    // マーケットプレイスコントラクトアドレスの取得
+    let marketplaceAddress = taskArgs.marketplace;
+    if (!marketplaceAddress) {
+      marketplaceAddress = getContractAddress(hre.network.name, "NFTMarketplace");
+      if (!marketplaceAddress) {
+        throw new Error(
+          `NFTMarketplace address not found for network ${hre.network.name}. Please deploy the contract first or provide the address manually.`
+        );
+      }
+    }
+
+    console.log("Approving marketplace to transfer NFT...");
+    console.log("NFT Contract:", nftContractAddress);
+    console.log("Marketplace:", marketplaceAddress);
+    console.log("Token ID:", taskArgs.tokenId);
+
+    const nftContract = await ethers.getContractAt("NFTContract", nftContractAddress);
+
+    const tx = await nftContract.approve(marketplaceAddress, taskArgs.tokenId);
+    await tx.wait();
+
+    console.log("Transaction hash:", tx.hash);
+    console.log("Approval granted successfully!");
+  });
+
+/**
+ * マーケットプレイスに全NFTの操作権限を承認するタスク
+ */
+task("nft:approve-all", "Approve marketplace to transfer all NFTs")
+  .addOptionalParam("contract", "NFT contract address (if not provided, will load from outputs)")
+  .addOptionalParam("marketplace", "Marketplace contract address (if not provided, will load from outputs)")
+  .setAction(async (taskArgs, hre) => {
+    const { ethers } = hre;
+
+    // NFTコントラクトアドレスの取得
+    let nftContractAddress = taskArgs.contract;
+    if (!nftContractAddress) {
+      nftContractAddress = getContractAddress(hre.network.name, "NFTContract");
+      if (!nftContractAddress) {
+        throw new Error(
+          `NFTContract address not found for network ${hre.network.name}. Please deploy the contract first or provide the address manually.`
+        );
+      }
+    }
+
+    // マーケットプレイスコントラクトアドレスの取得
+    let marketplaceAddress = taskArgs.marketplace;
+    if (!marketplaceAddress) {
+      marketplaceAddress = getContractAddress(hre.network.name, "NFTMarketplace");
+      if (!marketplaceAddress) {
+        throw new Error(
+          `NFTMarketplace address not found for network ${hre.network.name}. Please deploy the contract first or provide the address manually.`
+        );
+      }
+    }
+
+    console.log("Approving marketplace for all NFTs...");
+    console.log("NFT Contract:", nftContractAddress);
+    console.log("Marketplace:", marketplaceAddress);
+
+    const nftContract = await ethers.getContractAt("NFTContract", nftContractAddress);
+
+    const tx = await nftContract.setApprovalForAll(marketplaceAddress, true);
+    await tx.wait();
+
+    console.log("Transaction hash:", tx.hash);
+    console.log("Approval for all NFTs granted successfully!");
+  });
+
+/**
+ * 承認状態を確認するタスク
+ */
+task("nft:check-approval", "Check if marketplace is approved for NFT")
+  .addOptionalParam("contract", "NFT contract address (if not provided, will load from outputs)")
+  .addOptionalParam("marketplace", "Marketplace contract address (if not provided, will load from outputs)")
+  .addOptionalParam("tokenId", "Token ID to check (optional for individual approval)")
+  .addOptionalParam("owner", "Owner address to check (if not provided, will use signer address)")
+  .setAction(async (taskArgs, hre) => {
+    const { ethers } = hre;
+    const [signer] = await ethers.getSigners();
+
+    // NFTコントラクトアドレスの取得
+    let nftContractAddress = taskArgs.contract;
+    if (!nftContractAddress) {
+      nftContractAddress = getContractAddress(hre.network.name, "NFTContract");
+      if (!nftContractAddress) {
+        throw new Error(
+          `NFTContract address not found for network ${hre.network.name}. Please deploy the contract first or provide the address manually.`
+        );
+      }
+    }
+
+    // マーケットプレイスコントラクトアドレスの取得
+    let marketplaceAddress = taskArgs.marketplace;
+    if (!marketplaceAddress) {
+      marketplaceAddress = getContractAddress(hre.network.name, "NFTMarketplace");
+      if (!marketplaceAddress) {
+        throw new Error(
+          `NFTMarketplace address not found for network ${hre.network.name}. Please deploy the contract first or provide the address manually.`
+        );
+      }
+    }
+
+    const ownerAddress = taskArgs.owner || signer.address;
+
+    console.log("Checking approval status...");
+    console.log("NFT Contract:", nftContractAddress);
+    console.log("Marketplace:", marketplaceAddress);
+    console.log("Owner:", ownerAddress);
+
+    const nftContract = await ethers.getContractAt("NFTContract", nftContractAddress);
+
+    try {
+      // 全NFTの承認状態をチェック
+      const isApprovedForAll = await nftContract.isApprovedForAll(ownerAddress, marketplaceAddress);
+      console.log("Approved for all NFTs:", isApprovedForAll);
+
+      // 特定のトークンIDが指定されている場合は個別承認もチェック
+      if (taskArgs.tokenId) {
+        const approvedAddress = await nftContract.getApproved(taskArgs.tokenId);
+        const isApprovedForToken = approvedAddress.toLowerCase() === marketplaceAddress.toLowerCase();
+        console.log(`Approved for token ${taskArgs.tokenId}:`, isApprovedForToken);
+        console.log("Approved address:", approvedAddress);
+      }
+    } catch (error) {
+      console.error("Error checking approval:", error);
+    }
+  });

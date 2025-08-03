@@ -102,8 +102,17 @@ pnpm deploy:marketplace --network sepolia   # マーケットプレイスのみ�
 pnpm deploy:full --network sepolia         # 全コントラクトデプロイ
 
 # タスクコマンド（例）
-npx hardhat nft:mint --to 0x... --token-uri "https://..." --network sepolia
-npx hardhat marketplace:list --token-id 1 --price 1.0 --network sepolia
+# NFTをミント
+pnpm nft:mint --to 0x... --token-uri "https://..." --royalty-recipient 0x... --network sepolia
+
+# NFT承認（出品前に必要）
+pnpm nft:approve --token-id 1 --network sepolia
+
+# NFTを出品
+pnpm marketplace:list --token-id 1 --price 1.0 --network sepolia
+
+# NFTを購入
+pnpm marketplace:buy --listing-id 1 --price 1.0 --network sepolia
 ```
 
 ### フロントエンド関連（予定）

@@ -55,6 +55,9 @@ const config: HardhatUserConfig = {
     alwaysGenerateOverloads: false,
     externalArtifacts: ["externalArtifacts/*.json"],
   },
+  sourcify: {
+    enabled: true
+  }
 };
 
 export default config;

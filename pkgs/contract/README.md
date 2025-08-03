@@ -135,6 +135,11 @@ npx hardhat nft:mint --to 0x... --token-uri "https://..." --royalty-recipient 0x
 # NFT情報を取得
 npx hardhat nft:info --token-id 1 --network sepolia
 
+# マーケットプレイス承認関連（NFT出品前に必要）
+npx hardhat nft:check-approval --token-id 1 --network sepolia
+npx hardhat nft:approve --token-id 1 --network sepolia
+npx hardhat nft:approve-all --network sepolia
+
 # ミント手数料を更新
 npx hardhat nft:update-mint-fee --new-fee 0.02 --network sepolia
 
@@ -153,6 +158,11 @@ npx hardhat nft:mint --contract 0x... --to 0x... --token-uri "https://..." --roy
 
 # NFT情報を取得
 npx hardhat nft:info --contract 0x... --token-id 1 --network sepolia
+
+# マーケットプレイス承認関連（NFT出品前に必要）
+npx hardhat nft:check-approval --contract 0x... --marketplace 0x... --token-id 1 --network sepolia
+npx hardhat nft:approve --contract 0x... --marketplace 0x... --token-id 1 --network sepolia
+npx hardhat nft:approve-all --contract 0x... --marketplace 0x... --network sepolia
 
 # ミント手数料を更新
 npx hardhat nft:update-mint-fee --contract 0x... --new-fee 0.02 --network sepolia
@@ -247,12 +257,74 @@ npx hardhat marketplace:sales-history --contract 0x... --count 20 --network sepo
 }
 ```
 
+## 推奨ワークフロー
+
+### NFTを出品するまでの流れ
+
+```bash
+# 1. NFTをミント
+npx hardhat nft:mint \
+  --to 0xYourAddress \
+  --token-uri "ipfs://QmYourTokenURI" \
+  --royalty-recipient 0xYourAddress \
+  --network sepolia
+
+# 2. 承認状態を確認
+npx hardhat nft:check-approval --token-id 1 --network sepolia
+
+# 3. マーケットプレイスにNFTの操作権限を承認
+npx hardhat nft:approve --token-id 1 --network sepolia
+
+# 4. NFTを出品
+npx hardhat marketplace:list --token-id 1 --price 1.0 --network sepolia
+```
+
+### NFTを購入するまでの流れ
+
+```bash
+# 1. 出品情報を確認
+npx hardhat marketplace:listing-info --listing-id 1 --network sepolia
+
+# 2. NFTを購入
+npx hardhat marketplace:buy --listing-id 1 --price 1.0 --network sepolia
+```
+
+### オファーを作成・受諾するまでの流れ
+
+```bash
+# 1. オファーを作成
+npx hardhat marketplace:offer \
+  --token-id 1 \
+  --amount 0.8 \
+  --network sepolia
+
+# 2. オファー情報を確認
+npx hardhat marketplace:offer-info --offer-id 1 --network sepolia
+
+# 3. オファーを受諾（NFTオーナーが実行）
+npx hardhat marketplace:accept-offer --offer-id 1 --network sepolia
+```
+
+### 重要な注意事項
+
+#### NFT承認について
+- **必須**: NFTを出品する前に、マーケットプレイスに対してNFTの操作権限を承認する必要があります
+- **個別承認**: `nft:approve` - 特定のNFTのみを承認（セキュリティ重視）
+- **一括承認**: `nft:approve-all` - 所有する全NFTを承認（利便性重視）
+
+#### セキュリティのベストプラクティス
+1. 可能な限り個別承認（`nft:approve`）を使用する
+2. 承認状態を定期的に確認する（`nft:check-approval`）
+3. 不要になった承認は取り消す
+
 ## コントラクト仕様
 
 ### NFTContract
 
 #### 主要な機能
 - `mintNFT()`: NFTのミント
+- `approve()`: 特定のNFTの操作権限を承認
+- `setApprovalForAll()`: 全NFTの操作権限を承認
 - `updateMintFee()`: ミント手数料の更新
 - `updateTokenRoyalty()`: ロイヤリティの更新
 - `withdrawFees()`: 手数料の引き出し
