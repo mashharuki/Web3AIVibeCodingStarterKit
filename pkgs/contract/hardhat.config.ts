@@ -11,8 +11,7 @@ import "./tasks";
 
 dotenv.config();
 
-const { PRIVATE_KEY, ALCHEMY_API_KEY, COINMARKETCAP_API_KEY, ETHERSCAN_API_KEY } =
-  process.env;
+const { PRIVATE_KEY, ALCHEMY_API_KEY, COINMARKETCAP_API_KEY, ETHERSCAN_API_KEY } = process.env;
 
 const config: HardhatUserConfig = {
   solidity: {
@@ -56,8 +55,8 @@ const config: HardhatUserConfig = {
     externalArtifacts: ["externalArtifacts/*.json"],
   },
   sourcify: {
-    enabled: true
-  }
+    enabled: true,
+  },
 };
 
 export default config;

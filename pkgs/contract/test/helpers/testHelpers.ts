@@ -42,13 +42,12 @@ export interface DeployedContracts {
 
 /**
  * テスト用のアカウントを取得する
- * 
+ *
  * @returns テスト用のアカウント群
  */
 export async function getTestAccounts(): Promise<TestAccounts> {
-  const [owner, creator, seller, buyer, royaltyRecipient, unauthorized] = 
-    await ethers.getSigners();
-  
+  const [owner, creator, seller, buyer, royaltyRecipient, unauthorized] = await ethers.getSigners();
+
   return {
     owner,
     creator,
@@ -61,51 +60,51 @@ export async function getTestAccounts(): Promise<TestAccounts> {
 
 /**
  * NFTコントラクトをデプロイする
- * 
+ *
  * @param owner コントラクトのオーナーアドレス
  * @returns デプロイされたNFTコントラクト
  */
 export async function deployNFTContract(owner: string): Promise<NFTContract> {
   const NFTContractFactory = await ethers.getContractFactory("NFTContract");
-  const nftContract = await NFTContractFactory.deploy(
+  const nftContract = (await NFTContractFactory.deploy(
     TEST_CONSTANTS.TOKEN_NAME,
     TEST_CONSTANTS.TOKEN_SYMBOL,
     TEST_CONSTANTS.MINT_FEE,
     owner
-  ) as unknown as NFTContract;
-  
+  )) as unknown as NFTContract;
+
   return nftContract;
 }
 
 /**
  * NFTマーケットプレイスをデプロイする
- * 
+ *
  * @param owner コントラクトのオーナーアドレス
  * @returns デプロイされたマーケットプレイスコントラクト
  */
 export async function deployMarketplace(owner: string): Promise<NFTMarketplace> {
   const MarketplaceFactory = await ethers.getContractFactory("NFTMarketplace");
-  const marketplace = await MarketplaceFactory.deploy(owner) as unknown as NFTMarketplace;
-  
+  const marketplace = (await MarketplaceFactory.deploy(owner)) as unknown as NFTMarketplace;
+
   return marketplace;
 }
 
 /**
  * NFTコントラクトとマーケットプレイスの両方をデプロイする
- * 
+ *
  * @param owner コントラクトのオーナーアドレス
  * @returns デプロイされたコントラクト群
  */
 export async function deployAllContracts(owner: string): Promise<DeployedContracts> {
   const nftContract = await deployNFTContract(owner);
   const marketplace = await deployMarketplace(owner);
-  
+
   return { nftContract, marketplace };
 }
 
 /**
  * テスト用NFTをミントする
- * 
+ *
  * @param nftContract NFTコントラクト
  * @param minter ミントするアカウント
  * @param recipient NFTを受け取るアドレス
@@ -131,7 +130,7 @@ export async function mintTestNFT(
 
 /**
  * NFTをマーケットプレイスに出品する
- * 
+ *
  * @param marketplace マーケットプレイスコントラクト
  * @param lister 出品するアカウント
  * @param nftContract NFTコントラクトアドレス
@@ -146,14 +145,12 @@ export async function listNFTOnMarketplace(
   tokenId: number,
   price: bigint = TEST_CONSTANTS.LISTING_PRICE
 ) {
-  return await marketplace
-    .connect(lister)
-    .listNFT(nftContract, tokenId, price);
+  return await marketplace.connect(lister).listNFT(nftContract, tokenId, price);
 }
 
 /**
  * マーケットプレイスでNFTを購入する
- * 
+ *
  * @param marketplace マーケットプレイスコントラクト
  * @param buyer 購入するアカウント
  * @param nftContract NFTコントラクトアドレス
@@ -168,14 +165,12 @@ export async function buyNFTFromMarketplace(
   tokenId: number,
   paymentAmount: bigint
 ) {
-  return await marketplace
-    .connect(buyer)
-    .buyNFT(nftContract, tokenId, { value: paymentAmount });
+  return await marketplace.connect(buyer).buyNFT(nftContract, tokenId, { value: paymentAmount });
 }
 
 /**
  * NFTにオファーを作成する
- * 
+ *
  * @param marketplace マーケットプレイスコントラクト
  * @param offerer オファーするアカウント
  * @param nftContract NFTコントラクトアドレス
@@ -195,7 +190,7 @@ export async function makeOfferOnNFT(
   // デフォルトの有効期限：現在時刻から1時間後
   const defaultExpiration = Math.floor(Date.now() / 1000) + 3600;
   const expirationTime = expiration || defaultExpiration;
-  
+
   return await marketplace
     .connect(offerer)
     .makeOffer(nftContract, tokenId, expirationTime, { value: offerAmount });
@@ -203,7 +198,7 @@ export async function makeOfferOnNFT(
 
 /**
  * NFTマーケットプレイス向けのセットアップを行う（NFTミント + 承認設定）
- * 
+ *
  * @param contracts デプロイされたコントラクト群
  * @param accounts テストアカウント群
  * @returns ミントされたトークンID
@@ -214,7 +209,7 @@ export async function setupNFTForMarketplace(
 ): Promise<number> {
   const { nftContract, marketplace } = contracts;
   const { seller, royaltyRecipient } = accounts;
-  
+
   // NFTをミント
   await mintTestNFT(
     nftContract,
@@ -224,16 +219,18 @@ export async function setupNFTForMarketplace(
     TEST_CONSTANTS.ROYALTY_FEE,
     TEST_CONSTANTS.TOKEN_URI
   );
-  
+
   // マーケットプレイスにNFTの操作権限を付与
-  await nftContract.connect(seller).setApprovalForAll((marketplace as unknown as { target: string }).target, true);
-  
+  await nftContract
+    .connect(seller)
+    .setApprovalForAll((marketplace as unknown as { target: string }).target, true);
+
   return 1; // 最初にミントされるトークンIDは1
 }
 
 /**
  * 現在のブロックタイムスタンプを取得する
- * 
+ *
  * @returns 現在のブロックタイムスタンプ
  */
 export async function getCurrentTimestamp(): Promise<number> {
@@ -246,7 +243,7 @@ export async function getCurrentTimestamp(): Promise<number> {
 
 /**
  * 指定した秒数だけ時間を進める
- * 
+ *
  * @param seconds 進める秒数
  */
 export async function increaseTime(seconds: number): Promise<void> {
@@ -256,7 +253,7 @@ export async function increaseTime(seconds: number): Promise<void> {
 
 /**
  * アカウントの残高を取得する
- * 
+ *
  * @param address アドレス
  * @returns アカウントの残高
  */

@@ -33,12 +33,7 @@
     "marketplace:offer-info": "npx hardhat marketplace:offer-info",
     "marketplace:sales-history": "npx hardhat marketplace:sales-history"
   },
-  "keywords": [
-    "hardhat",
-    "solidity",
-    "nft",
-    "marketplace"
-  ],
+  "keywords": ["hardhat", "solidity", "nft", "marketplace"],
   "author": "",
   "license": "MIT",
   "devDependencies": {

@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { WalletButton } from './wallet-button';
+import Link from "next/link";
+import { WalletButton } from "./wallet-button";
 
 export function Header() {
   return (
@@ -15,16 +15,10 @@ export function Header() {
 
         {/* ナビゲーション */}
         <nav className="hidden md:flex items-center space-x-6">
-          <Link
-            href="/nfts"
-            className="text-sm font-medium transition-colors hover:text-primary"
-          >
+          <Link href="/nfts" className="text-sm font-medium transition-colors hover:text-primary">
             マーケット
           </Link>
-          <Link
-            href="/create"
-            className="text-sm font-medium transition-colors hover:text-primary"
-          >
+          <Link href="/create" className="text-sm font-medium transition-colors hover:text-primary">
             NFT作成
           </Link>
           <Link

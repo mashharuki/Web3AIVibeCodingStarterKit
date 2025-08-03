@@ -28,9 +28,24 @@ pnpm install
 cp .env.example .env.local
 ```
 
+必要な環境変数：
+
+- `NEXT_PUBLIC_APP_ID` - Privy App ID
+- `NEXT_PUBLIC_BICONOMY_BUNDLER_API_KEY` - BiconomyのBundler API Key
+- `NEXT_PUBLIC_BICONOMY_PAYMASTER_API_KEY` - BiconomyのPaymaster API Key
+
 ### 3. Privy App IDの設定
 
 [Privy Console](https://console.privy.io)でアプリケーションを作成し、App IDを取得して設定します。
+
+### 4. Biconomy API キーの設定
+
+[Biconomy Dashboard](https://dashboard.biconomy.io)でアカウントを作成し、以下のAPI Keyを取得してください：
+
+1. **Bundler API Key**: Sepolia用のBundler API
+2. **Paymaster API Key**: Sepolia用のPaymaster API
+
+これらのAPIキーを`.env.local`ファイルに設定することで、ガスレス取引（Account Abstraction）が利用可能になります。
 
 ## 開発
 

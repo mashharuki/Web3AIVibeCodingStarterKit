@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import { NFTCard } from '@/components/nft-card-improved';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useNFTs } from '@/hooks/useNFTs';
-import { useWallet } from '@/hooks/useWallet';
-import type { NFT } from '@/lib/constants';
-import { useEffect, useState } from 'react';
+import { NFTCard } from "@/components/nft-card-improved";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useNFTs } from "@/hooks/useNFTs";
+import { useWallet } from "@/hooks/useWallet";
+import type { NFT } from "@/lib/constants";
+import { useCallback, useEffect, useState } from "react";
 
 export default function ProfilePage() {
   const { authenticated, address } = useWallet();
@@ -16,30 +16,30 @@ export default function ProfilePage() {
   const [listedNFTs, setListedNFTs] = useState<NFT[]>([]);
   const [showListModal, setShowListModal] = useState(false);
   const [selectedNFT, setSelectedNFT] = useState<NFT | null>(null);
-  const [listPrice, setListPrice] = useState('');
+  const [listPrice, setListPrice] = useState("");
+
+  const loadUserNFTs = useCallback(async () => {
+    if (!address) return;
+
+    try {
+      const ownedNFTs = await fetchUserNFTs(address);
+      setUserNFTs(ownedNFTs);
+
+      // 出品中のNFTをフィルタリング
+      const listed = nfts.filter(
+        (nft) => nft.owner.toLowerCase() === address.toLowerCase() && nft.isListed
+      );
+      setListedNFTs(listed);
+    } catch (error) {
+      console.error("ユーザーNFT取得エラー:", error);
+    }
+  }, [address, fetchUserNFTs, nfts]);
 
   useEffect(() => {
     if (authenticated && address) {
       loadUserNFTs();
     }
-  }, [authenticated, address]);
-
-  const loadUserNFTs = async () => {
-    if (!address) return;
-    
-    try {
-      const ownedNFTs = await fetchUserNFTs(address);
-      setUserNFTs(ownedNFTs);
-      
-      // 出品中のNFTをフィルタリング
-      const listed = nfts.filter(nft => 
-        nft.owner.toLowerCase() === address.toLowerCase() && nft.isListed
-      );
-      setListedNFTs(listed);
-    } catch (error) {
-      console.error('ユーザーNFT取得エラー:', error);
-    }
-  };
+  }, [authenticated, address, loadUserNFTs]);
 
   const handleListNFT = async () => {
     if (!selectedNFT || !listPrice) return;
@@ -48,7 +48,7 @@ export default function ProfilePage() {
     if (success) {
       setShowListModal(false);
       setSelectedNFT(null);
-      setListPrice('');
+      setListPrice("");
       loadUserNFTs(); // データを再読み込み
     }
   };
@@ -64,9 +64,7 @@ export default function ProfilePage() {
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
             <CardTitle>ウォレット接続が必要です</CardTitle>
-            <CardDescription>
-              マイページを表示するにはウォレットを接続してください
-            </CardDescription>
+            <CardDescription>マイページを表示するにはウォレットを接続してください</CardDescription>
           </CardHeader>
         </Card>
       </div>
@@ -153,10 +151,7 @@ export default function ProfilePage() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {userNFTs.map((nft) => (
                   <div key={`${nft.contractAddress}-${nft.tokenId}`} className="relative group">
-                    <NFTCard
-                      nft={nft}
-                      showBuyButton={false}
-                    />
+                    <NFTCard nft={nft} showBuyButton={false} />
                     {!nft.isListed && (
                       <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
                         <Button
@@ -179,9 +174,7 @@ export default function ProfilePage() {
               <div className="text-center py-12">
                 <div className="text-6xl mb-4">🏪</div>
                 <h3 className="text-xl font-semibold mb-2">出品中のNFTがありません</h3>
-                <p className="text-muted-foreground">
-                  保有NFTを出品してみましょう。
-                </p>
+                <p className="text-muted-foreground">保有NFTを出品してみましょう。</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -241,11 +234,7 @@ export default function ProfilePage() {
                   >
                     キャンセル
                   </Button>
-                  <Button
-                    className="flex-1"
-                    onClick={handleListNFT}
-                    disabled={!listPrice}
-                  >
+                  <Button className="flex-1" onClick={handleListNFT} disabled={!listPrice}>
                     出品する
                   </Button>
                 </div>

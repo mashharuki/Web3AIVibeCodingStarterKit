@@ -1,6 +1,13 @@
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import Image from 'next/image';
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import Image from "next/image";
 
 interface NFTCardProps {
   id: string;
@@ -43,13 +50,13 @@ export function NFTCard({
           )}
         </div>
       </CardHeader>
-      
+
       <CardContent className="p-4">
         <CardTitle className="text-lg mb-2 line-clamp-1">{title}</CardTitle>
         <CardDescription className="text-sm text-gray-600 mb-3 line-clamp-2">
           {description}
         </CardDescription>
-        
+
         <div className="flex items-center justify-between mb-3">
           <div>
             <p className="text-xs text-gray-500">価格</p>
@@ -61,23 +68,13 @@ export function NFTCard({
           </div>
         </div>
       </CardContent>
-      
+
       <CardFooter className="p-4 pt-0 gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          className="flex-1"
-          onClick={onView}
-        >
+        <Button variant="outline" size="sm" className="flex-1" onClick={onView}>
           詳細を見る
         </Button>
         {isListed && (
-          <Button
-            variant="gradient"
-            size="sm"
-            className="flex-1"
-            onClick={onBuy}
-          >
+          <Button variant="gradient" size="sm" className="flex-1" onClick={onBuy}>
             購入する
           </Button>
         )}

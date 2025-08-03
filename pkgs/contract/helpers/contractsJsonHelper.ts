@@ -95,7 +95,10 @@ const getContractAddress = (network: string, contractName: string): string | nul
  * @param contractName コントラクト名
  * @returns デプロイメントパラメーター（存在しない場合はnull）
  */
-const getDeploymentParams = (network: string, contractName: string): Record<string, unknown> | null => {
+const getDeploymentParams = (
+  network: string,
+  contractName: string
+): Record<string, unknown> | null => {
   try {
     const data = loadDeployedContractAddresses(network);
     const paramsStr = data?.deploymentParams?.[contractName];
@@ -155,17 +158,17 @@ const writeContractAddress = ({
 }) => {
   try {
     const filePath = getFilePath({ network: network });
-    
+
     // ディレクトリが存在しない場合は作成
-    const dir = filePath.substring(0, filePath.lastIndexOf('/'));
+    const dir = filePath.substring(0, filePath.lastIndexOf("/"));
     fs.mkdirSync(dir, { recursive: true });
-    
+
     // ファイルが存在しない場合は空のオブジェクトで初期化
     let base: Record<string, Record<string, string>> = {};
     if (fs.existsSync(filePath)) {
       base = jsonfile.readFileSync(filePath);
     }
-    
+
     _updateJson({
       group: group,
       name: name,
@@ -206,12 +209,11 @@ const writeValueToGroup = ({
 };
 
 export {
-    getContractAddress,
-    getDeploymentParams,
-    getFilePath,
-    loadDeployedContractAddresses,
-    resetContractAddressesJson,
-    writeContractAddress,
-    writeValueToGroup
+  getContractAddress,
+  getDeploymentParams,
+  getFilePath,
+  loadDeployedContractAddresses,
+  resetContractAddressesJson,
+  writeContractAddress,
+  writeValueToGroup,
 };
-

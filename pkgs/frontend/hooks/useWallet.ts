@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { createWalletClientFromPrivy } from '@/lib/web3';
-import { usePrivy } from '@privy-io/react-auth';
-import { useEffect, useState } from 'react';
-import type { WalletClient } from 'viem';
+import { createWalletClientFromPrivy } from "@/lib/web3";
+import { usePrivy } from "@privy-io/react-auth";
+import { useEffect, useState } from "react";
+import type { WalletClient } from "viem";
 
 // Privyウォレット型の拡張
 interface PrivyWallet {
@@ -24,11 +24,15 @@ export function useWallet() {
           const wallet = user.wallet as unknown as PrivyWallet;
           const provider = await wallet.getEthereumProvider();
           if (provider) {
-            const client = createWalletClientFromPrivy(provider as { request: (args: { method: string; params?: unknown[] }) => Promise<unknown> });
+            const client = createWalletClientFromPrivy(
+              provider as {
+                request: (args: { method: string; params?: unknown[] }) => Promise<unknown>;
+              }
+            );
             setWalletClient(client);
           }
         } catch (error) {
-          console.error('ウォレット設定エラー:', error);
+          console.error("ウォレット設定エラー:", error);
         }
       } else {
         setWalletClient(null);
@@ -43,7 +47,7 @@ export function useWallet() {
     try {
       await login();
     } catch (error) {
-      console.error('ウォレット接続エラー:', error);
+      console.error("ウォレット接続エラー:", error);
     } finally {
       setIsConnecting(false);
     }
@@ -54,7 +58,7 @@ export function useWallet() {
       await logout();
       setWalletClient(null);
     } catch (error) {
-      console.error('ウォレット切断エラー:', error);
+      console.error("ウォレット切断エラー:", error);
     }
   };
 

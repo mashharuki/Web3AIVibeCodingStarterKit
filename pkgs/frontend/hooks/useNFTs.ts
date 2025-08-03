@@ -1,16 +1,18 @@
-'use client';
+"use client";
 
-import { MARKETPLACE_CONTRACT_ABI, NFT_CONTRACT_ABI } from '@/lib/abi';
-import type { NFT, NFTMetadata } from '@/lib/constants';
-import { CONTRACT_ADDRESSES } from '@/lib/constants';
-import { publicClient } from '@/lib/web3';
-import { useCallback, useEffect, useState } from 'react';
-import toast from 'react-hot-toast';
-import { sepolia } from 'viem/chains';
-import { useWallet } from './useWallet';
+import { MARKETPLACE_CONTRACT_ABI, NFT_CONTRACT_ABI } from "@/lib/abi";
+import type { NFT, NFTMetadata } from "@/lib/constants";
+import { CONTRACT_ADDRESSES } from "@/lib/constants";
+import { publicClient } from "@/lib/web3";
+import { useCallback, useEffect, useState } from "react";
+import toast from "react-hot-toast";
+import { encodeFunctionData } from "viem";
+import { useBiconomy } from "./useBiconomy";
+import { useWallet } from "./useWallet";
 
 export function useNFTs() {
-  const { walletClient, address } = useWallet();
+  const { authenticated, address } = useWallet();
+  const { smartAccount, initializeBiconomyAccount, executeUserOp } = useBiconomy();
   const [nfts, setNfts] = useState<NFT[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -20,14 +22,14 @@ export function useNFTs() {
   const fetchMetadata = useCallback(async (tokenURI: string): Promise<NFTMetadata | null> => {
     try {
       // IPFSのURLを変換
-      const url = tokenURI.startsWith('ipfs://') 
+      const url = tokenURI.startsWith("ipfs://")
         ? `https://ipfs.io/ipfs/${tokenURI.slice(7)}`
         : tokenURI;
-      
+
       const response = await fetch(url);
       return await response.json();
     } catch (error) {
-      console.error('メタデータ取得エラー:', error);
+      console.error("メタデータ取得エラー:", error);
       return null;
     }
   }, []);
@@ -40,11 +42,11 @@ export function useNFTs() {
       const result = await publicClient.readContract({
         address: CONTRACT_ADDRESSES.MARKETPLACE_CONTRACT,
         abi: MARKETPLACE_CONTRACT_ABI,
-        functionName: 'getActiveListings',
+        functionName: "getActiveListings",
       });
       return result;
     } catch (error) {
-      console.error('出品情報取得エラー:', error);
+      console.error("出品情報取得エラー:", error);
       return [[], []];
     }
   }, []);
@@ -69,7 +71,7 @@ export function useNFTs() {
           const tokenURI = await publicClient.readContract({
             address: CONTRACT_ADDRESSES.NFT_CONTRACT,
             abi: NFT_CONTRACT_ABI,
-            functionName: 'tokenURI',
+            functionName: "tokenURI",
             args: [listingData.tokenId],
           });
 
@@ -89,7 +91,7 @@ export function useNFTs() {
 
           return nft;
         } catch (error) {
-          console.error('NFT情報取得エラー:', error);
+          console.error("NFT情報取得エラー:", error);
           return null;
         }
       });
@@ -97,7 +99,7 @@ export function useNFTs() {
       const results = await Promise.all(nftPromises);
       return results.filter((nft): nft is NFT => nft !== null);
     } catch (error) {
-      console.error('出品NFT取得エラー:', error);
+      console.error("出品NFT取得エラー:", error);
       return [];
     }
   }, [getActiveListings, fetchMetadata]);
@@ -111,17 +113,17 @@ export function useNFTs() {
       const balance = await publicClient.readContract({
         address: CONTRACT_ADDRESSES.NFT_CONTRACT,
         abi: NFT_CONTRACT_ABI,
-        functionName: 'balanceOf',
+        functionName: "balanceOf",
         args: [userAddress as `0x${string}`],
       });
 
       // 各NFTの情報を取得（実装を簡略化）
       // 実際の実装では、イベントログやインデックスサービスを使用する
       console.log(`ユーザー ${userAddress} は ${balance} 個のNFTを保有しています`);
-      
+
       return [];
     } catch (error) {
-      console.error('ユーザーNFT取得エラー:', error);
+      console.error("ユーザーNFT取得エラー:", error);
       return [];
     }
   };
@@ -130,29 +132,43 @@ export function useNFTs() {
    * NFTを購入する
    */
   const buyNFT = async (listingId: string, price: string) => {
-    if (!walletClient || !address) {
-      toast.error('ウォレットが接続されていません');
+    if (!authenticated || !address) {
+      toast.error("ウォレットが接続されていません");
       return false;
     }
 
     try {
       setLoading(true);
-      
-      const hash = await walletClient.writeContract({
-        address: CONTRACT_ADDRESSES.MARKETPLACE_CONTRACT,
+
+      // Biconomyアカウントを初期化（まだの場合）
+      let nexusClient = smartAccount;
+      if (!nexusClient) {
+        const result = await initializeBiconomyAccount();
+        nexusClient = result.nexusClient;
+      }
+
+      // function call dataを作成
+      const functionCallData = encodeFunctionData({
         abi: MARKETPLACE_CONTRACT_ABI,
-        functionName: 'buyNFT',
+        functionName: "buyNFT",
         args: [BigInt(listingId)],
-        value: BigInt(Math.floor(Number.parseFloat(price) * 1e18)),
-        chain: sepolia,
-        account: address as `0x${string}`,
       });
 
-      toast.success('NFTの購入が完了しました！');
-      return true;
+      // ユーザーオペレーションを実行
+      const hash = await executeUserOp(
+        nexusClient,
+        CONTRACT_ADDRESSES.MARKETPLACE_CONTRACT,
+        functionCallData as `0x${string}`
+      );
+
+      if (hash) {
+        toast.success("NFTの購入が完了しました！");
+        return true;
+      }
+      return false;
     } catch (error) {
-      console.error('NFT購入エラー:', error);
-      toast.error('NFTの購入に失敗しました');
+      console.error("NFT購入エラー:", error);
+      toast.error("NFTの購入に失敗しました");
       return false;
     } finally {
       setLoading(false);
@@ -163,43 +179,59 @@ export function useNFTs() {
    * NFTを出品する
    */
   const listNFT = async (tokenId: string, price: string) => {
-    if (!walletClient || !address) {
-      toast.error('ウォレットが接続されていません');
+    if (!authenticated || !address) {
+      toast.error("ウォレットが接続されていません");
       return false;
     }
 
     try {
       setLoading(true);
 
+      // Biconomyアカウントを初期化（まだの場合）
+      let nexusClient = smartAccount;
+      if (!nexusClient) {
+        const result = await initializeBiconomyAccount();
+        nexusClient = result.nexusClient;
+      }
+
       // まずマーケットプレイスにNFTの承認を与える
-      await walletClient.writeContract({
-        address: CONTRACT_ADDRESSES.NFT_CONTRACT,
+      const approveCallData = encodeFunctionData({
         abi: NFT_CONTRACT_ABI,
-        functionName: 'approve',
+        functionName: "approve",
         args: [CONTRACT_ADDRESSES.MARKETPLACE_CONTRACT, BigInt(tokenId)],
-        chain: sepolia,
-        account: address as `0x${string}`,
       });
 
+      await executeUserOp(
+        nexusClient,
+        CONTRACT_ADDRESSES.NFT_CONTRACT,
+        approveCallData as `0x${string}`
+      );
+
       // NFTを出品する
-      const hash = await walletClient.writeContract({
-        address: CONTRACT_ADDRESSES.MARKETPLACE_CONTRACT,
+      const listCallData = encodeFunctionData({
         abi: MARKETPLACE_CONTRACT_ABI,
-        functionName: 'listNFT',
+        functionName: "listNFT",
         args: [
           CONTRACT_ADDRESSES.NFT_CONTRACT,
           BigInt(tokenId),
-          BigInt(Math.floor(Number.parseFloat(price) * 1e18))
+          BigInt(Math.floor(Number.parseFloat(price) * 1e18)),
         ],
-        chain: sepolia,
-        account: address as `0x${string}`,
       });
 
-      toast.success('NFTが出品されました！');
-      return true;
+      const hash = await executeUserOp(
+        nexusClient,
+        CONTRACT_ADDRESSES.MARKETPLACE_CONTRACT,
+        listCallData as `0x${string}`
+      );
+
+      if (hash) {
+        toast.success("NFTが出品されました！");
+        return true;
+      }
+      return false;
     } catch (error) {
-      console.error('NFT出品エラー:', error);
-      toast.error('NFTの出品に失敗しました');
+      console.error("NFT出品エラー:", error);
+      toast.error("NFTの出品に失敗しました");
       return false;
     } finally {
       setLoading(false);

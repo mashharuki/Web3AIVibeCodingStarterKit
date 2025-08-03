@@ -83,15 +83,13 @@ describe("NFTContract", function () {
     it("ミント手数料が不足している場合はリバートする", async function () {
       // 不十分な手数料でミントを試行
       await expect(
-        nftContract
-          .connect(accounts.creator)
-          .mintNFT(
-            accounts.creator.address,
-            TEST_CONSTANTS.TOKEN_URI,
-            accounts.royaltyRecipient.address,
-            TEST_CONSTANTS.ROYALTY_FEE,
-            { value: ethers.parseEther("0.005") } // 必要な手数料の半分
-          )
+        nftContract.connect(accounts.creator).mintNFT(
+          accounts.creator.address,
+          TEST_CONSTANTS.TOKEN_URI,
+          accounts.royaltyRecipient.address,
+          TEST_CONSTANTS.ROYALTY_FEE,
+          { value: ethers.parseEther("0.005") } // 必要な手数料の半分
+        )
       ).to.be.revertedWith("Insufficient mint fee");
     });
 
@@ -163,7 +161,7 @@ describe("NFTContract", function () {
 
     it("正しいロイヤリティ情報が設定されている", async function () {
       const [recipient, amount] = await nftContract.royaltyInfo(1n, ethers.parseEther("1"));
-      
+
       expect(recipient).to.equal(accounts.royaltyRecipient.address);
       // 5%のロイヤリティ = 0.05 ETH
       expect(amount).to.equal(ethers.parseEther("0.05"));
@@ -204,9 +202,7 @@ describe("NFTContract", function () {
 
     it("存在しないトークンのロイヤリティ更新はリバートする", async function () {
       await expect(
-        nftContract
-          .connect(accounts.creator)
-          .updateTokenRoyalty(999n, accounts.buyer.address, 1000)
+        nftContract.connect(accounts.creator).updateTokenRoyalty(999n, accounts.buyer.address, 1000)
       ).to.be.revertedWith("Token does not exist");
     });
   });
@@ -243,7 +239,9 @@ describe("NFTContract", function () {
       }
 
       const ownerBalanceBefore = await getBalance(accounts.owner.address);
-      const contractBalance = await getBalance((nftContract as unknown as { target: string }).target);
+      const contractBalance = await getBalance(
+        (nftContract as unknown as { target: string }).target
+      );
 
       // 手数料を引き出し
       const tx = await nftContract.connect(accounts.owner).withdrawFees();
@@ -260,8 +258,9 @@ describe("NFTContract", function () {
     });
 
     it("手数料がない場合は引き出しをリバートする", async function () {
-      await expect(nftContract.connect(accounts.owner).withdrawFees())
-        .to.be.revertedWith("No fees to withdraw");
+      await expect(nftContract.connect(accounts.owner).withdrawFees()).to.be.revertedWith(
+        "No fees to withdraw"
+      );
     });
   });
 
@@ -295,7 +294,7 @@ describe("NFTContract", function () {
     it("オーナーが一時停止を解除できる", async function () {
       // 一時停止してから解除
       await nftContract.connect(accounts.owner).pause();
-      
+
       await expect(nftContract.connect(accounts.owner).unpause())
         .to.emit(nftContract, "Unpaused")
         .withArgs(accounts.owner.address);
@@ -334,18 +333,21 @@ describe("NFTContract", function () {
    */
   describe("エラーケース", function () {
     it("存在しないトークンのURIを取得しようとするとリバートする", async function () {
-      await expect(nftContract.tokenURI(999n))
-        .to.be.revertedWithCustomError(nftContract, "ERC721NonexistentToken");
+      await expect(nftContract.tokenURI(999n)).to.be.revertedWithCustomError(
+        nftContract,
+        "ERC721NonexistentToken"
+      );
     });
 
     it("存在しないトークンの所有者を取得しようとするとリバートする", async function () {
-      await expect(nftContract.ownerOf(999n))
-        .to.be.revertedWithCustomError(nftContract, "ERC721NonexistentToken");
+      await expect(nftContract.ownerOf(999n)).to.be.revertedWithCustomError(
+        nftContract,
+        "ERC721NonexistentToken"
+      );
     });
 
     it("存在しないトークンの作成者を取得しようとするとリバートする", async function () {
-      await expect(nftContract.getCreator(999n))
-        .to.be.revertedWith("Token does not exist");
+      await expect(nftContract.getCreator(999n)).to.be.revertedWith("Token does not exist");
     });
   });
 });

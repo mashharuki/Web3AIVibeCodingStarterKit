@@ -1,11 +1,18 @@
-'use client';
+"use client";
 
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import type { NFT } from '@/lib/constants';
-import { formatPrice } from '@/lib/web3';
-import Image from 'next/image';
-import { useState } from 'react';
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import type { NFT } from "@/lib/constants";
+import { formatPrice } from "@/lib/web3";
+import Image from "next/image";
+import { useState } from "react";
 
 interface NFTCardProps {
   nft: NFT;
@@ -19,13 +26,13 @@ export function NFTCard({ nft, onBuy, onView, showBuyButton = true }: NFTCardPro
 
   const getImageSrc = () => {
     if (imageError || !nft.metadata?.image) {
-      return '/placeholder-nft.png';
+      return "/placeholder-nft.png";
     }
-    
-    if (nft.metadata.image.startsWith('ipfs://')) {
+
+    if (nft.metadata.image.startsWith("ipfs://")) {
       return `https://ipfs.io/ipfs/${nft.metadata.image.slice(7)}`;
     }
-    
+
     return nft.metadata.image;
   };
 
@@ -48,15 +55,15 @@ export function NFTCard({ nft, onBuy, onView, showBuyButton = true }: NFTCardPro
           )}
         </div>
       </CardHeader>
-      
+
       <CardContent className="p-4">
         <CardTitle className="text-lg mb-2 line-clamp-1">
           {nft.metadata?.name || `NFT #${nft.tokenId}`}
         </CardTitle>
         <CardDescription className="text-sm text-gray-600 mb-3 line-clamp-2">
-          {nft.metadata?.description || 'No description available'}
+          {nft.metadata?.description || "No description available"}
         </CardDescription>
-        
+
         {nft.metadata?.attributes && nft.metadata.attributes.length > 0 && (
           <div className="mb-3">
             <p className="text-xs text-gray-500 mb-1">属性</p>
@@ -72,12 +79,12 @@ export function NFTCard({ nft, onBuy, onView, showBuyButton = true }: NFTCardPro
             </div>
           </div>
         )}
-        
+
         <div className="flex items-center justify-between mb-3">
           <div>
             <p className="text-xs text-gray-500">価格</p>
             <p className="font-bold text-lg text-nft-primary">
-              {nft.price ? `${formatPrice(nft.price)} ETH` : '非売品'}
+              {nft.price ? `${formatPrice(nft.price)} ETH` : "非売品"}
             </p>
           </div>
           <div className="text-right">
@@ -88,14 +95,9 @@ export function NFTCard({ nft, onBuy, onView, showBuyButton = true }: NFTCardPro
           </div>
         </div>
       </CardContent>
-      
+
       <CardFooter className="p-4 pt-0 gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          className="flex-1"
-          onClick={() => onView?.(nft)}
-        >
+        <Button variant="outline" size="sm" className="flex-1" onClick={() => onView?.(nft)}>
           詳細を見る
         </Button>
         {showBuyButton && nft.isListed && nft.price && (

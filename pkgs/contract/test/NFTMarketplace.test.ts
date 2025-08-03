@@ -8,7 +8,7 @@ import {
   deployMarketplace,
   deployNFTContract,
   getTestAccounts,
-  mintTestNFT
+  mintTestNFT,
 } from "./helpers/testHelpers";
 
 /**
@@ -29,7 +29,7 @@ describe("NFTMarketplace", () => {
    */
   beforeEach(async () => {
     accounts = await getTestAccounts();
-    
+
     // コントラクトをデプロイ
     nftContract = await deployNFTContract(accounts.owner.address);
     marketplace = await deployMarketplace(accounts.owner.address);
@@ -45,7 +45,9 @@ describe("NFTMarketplace", () => {
     );
 
     // マーケットプレイスにNFTの操作権限を付与
-    await nftContract.connect(accounts.seller).setApprovalForAll((marketplace as unknown as { target: string }).target, true);
+    await nftContract
+      .connect(accounts.seller)
+      .setApprovalForAll((marketplace as unknown as { target: string }).target, true);
   });
 
   /**
@@ -66,11 +68,19 @@ describe("NFTMarketplace", () => {
    */
   describe("NFT出品", () => {
     it("正常にNFTを出品できる", async () => {
-      const tx = await marketplace.connect(accounts.seller).listNFT((nftContract as unknown as { target: string }).target, 1, LISTING_PRICE);
+      const tx = await marketplace
+        .connect(accounts.seller)
+        .listNFT((nftContract as unknown as { target: string }).target, 1, LISTING_PRICE);
 
       await expect(tx)
         .to.emit(marketplace, "NFTListed")
-        .withArgs(1, accounts.seller.address, (nftContract as unknown as { target: string }).target, 1, LISTING_PRICE);
+        .withArgs(
+          1,
+          accounts.seller.address,
+          (nftContract as unknown as { target: string }).target,
+          1,
+          LISTING_PRICE
+        );
 
       const listing = await marketplace.listings(1);
       expect(listing.seller).to.equal(accounts.seller.address);
@@ -82,32 +92,44 @@ describe("NFTMarketplace", () => {
 
     it("NFTの所有者でない場合は出品できない", async () => {
       await expect(
-        marketplace.connect(accounts.buyer).listNFT((nftContract as unknown as { target: string }).target, 1, LISTING_PRICE)
+        marketplace
+          .connect(accounts.buyer)
+          .listNFT((nftContract as unknown as { target: string }).target, 1, LISTING_PRICE)
       ).to.be.revertedWith("Not the owner of the token");
     });
 
     it("価格が0の場合は出品できない", async () => {
       await expect(
-        marketplace.connect(accounts.seller).listNFT((nftContract as unknown as { target: string }).target, 1, 0)
+        marketplace
+          .connect(accounts.seller)
+          .listNFT((nftContract as unknown as { target: string }).target, 1, 0)
       ).to.be.revertedWith("Price must be greater than 0");
     });
 
     it("マーケットプレイスが承認されていない場合は出品できない", async () => {
       // 承認を取り消し
-      await nftContract.connect(accounts.seller).setApprovalForAll((marketplace as unknown as { target: string }).target, false);
+      await nftContract
+        .connect(accounts.seller)
+        .setApprovalForAll((marketplace as unknown as { target: string }).target, false);
 
       await expect(
-        marketplace.connect(accounts.seller).listNFT((nftContract as unknown as { target: string }).target, 1, LISTING_PRICE)
+        marketplace
+          .connect(accounts.seller)
+          .listNFT((nftContract as unknown as { target: string }).target, 1, LISTING_PRICE)
       ).to.be.revertedWith("Marketplace not approved");
     });
 
     it("既に出品済みのトークンは再出品できない", async () => {
       // 最初の出品
-      await marketplace.connect(accounts.seller).listNFT((nftContract as unknown as { target: string }).target, 1, LISTING_PRICE);
+      await marketplace
+        .connect(accounts.seller)
+        .listNFT((nftContract as unknown as { target: string }).target, 1, LISTING_PRICE);
 
       // 2回目の出品（失敗するはず）
       await expect(
-        marketplace.connect(accounts.seller).listNFT((nftContract as unknown as { target: string }).target, 1, LISTING_PRICE)
+        marketplace
+          .connect(accounts.seller)
+          .listNFT((nftContract as unknown as { target: string }).target, 1, LISTING_PRICE)
       ).to.be.revertedWith("Token already listed");
     });
   });
@@ -118,7 +140,9 @@ describe("NFTMarketplace", () => {
   describe("NFT購入", () => {
     beforeEach(async () => {
       // NFTを出品
-      await marketplace.connect(accounts.seller).listNFT((nftContract as unknown as { target: string }).target, 1, LISTING_PRICE);
+      await marketplace
+        .connect(accounts.seller)
+        .listNFT((nftContract as unknown as { target: string }).target, 1, LISTING_PRICE);
     });
 
     it("正常にNFTを購入できる", async () => {
@@ -126,7 +150,14 @@ describe("NFTMarketplace", () => {
 
       await expect(tx)
         .to.emit(marketplace, "NFTSold")
-        .withArgs(1, accounts.seller.address, accounts.buyer.address, (nftContract as unknown as { target: string }).target, 1, LISTING_PRICE);
+        .withArgs(
+          1,
+          accounts.seller.address,
+          accounts.buyer.address,
+          (nftContract as unknown as { target: string }).target,
+          1,
+          LISTING_PRICE
+        );
 
       // NFTの所有者が変更されているか確認
       expect(await nftContract.ownerOf(1)).to.equal(accounts.buyer.address);
@@ -160,12 +191,16 @@ describe("NFTMarketplace", () => {
     });
 
     it("ロイヤリティが正しく支払われる", async () => {
-      const initialRoyaltyBalance = await ethers.provider.getBalance(accounts.royaltyRecipient.address);
+      const initialRoyaltyBalance = await ethers.provider.getBalance(
+        accounts.royaltyRecipient.address
+      );
       const initialSellerBalance = await ethers.provider.getBalance(accounts.seller.address);
 
       await marketplace.connect(accounts.buyer).buyNFT(1, { value: LISTING_PRICE });
 
-      const finalRoyaltyBalance = await ethers.provider.getBalance(accounts.royaltyRecipient.address);
+      const finalRoyaltyBalance = await ethers.provider.getBalance(
+        accounts.royaltyRecipient.address
+      );
       const finalSellerBalance = await ethers.provider.getBalance(accounts.seller.address);
 
       const expectedRoyalty = (LISTING_PRICE * BigInt(TEST_CONSTANTS.ROYALTY_FEE)) / BigInt(10000);
@@ -199,7 +234,9 @@ describe("NFTMarketplace", () => {
   describe("出品キャンセル", () => {
     beforeEach(async () => {
       // NFTを出品
-      await marketplace.connect(accounts.seller).listNFT((nftContract as unknown as { target: string }).target, 1, LISTING_PRICE);
+      await marketplace
+        .connect(accounts.seller)
+        .listNFT((nftContract as unknown as { target: string }).target, 1, LISTING_PRICE);
     });
 
     it("出品者が出品をキャンセルできる", async () => {
@@ -207,7 +244,12 @@ describe("NFTMarketplace", () => {
 
       await expect(tx)
         .to.emit(marketplace, "ListingCancelled")
-        .withArgs(1, accounts.seller.address, (nftContract as unknown as { target: string }).target, 1);
+        .withArgs(
+          1,
+          accounts.seller.address,
+          (nftContract as unknown as { target: string }).target,
+          1
+        );
 
       const listing = await marketplace.listings(1);
       expect(listing.active).to.be.false;
@@ -239,11 +281,20 @@ describe("NFTMarketplace", () => {
     it("正常にオファーを作成できる", async () => {
       const tx = await marketplace
         .connect(accounts.buyer)
-        .makeOffer((nftContract as unknown as { target: string }).target, 1, EXPIRATION_TIME, { value: OFFER_AMOUNT });
+        .makeOffer((nftContract as unknown as { target: string }).target, 1, EXPIRATION_TIME, {
+          value: OFFER_AMOUNT,
+        });
 
       await expect(tx)
         .to.emit(marketplace, "OfferMade")
-        .withArgs(1, accounts.buyer.address, (nftContract as unknown as { target: string }).target, 1, OFFER_AMOUNT, EXPIRATION_TIME);
+        .withArgs(
+          1,
+          accounts.buyer.address,
+          (nftContract as unknown as { target: string }).target,
+          1,
+          OFFER_AMOUNT,
+          EXPIRATION_TIME
+        );
 
       const offer = await marketplace.offers(1);
       expect(offer.bidder).to.equal(accounts.buyer.address);
@@ -257,13 +308,19 @@ describe("NFTMarketplace", () => {
       await expect(
         marketplace
           .connect(accounts.seller)
-          .makeOffer((nftContract as unknown as { target: string }).target, 1, EXPIRATION_TIME, { value: OFFER_AMOUNT })
+          .makeOffer((nftContract as unknown as { target: string }).target, 1, EXPIRATION_TIME, {
+            value: OFFER_AMOUNT,
+          })
       ).to.be.revertedWith("Cannot offer on your own NFT");
     });
 
     it("オファー金額が0の場合は作成できない", async () => {
       await expect(
-        marketplace.connect(accounts.buyer).makeOffer((nftContract as unknown as { target: string }).target, 1, EXPIRATION_TIME, { value: 0 })
+        marketplace
+          .connect(accounts.buyer)
+          .makeOffer((nftContract as unknown as { target: string }).target, 1, EXPIRATION_TIME, {
+            value: 0,
+          })
       ).to.be.revertedWith("Offer amount must be greater than 0");
     });
 
@@ -273,7 +330,9 @@ describe("NFTMarketplace", () => {
       await expect(
         marketplace
           .connect(accounts.buyer)
-          .makeOffer((nftContract as unknown as { target: string }).target, 1, pastTime, { value: OFFER_AMOUNT })
+          .makeOffer((nftContract as unknown as { target: string }).target, 1, pastTime, {
+            value: OFFER_AMOUNT,
+          })
       ).to.be.revertedWith("Invalid expiration time");
     });
   });
@@ -289,7 +348,9 @@ describe("NFTMarketplace", () => {
       // オファーを作成
       await marketplace
         .connect(accounts.buyer)
-        .makeOffer((nftContract as unknown as { target: string }).target, 1, EXPIRATION_TIME, { value: OFFER_AMOUNT });
+        .makeOffer((nftContract as unknown as { target: string }).target, 1, EXPIRATION_TIME, {
+          value: OFFER_AMOUNT,
+        });
 
       offerId = 1; // 最初のオファーIDは1
     });
@@ -299,7 +360,14 @@ describe("NFTMarketplace", () => {
 
       await expect(tx)
         .to.emit(marketplace, "OfferAccepted")
-        .withArgs(offerId, accounts.seller.address, accounts.buyer.address, (nftContract as unknown as { target: string }).target, 1, OFFER_AMOUNT);
+        .withArgs(
+          offerId,
+          accounts.seller.address,
+          accounts.buyer.address,
+          (nftContract as unknown as { target: string }).target,
+          1,
+          OFFER_AMOUNT
+        );
 
       // NFTの所有者が変更されているか確認
       expect(await nftContract.ownerOf(1)).to.equal(accounts.buyer.address);
@@ -336,7 +404,9 @@ describe("NFTMarketplace", () => {
       // オファーを作成
       await marketplace
         .connect(accounts.buyer)
-        .makeOffer((nftContract as unknown as { target: string }).target, 1, EXPIRATION_TIME, { value: OFFER_AMOUNT });
+        .makeOffer((nftContract as unknown as { target: string }).target, 1, EXPIRATION_TIME, {
+          value: OFFER_AMOUNT,
+        });
 
       offerId = 1;
     });
@@ -352,7 +422,12 @@ describe("NFTMarketplace", () => {
 
       await expect(tx)
         .to.emit(marketplace, "OfferCancelled")
-        .withArgs(offerId, accounts.buyer.address, (nftContract as unknown as { target: string }).target, 1);
+        .withArgs(
+          offerId,
+          accounts.buyer.address,
+          (nftContract as unknown as { target: string }).target,
+          1
+        );
 
       const finalBalance = await ethers.provider.getBalance(accounts.buyer.address);
       // オファーがキャンセルされてガス代を引いても返金されるので、元の残高に近い値になる
@@ -387,9 +462,9 @@ describe("NFTMarketplace", () => {
     it("手数料が高すぎる場合は更新できない", async () => {
       const highFee = 1500; // 15%
 
-      await expect(marketplace.connect(accounts.owner).updateMarketplaceFee(highFee)).to.be.revertedWith(
-        "Fee too high"
-      );
+      await expect(
+        marketplace.connect(accounts.owner).updateMarketplaceFee(highFee)
+      ).to.be.revertedWith("Fee too high");
     });
 
     it("オーナー以外は手数料を更新できない", async () => {
@@ -412,13 +487,17 @@ describe("NFTMarketplace", () => {
       await marketplace.connect(accounts.owner).pause();
 
       await expect(
-        marketplace.connect(accounts.seller).listNFT((nftContract as unknown as { target: string }).target, 1, LISTING_PRICE)
+        marketplace
+          .connect(accounts.seller)
+          .listNFT((nftContract as unknown as { target: string }).target, 1, LISTING_PRICE)
       ).to.be.revertedWithCustomError(marketplace, "EnforcedPause");
     });
 
     it("一時停止中は購入できない", async () => {
       // 出品してから一時停止
-      await marketplace.connect(accounts.seller).listNFT((nftContract as unknown as { target: string }).target, 1, LISTING_PRICE);
+      await marketplace
+        .connect(accounts.seller)
+        .listNFT((nftContract as unknown as { target: string }).target, 1, LISTING_PRICE);
 
       await marketplace.connect(accounts.owner).pause();
 
@@ -436,7 +515,9 @@ describe("NFTMarketplace", () => {
       expect(await marketplace.getSalesHistoryCount()).to.equal(0n);
 
       // NFTを出品して購入
-      await marketplace.connect(accounts.seller).listNFT((nftContract as unknown as { target: string }).target, 1, LISTING_PRICE);
+      await marketplace
+        .connect(accounts.seller)
+        .listNFT((nftContract as unknown as { target: string }).target, 1, LISTING_PRICE);
 
       await marketplace.connect(accounts.buyer).buyNFT(1, { value: LISTING_PRICE });
 
@@ -446,13 +527,25 @@ describe("NFTMarketplace", () => {
     it("トークンのオファー数を取得できる", async () => {
       const EXPIRATION_TIME = Math.floor(Date.now() / 1000) + 3600;
 
-      expect(await marketplace.getTokenOffersCount((nftContract as unknown as { target: string }).target, 1)).to.equal(0n);
+      expect(
+        await marketplace.getTokenOffersCount(
+          (nftContract as unknown as { target: string }).target,
+          1
+        )
+      ).to.equal(0n);
 
       await marketplace
         .connect(accounts.buyer)
-        .makeOffer((nftContract as unknown as { target: string }).target, 1, EXPIRATION_TIME, { value: OFFER_AMOUNT });
+        .makeOffer((nftContract as unknown as { target: string }).target, 1, EXPIRATION_TIME, {
+          value: OFFER_AMOUNT,
+        });
 
-      expect(await marketplace.getTokenOffersCount((nftContract as unknown as { target: string }).target, 1)).to.equal(1n);
+      expect(
+        await marketplace.getTokenOffersCount(
+          (nftContract as unknown as { target: string }).target,
+          1
+        )
+      ).to.equal(1n);
     });
   });
 });

@@ -1,5 +1,5 @@
-import { createPublicClient, createWalletClient, custom, http } from 'viem';
-import { sepolia } from 'viem/chains';
+import { createPublicClient, createWalletClient, custom, http } from "viem";
+import { sepolia } from "viem/chains";
 
 // EthereumProvider型の定義
 interface EthereumProvider {
@@ -37,7 +37,7 @@ export const truncateAddress = (address: string): string => {
 
 export const formatPrice = (price: string): string => {
   const num = Number.parseFloat(price);
-  if (num === 0) return '0';
-  if (num < 0.001) return '< 0.001';
+  if (num === 0) return "0";
+  if (num < 0.001) return "< 0.001";
   return num.toFixed(3);
 };

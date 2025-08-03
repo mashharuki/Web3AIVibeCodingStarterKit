@@ -1,38 +1,38 @@
-'use client';
+"use client";
 
-import { NFTCard } from '@/components/nft-card-improved';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { useNFTs } from '@/hooks/useNFTs';
-import { useWallet } from '@/hooks/useWallet';
-import type { NFT } from '@/lib/constants';
-import { useEffect, useState } from 'react';
+import { NFTCard } from "@/components/nft-card-improved";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { useNFTs } from "@/hooks/useNFTs";
+import { useWallet } from "@/hooks/useWallet";
+import type { NFT } from "@/lib/constants";
+import { useEffect, useState } from "react";
 
 const categories = [
-  { id: 'all', label: 'すべて' },
-  { id: 'art', label: 'アート' },
-  { id: 'music', label: 'ミュージック' },
-  { id: 'photography', label: '写真' },
-  { id: 'gaming', label: 'ゲーム' },
-  { id: 'sport', label: 'スポーツ' },
-  { id: 'utility', label: 'ユーティリティ' },
+  { id: "all", label: "すべて" },
+  { id: "art", label: "アート" },
+  { id: "music", label: "ミュージック" },
+  { id: "photography", label: "写真" },
+  { id: "gaming", label: "ゲーム" },
+  { id: "sport", label: "スポーツ" },
+  { id: "utility", label: "ユーティリティ" },
 ];
 
 const sortOptions = [
-  { id: 'newest', label: '新着順' },
-  { id: 'oldest', label: '古い順' },
-  { id: 'priceHigh', label: '価格: 高い順' },
-  { id: 'priceLow', label: '価格: 安い順' },
-  { id: 'name', label: '名前順' },
+  { id: "newest", label: "新着順" },
+  { id: "oldest", label: "古い順" },
+  { id: "priceHigh", label: "価格: 高い順" },
+  { id: "priceLow", label: "価格: 安い順" },
+  { id: "name", label: "名前順" },
 ];
 
 export default function NFTsPage() {
   const { nfts, loading, fetchListedNFTs } = useNFTs();
   const { authenticated } = useWallet();
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [sortBy, setSortBy] = useState('newest');
-  const [priceRange, setPriceRange] = useState({ min: '', max: '' });
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortBy, setSortBy] = useState("newest");
+  const [priceRange, setPriceRange] = useState({ min: "", max: "" });
   const [showFilters, setShowFilters] = useState(false);
 
   useEffect(() => {
@@ -41,33 +41,37 @@ export default function NFTsPage() {
 
   const filteredAndSortedNFTs = () => {
     const filtered = nfts.filter((nft: NFT) => {
-      const matchesSearch = !searchTerm || 
+      const matchesSearch =
+        !searchTerm ||
         nft.metadata?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         nft.metadata?.description?.toLowerCase().includes(searchTerm.toLowerCase());
-      
-      const matchesCategory = selectedCategory === 'all' || 
-        nft.metadata?.attributes?.some(attr => 
-          attr.trait_type === 'category' && String(attr.value).toLowerCase() === selectedCategory
+
+      const matchesCategory =
+        selectedCategory === "all" ||
+        nft.metadata?.attributes?.some(
+          (attr) =>
+            attr.trait_type === "category" && String(attr.value).toLowerCase() === selectedCategory
         );
 
-      const matchesPriceRange = (!priceRange.min || Number(nft.price) >= Number(priceRange.min)) &&
+      const matchesPriceRange =
+        (!priceRange.min || Number(nft.price) >= Number(priceRange.min)) &&
         (!priceRange.max || Number(nft.price) <= Number(priceRange.max));
-      
+
       return matchesSearch && matchesCategory && matchesPriceRange;
     });
 
     return filtered.sort((a: NFT, b: NFT) => {
       switch (sortBy) {
-        case 'newest':
+        case "newest":
           return Number(b.tokenId) - Number(a.tokenId);
-        case 'oldest':
+        case "oldest":
           return Number(a.tokenId) - Number(b.tokenId);
-        case 'priceHigh':
+        case "priceHigh":
           return Number(b.price) - Number(a.price);
-        case 'priceLow':
+        case "priceLow":
           return Number(a.price) - Number(b.price);
-        case 'name':
-          return (a.metadata?.name || '').localeCompare(b.metadata?.name || '');
+        case "name":
+          return (a.metadata?.name || "").localeCompare(b.metadata?.name || "");
         default:
           return 0;
       }
@@ -107,7 +111,7 @@ export default function NFTsPage() {
               onClick={() => setShowFilters(!showFilters)}
               className="whitespace-nowrap"
             >
-              フィルター {showFilters ? '▲' : '▼'}
+              フィルター {showFilters ? "▲" : "▼"}
             </Button>
           </div>
 
@@ -120,7 +124,7 @@ export default function NFTsPage() {
                     {categories.map((category) => (
                       <Button
                         key={category.id}
-                        variant={selectedCategory === category.id ? 'default' : 'outline'}
+                        variant={selectedCategory === category.id ? "default" : "outline"}
                         size="sm"
                         onClick={() => setSelectedCategory(category.id)}
                       >
@@ -138,7 +142,7 @@ export default function NFTsPage() {
                       step="0.001"
                       placeholder="最小"
                       value={priceRange.min}
-                      onChange={(e) => setPriceRange(prev => ({ ...prev, min: e.target.value }))}
+                      onChange={(e) => setPriceRange((prev) => ({ ...prev, min: e.target.value }))}
                       className="flex-1 px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
                     />
                     <span className="text-muted-foreground">〜</span>
@@ -147,7 +151,7 @@ export default function NFTsPage() {
                       step="0.001"
                       placeholder="最大"
                       value={priceRange.max}
-                      onChange={(e) => setPriceRange(prev => ({ ...prev, max: e.target.value }))}
+                      onChange={(e) => setPriceRange((prev) => ({ ...prev, max: e.target.value }))}
                       className="flex-1 px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
                     />
                   </div>
@@ -181,9 +185,9 @@ export default function NFTsPage() {
             <div className="text-6xl mb-4">🎨</div>
             <h3 className="text-xl font-semibold mb-2">NFTが見つかりませんでした</h3>
             <p className="text-muted-foreground mb-4">
-              {searchTerm || selectedCategory !== 'all' || priceRange.min || priceRange.max
-                ? '検索条件を変更してみてください。'
-                : 'まだNFTが出品されていません。'}
+              {searchTerm || selectedCategory !== "all" || priceRange.min || priceRange.max
+                ? "検索条件を変更してみてください。"
+                : "まだNFTが出品されていません。"}
             </p>
             {authenticated && (
               <Button asChild>
@@ -194,11 +198,11 @@ export default function NFTsPage() {
         ) : (
           <>
             <div className="mb-6 flex justify-between items-center">
-              <p className="text-muted-foreground">
-                {finalNFTs.length} 個のNFTが見つかりました
-              </p>
+              <p className="text-muted-foreground">{finalNFTs.length} 個のNFTが見つかりました</p>
               <div className="text-sm text-muted-foreground">
-                総価値: {finalNFTs.reduce((sum: number, nft: NFT) => sum + Number(nft.price), 0).toFixed(3)} ETH
+                総価値:{" "}
+                {finalNFTs.reduce((sum: number, nft: NFT) => sum + Number(nft.price), 0).toFixed(3)}{" "}
+                ETH
               </div>
             </div>
 

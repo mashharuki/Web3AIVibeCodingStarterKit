@@ -4,18 +4,23 @@ export default function HomePage() {
       {/* Hero Section */}
       <section className="hero-gradient py-20 px-4">
         <div className="container mx-auto text-center">
-          <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
-            NFTマーケットプレイス
-          </h1>
+          <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">NFTマーケットプレイス</h1>
           <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
-            モダンで安全なNFT取引プラットフォーム。<br />
+            モダンで安全なNFT取引プラットフォーム。
+            <br />
             Privyによる認証とBiconomyによるアカウント抽象化で快適な取引体験を提供します。
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button type="button" className="bg-white text-nft-primary px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
+            <button
+              type="button"
+              className="bg-white text-nft-primary px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
+            >
               NFTを探す
             </button>
-            <button type="button" className="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-nft-primary transition-colors">
+            <button
+              type="button"
+              className="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-nft-primary transition-colors"
+            >
               NFTを作成
             </button>
           </div>

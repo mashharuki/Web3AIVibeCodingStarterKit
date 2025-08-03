@@ -11,12 +11,7 @@
     "lint:fix": "biome check --fix .",
     "format": "biome format --write ."
   },
-  "keywords": [
-    "web3",
-    "nft",
-    "marketplace",
-    "ethereum"
-  ],
+  "keywords": ["web3", "nft", "marketplace", "ethereum"],
   "author": "",
   "license": "MIT",
   "devDependencies": {

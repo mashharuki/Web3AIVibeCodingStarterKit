@@ -222,7 +222,10 @@ task("nft:withdraw-fees", "Withdraw accumulated fees")
  */
 task("nft:approve", "Approve marketplace to transfer NFT")
   .addOptionalParam("contract", "NFT contract address (if not provided, will load from outputs)")
-  .addOptionalParam("marketplace", "Marketplace contract address (if not provided, will load from outputs)")
+  .addOptionalParam(
+    "marketplace",
+    "Marketplace contract address (if not provided, will load from outputs)"
+  )
   .addParam("tokenId", "Token ID to approve")
   .setAction(async (taskArgs, hre) => {
     const { ethers } = hre;
@@ -268,7 +271,10 @@ task("nft:approve", "Approve marketplace to transfer NFT")
  */
 task("nft:approve-all", "Approve marketplace to transfer all NFTs")
   .addOptionalParam("contract", "NFT contract address (if not provided, will load from outputs)")
-  .addOptionalParam("marketplace", "Marketplace contract address (if not provided, will load from outputs)")
+  .addOptionalParam(
+    "marketplace",
+    "Marketplace contract address (if not provided, will load from outputs)"
+  )
   .setAction(async (taskArgs, hre) => {
     const { ethers } = hre;
 
@@ -312,7 +318,10 @@ task("nft:approve-all", "Approve marketplace to transfer all NFTs")
  */
 task("nft:check-approval", "Check if marketplace is approved for NFT")
   .addOptionalParam("contract", "NFT contract address (if not provided, will load from outputs)")
-  .addOptionalParam("marketplace", "Marketplace contract address (if not provided, will load from outputs)")
+  .addOptionalParam(
+    "marketplace",
+    "Marketplace contract address (if not provided, will load from outputs)"
+  )
   .addOptionalParam("tokenId", "Token ID to check (optional for individual approval)")
   .addOptionalParam("owner", "Owner address to check (if not provided, will use signer address)")
   .setAction(async (taskArgs, hre) => {
@@ -358,7 +367,8 @@ task("nft:check-approval", "Check if marketplace is approved for NFT")
       // 特定のトークンIDが指定されている場合は個別承認もチェック
       if (taskArgs.tokenId) {
         const approvedAddress = await nftContract.getApproved(taskArgs.tokenId);
-        const isApprovedForToken = approvedAddress.toLowerCase() === marketplaceAddress.toLowerCase();
+        const isApprovedForToken =
+          approvedAddress.toLowerCase() === marketplaceAddress.toLowerCase();
         console.log(`Approved for token ${taskArgs.tokenId}:`, isApprovedForToken);
         console.log("Approved address:", approvedAddress);
       }

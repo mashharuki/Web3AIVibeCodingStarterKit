@@ -1,4 +1,5 @@
 // コントラクト設定
+// NOTE: 以下のアドレスはSepoliaにデプロイ済みのアドレスです
 export const CONTRACT_ADDRESSES = {
   NFT_CONTRACT: "0xEaC471E00787e7360E08C0b9a98BF0160302353e" as const,
   MARKETPLACE_CONTRACT: "0x9C6a56fBBef7EFD2b8dbC5F7DA8a261E00862d51" as const,

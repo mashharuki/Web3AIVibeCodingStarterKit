@@ -6,7 +6,10 @@ import { getContractAddress } from "../../helpers/contractsJsonHelper";
  * NFTを出品するタスク
  */
 task("marketplace:list", "List an NFT for sale")
-  .addOptionalParam("contract", "Marketplace contract address (if not provided, will load from outputs)")
+  .addOptionalParam(
+    "contract",
+    "Marketplace contract address (if not provided, will load from outputs)"
+  )
   .addOptionalParam("nftContract", "NFT contract address (if not provided, will load from outputs)")
   .addParam("tokenId", "Token ID")
   .addParam("price", "Price in ETH")
@@ -69,7 +72,10 @@ task("marketplace:list", "List an NFT for sale")
  * NFTを購入するタスク
  */
 task("marketplace:buy", "Buy an NFT")
-  .addOptionalParam("contract", "Marketplace contract address (if not provided, will load from outputs)")
+  .addOptionalParam(
+    "contract",
+    "Marketplace contract address (if not provided, will load from outputs)"
+  )
   .addParam("listingId", "Listing ID")
   .addParam("price", "Price in ETH")
   .setAction(async (taskArgs, hre) => {
@@ -106,7 +112,10 @@ task("marketplace:buy", "Buy an NFT")
  * 出品をキャンセルするタスク
  */
 task("marketplace:cancel", "Cancel an NFT listing")
-  .addOptionalParam("contract", "Marketplace contract address (if not provided, will load from outputs)")
+  .addOptionalParam(
+    "contract",
+    "Marketplace contract address (if not provided, will load from outputs)"
+  )
   .addParam("listingId", "Listing ID")
   .setAction(async (taskArgs, hre) => {
     const { ethers } = hre;
@@ -139,7 +148,10 @@ task("marketplace:cancel", "Cancel an NFT listing")
  * オファーを作成するタスク
  */
 task("marketplace:offer", "Make an offer on an NFT")
-  .addOptionalParam("contract", "Marketplace contract address (if not provided, will load from outputs)")
+  .addOptionalParam(
+    "contract",
+    "Marketplace contract address (if not provided, will load from outputs)"
+  )
   .addOptionalParam("nftContract", "NFT contract address (if not provided, will load from outputs)")
   .addParam("tokenId", "Token ID")
   .addParam("amount", "Offer amount in ETH")
@@ -178,7 +190,10 @@ task("marketplace:offer", "Make an offer on an NFT")
     console.log("NFT Contract:", nftContractAddress);
     console.log("Token ID:", taskArgs.tokenId);
     console.log("Amount:", taskArgs.amount, "ETH");
-    console.log("Expiration:", new Date(Number.parseInt(taskArgs.expiration) * 1000).toLocaleString());
+    console.log(
+      "Expiration:",
+      new Date(Number.parseInt(taskArgs.expiration) * 1000).toLocaleString()
+    );
 
     const marketplace = await ethers.getContractAt("NFTMarketplace", marketplaceAddress);
 
@@ -211,7 +226,10 @@ task("marketplace:offer", "Make an offer on an NFT")
  * オファーを受諾するタスク
  */
 task("marketplace:accept-offer", "Accept an offer")
-  .addOptionalParam("contract", "Marketplace contract address (if not provided, will load from outputs)")
+  .addOptionalParam(
+    "contract",
+    "Marketplace contract address (if not provided, will load from outputs)"
+  )
   .addParam("offerId", "Offer ID")
   .setAction(async (taskArgs, hre) => {
     const { ethers } = hre;
@@ -244,7 +262,10 @@ task("marketplace:accept-offer", "Accept an offer")
  * オファーをキャンセルするタスク
  */
 task("marketplace:cancel-offer", "Cancel an offer")
-  .addOptionalParam("contract", "Marketplace contract address (if not provided, will load from outputs)")
+  .addOptionalParam(
+    "contract",
+    "Marketplace contract address (if not provided, will load from outputs)"
+  )
   .addParam("offerId", "Offer ID")
   .setAction(async (taskArgs, hre) => {
     const { ethers } = hre;
@@ -277,7 +298,10 @@ task("marketplace:cancel-offer", "Cancel an offer")
  * 出品情報を取得するタスク
  */
 task("marketplace:listing-info", "Get listing information")
-  .addOptionalParam("contract", "Marketplace contract address (if not provided, will load from outputs)")
+  .addOptionalParam(
+    "contract",
+    "Marketplace contract address (if not provided, will load from outputs)"
+  )
   .addParam("listingId", "Listing ID")
   .setAction(async (taskArgs, hre) => {
     const { ethers } = hre;
@@ -317,7 +341,10 @@ task("marketplace:listing-info", "Get listing information")
  * オファー情報を取得するタスク
  */
 task("marketplace:offer-info", "Get offer information")
-  .addOptionalParam("contract", "Marketplace contract address (if not provided, will load from outputs)")
+  .addOptionalParam(
+    "contract",
+    "Marketplace contract address (if not provided, will load from outputs)"
+  )
   .addParam("offerId", "Offer ID")
   .setAction(async (taskArgs, hre) => {
     const { ethers } = hre;
@@ -357,7 +384,10 @@ task("marketplace:offer-info", "Get offer information")
  * 販売履歴を取得するタスク
  */
 task("marketplace:sales-history", "Get sales history")
-  .addOptionalParam("contract", "Marketplace contract address (if not provided, will load from outputs)")
+  .addOptionalParam(
+    "contract",
+    "Marketplace contract address (if not provided, will load from outputs)"
+  )
   .addOptionalParam("count", "Number of recent sales to show", "10")
   .setAction(async (taskArgs, hre) => {
     const { ethers } = hre;
