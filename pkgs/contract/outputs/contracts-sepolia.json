@@ -1,6 +1,10 @@
 {
   "contracts": {
-    "NFTContract": "0x953ae606af2B695EEdF012c0358eB65233CFc4c1",
-    "NFTMarketplace": "0x452D352bc79B7c1eF23AF28D4CF841267b55DE1B"
+    "NFTContract": "0xEaC471E00787e7360E08C0b9a98BF0160302353e",
+    "NFTMarketplace": "0x9C6a56fBBef7EFD2b8dbC5F7DA8a261E00862d51"
+  },
+  "deploymentParams": {
+    "NFTContract": "{\"tokenName\":\"VibeNFT\",\"tokenSymbol\":\"VNFT\",\"mintFee\":\"10000000000000000\",\"owner\":\"0x51908F598A5e0d8F1A3bAbFa6DF76F9704daD072\"}",
+    "NFTMarketplace": "{\"owner\":\"0x51908F598A5e0d8F1A3bAbFa6DF76F9704daD072\"}"
   }
 }

@@ -1,5 +1,5 @@
 import { task } from "hardhat/config";
-import { resetContractAddressesJson, writeContractAddress } from "../../helpers/contractsJsonHelper";
+import { getContractAddress, getDeploymentParams, resetContractAddressesJson, writeContractAddress } from "../../helpers/contractsJsonHelper";
 import FullDeploymentModule from "../../ignition/modules/FullDeployment";
 import NFTContractModule from "../../ignition/modules/NFTContract";
 import NFTMarketplaceModule from "../../ignition/modules/NFTMarketplace";
@@ -66,6 +66,28 @@ task("deploy:full", "Deploy all contracts")
         network: network.name,
       });
       
+      // デプロイメントパラメーターを保存
+      writeContractAddress({
+        group: "deploymentParams",
+        name: "NFTContract",
+        value: JSON.stringify({
+          tokenName: parameters.tokenName,
+          tokenSymbol: parameters.tokenSymbol,
+          mintFee: parameters.mintFee.toString(),
+          owner: parameters.owner,
+        }),
+        network: network.name,
+      });
+      
+      writeContractAddress({
+        group: "deploymentParams",
+        name: "NFTMarketplace", 
+        value: JSON.stringify({
+          owner: parameters.owner,
+        }),
+        network: network.name,
+      });
+      
       console.log(`📝 Contract addresses saved to outputs/contracts-${network.name}.json`);
       
     } catch (error) {
@@ -123,6 +145,19 @@ task("deploy:nft", "Deploy NFT contract only")
         network: network.name,
       });
       
+      // デプロイメントパラメーターを保存
+      writeContractAddress({
+        group: "deploymentParams",
+        name: "NFTContract",
+        value: JSON.stringify({
+          tokenName: parameters.tokenName,
+          tokenSymbol: parameters.tokenSymbol,
+          mintFee: parameters.mintFee.toString(),
+          owner: parameters.owner,
+        }),
+        network: network.name,
+      });
+      
       console.log(`📝 Contract address saved to outputs/contracts-${network.name}.json`);
       
     } catch (error) {
@@ -174,10 +209,132 @@ task("deploy:marketplace", "Deploy marketplace contract only")
         network: network.name,
       });
       
+      // デプロイメントパラメーターを保存
+      writeContractAddress({
+        group: "deploymentParams",
+        name: "NFTMarketplace",
+        value: JSON.stringify({
+          owner: parameters.owner,
+        }),
+        network: network.name,
+      });
+      
       console.log(`📝 Contract address saved to outputs/contracts-${network.name}.json`);
       
     } catch (error) {
       console.error("❌ Marketplace Contract deployment failed:", error);
       throw error;
+    }
+  });
+
+/**
+ * NFTコントラクトをverifyするタスク
+ */
+task("verify:nft", "Verify NFT contract")
+  .addOptionalParam("contract", "NFT contract address (if not provided, will load from outputs)")
+  .setAction(async (taskArgs, hre) => {
+    // NFTコントラクトアドレスの取得
+    let contractAddress: string = taskArgs.contract;
+    if (!contractAddress) {
+      contractAddress = getContractAddress(hre.network.name, "NFTContract") as string;
+      if (!contractAddress) {
+        throw new Error(
+          `NFTContract address not found for network ${hre.network.name}. Please deploy the contract first or provide the address manually.`
+        );
+      }
+    }
+
+    // デプロイメントパラメーターの取得
+    const deploymentParams = getDeploymentParams(hre.network.name, "NFTContract");
+    if (!deploymentParams) {
+      throw new Error(
+        `Deployment parameters not found for NFTContract on network ${hre.network.name}. Please redeploy the contract.`
+      );
+    }
+
+    console.log("Verifying NFT contract...");
+    console.log("Contract address:", contractAddress);
+    console.log("Network:", hre.network.name);
+    console.log("Constructor arguments:", [
+      deploymentParams.tokenName,
+      deploymentParams.tokenSymbol,
+      deploymentParams.mintFee,
+      deploymentParams.owner,
+    ]);
+
+    try {
+      await hre.run("verify:verify", {
+        address: contractAddress,
+        constructorArguments: [
+          deploymentParams.tokenName,
+          deploymentParams.tokenSymbol,
+          deploymentParams.mintFee,
+          deploymentParams.owner,
+        ],
+      });
+      console.log("NFT contract verified successfully!");
+    } catch (error) {
+      console.error("Verification failed:", error);
+    }
+  });
+
+/**
+ * NFTMarketplaceコントラクトをverifyするタスク
+ */
+task("verify:marketplace", "Verify NFTMarketplace contract")
+  .addOptionalParam("contract", "Marketplace contract address (if not provided, will load from outputs)")
+  .setAction(async (taskArgs, hre) => {
+    // マーケットプレイスコントラクトアドレスの取得
+    let contractAddress: string = taskArgs.contract;
+    if (!contractAddress) {
+      contractAddress = getContractAddress(hre.network.name, "NFTMarketplace") as string;
+      if (!contractAddress) {
+        throw new Error(
+          `NFTMarketplace address not found for network ${hre.network.name}. Please deploy the contract first or provide the address manually.`
+        );
+      }
+    }
+
+    // デプロイメントパラメーターの取得
+    const deploymentParams = getDeploymentParams(hre.network.name, "NFTMarketplace");
+    if (!deploymentParams) {
+      throw new Error(
+        `Deployment parameters not found for NFTMarketplace on network ${hre.network.name}. Please redeploy the contract.`
+      );
+    }
+
+    console.log("Verifying NFTMarketplace contract...");
+    console.log("Contract address:", contractAddress);
+    console.log("Network:", hre.network.name);
+    console.log("Constructor arguments:", [deploymentParams.owner]);
+
+    try {
+      await hre.run("verify:verify", {
+        address: contractAddress,
+        constructorArguments: [deploymentParams.owner],
+      });
+      console.log("NFTMarketplace contract verified successfully!");
+    } catch (error) {
+      console.error("Verification failed:", error);
+    }
+  });
+
+/**
+ * 全コントラクトをverifyするタスク
+ */
+task("verify:all", "Verify all contracts")
+  .setAction(async (taskArgs, hre) => {
+    console.log("Verifying all contracts...");
+    
+    try {
+      console.log("\n--- Verifying NFT Contract ---");
+      await hre.run("verify:nft");
+      
+      console.log("\n--- Verifying NFTMarketplace Contract ---");
+      await hre.run("verify:marketplace");
+      
+      console.log("\nAll contracts verified successfully!");
+    } catch (error) {
+      console.error("Verification failed:", error);
     }
   });

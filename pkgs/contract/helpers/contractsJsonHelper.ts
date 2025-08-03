@@ -89,6 +89,24 @@ const getContractAddress = (network: string, contractName: string): string | nul
 };
 
 /**
+ * デプロイメントパラメーターを取得する
+ *
+ * @param network ネットワーク名
+ * @param contractName コントラクト名
+ * @returns デプロイメントパラメーター（存在しない場合はnull）
+ */
+const getDeploymentParams = (network: string, contractName: string): Record<string, unknown> | null => {
+  try {
+    const data = loadDeployedContractAddresses(network);
+    const paramsStr = data?.deploymentParams?.[contractName];
+    return paramsStr ? JSON.parse(paramsStr) : null;
+  } catch (error) {
+    console.log(`Error loading deployment params for ${contractName} on ${network}:`, error);
+    return null;
+  }
+};
+
+/**
  * JSONを更新する内部関数
  *
  * @param group グループ名
@@ -188,9 +206,12 @@ const writeValueToGroup = ({
 };
 
 export {
-  getContractAddress, getFilePath,
-  loadDeployedContractAddresses, resetContractAddressesJson,
-  writeContractAddress,
-  writeValueToGroup
+    getContractAddress,
+    getDeploymentParams,
+    getFilePath,
+    loadDeployedContractAddresses,
+    resetContractAddressesJson,
+    writeContractAddress,
+    writeValueToGroup
 };
 

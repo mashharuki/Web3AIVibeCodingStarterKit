@@ -227,6 +227,24 @@ const getContractAddress = (network: string, contractName: string): string | nul
 };
 
 /**
+ * デプロイメントパラメーターを取得する
+ *
+ * @param network ネットワーク名
+ * @param contractName コントラクト名
+ * @returns デプロイメントパラメーター（存在しない場合はnull）
+ */
+const getDeploymentParams = (network: string, contractName: string): Record<string, unknown> | null => {
+  try {
+    const data = loadDeployedContractAddresses(network);
+    const paramsStr = data?.deploymentParams?.[contractName];
+    return paramsStr ? JSON.parse(paramsStr) : null;
+  } catch (error) {
+    console.log(`Error loading deployment params for ${contractName} on ${network}:`, error);
+    return null;
+  }
+};
+
+/**
  * JSONを更新する内部関数
  *
  * @param group グループ名
@@ -326,11 +344,13 @@ const writeValueToGroup = ({
 };
 
 export {
-  getFilePath,
-  loadDeployedContractAddresses,
-  resetContractAddressesJson,
-  writeContractAddress,
-  writeValueToGroup
+    getContractAddress,
+    getDeploymentParams,
+    getFilePath,
+    loadDeployedContractAddresses,
+    resetContractAddressesJson,
+    writeContractAddress,
+    writeValueToGroup
 };
 ```
 
@@ -366,6 +386,19 @@ const deploy = async () => {
     network: network.name,
   });
 
+  // デプロイメントパラメーターを保存
+  writeContractAddress({
+    group: "deploymentParams",
+    name: "コントラクトの名前",
+    value: JSON.stringify({
+      tokenName: parameters.tokenName,
+      tokenSymbol: parameters.tokenSymbol,
+      mintFee: parameters.mintFee.toString(),
+      owner: parameters.owner,
+    }),
+    network: network.name,
+  });
+
   console.log(
     "##################################### [Deploy END] #####################################",
   );
@@ -374,6 +407,65 @@ const deploy = async () => {
 };
 
 deploy();
+```
+
+デプロイしたスマートコントラクトをVerifyするタスクを作成するようにしてください。
+
+デプロイ時のパラメータは、ヘルパー関数の`getDeploymentParams`を使用して取得できます。
+
+例えば以下のように実装します。
+
+```ts
+/**
+ * NFTコントラクトをverifyするタスク
+ */
+task("verify:nft", "Verify NFT contract")
+  .addOptionalParam("contract", "NFT contract address (if not provided, will load from outputs)")
+  .setAction(async (taskArgs, hre) => {
+    // NFTコントラクトアドレスの取得
+    let contractAddress: string = taskArgs.contract;
+    if (!contractAddress) {
+      contractAddress = getContractAddress(hre.network.name, "NFTContract") as string;
+      if (!contractAddress) {
+        throw new Error(
+          `NFTContract address not found for network ${hre.network.name}. Please deploy the contract first or provide the address manually.`
+        );
+      }
+    }
+
+    // デプロイメントパラメーターの取得
+    const deploymentParams = getDeploymentParams(hre.network.name, "NFTContract");
+    if (!deploymentParams) {
+      throw new Error(
+        `Deployment parameters not found for NFTContract on network ${hre.network.name}. Please redeploy the contract.`
+      );
+    }
+
+    console.log("Verifying NFT contract...");
+    console.log("Contract address:", contractAddress);
+    console.log("Network:", hre.network.name);
+    console.log("Constructor arguments:", [
+      deploymentParams.tokenName,
+      deploymentParams.tokenSymbol,
+      deploymentParams.mintFee,
+      deploymentParams.owner,
+    ]);
+
+    try {
+      await hre.run("verify:verify", {
+        address: contractAddress,
+        constructorArguments: [
+          deploymentParams.tokenName,
+          deploymentParams.tokenSymbol,
+          deploymentParams.mintFee,
+          deploymentParams.owner,
+        ],
+      });
+      console.log("NFT contract verified successfully!");
+    } catch (error) {
+      console.error("Verification failed:", error);
+    }
+  });
 ```
 
 また、デプロイ前に `resetContractAddressesJson` を呼び出して、デプロイ先のネットワークのアドレスJSONファイルをリセットするタスクファイルを実装してください。
@@ -436,6 +528,23 @@ task("reset-all-contracts", "全ネットワークのコントラクトアドレ
     }
   });
 
+```
+
+スマートコントラクトの機能を呼び出すタスクファイルの実装時にはコントラクトのアドレスはコマンドオプションで指定せず、ヘルパー関数の `getContractAddress` を使用して自動的に取得するようにしてください。
+
+例えば以下のように実装してください。
+
+```ts
+// NFTコントラクトアドレスの取得
+let nftContractAddress = taskArgs.contract;
+if (!nftContractAddress) {
+  nftContractAddress = getContractAddress(hre.network.name, "NFTContract");
+  if (!nftContractAddress) {
+    throw new Error(
+      `NFTContract address not found for network ${hre.network.name}. Please deploy the contract first or provide the address manually.`
+    );
+  }
+}
 ```
 
 # .solhint.json の設定

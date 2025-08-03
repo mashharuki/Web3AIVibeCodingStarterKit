@@ -9,7 +9,7 @@
     "deploy:nft": "npx hardhat deploy:nft",
     "deploy:marketplace": "npx hardhat deploy:marketplace",
     "deploy:full": "npx hardhat deploy:full",
-    "verify": "npx hardhat verify",
+    "verify": "npx hardhat verify:all",
     "gas-report": "REPORT_GAS=true npx hardhat test",
     "lint": "solhint contracts/**/*.sol --fix && npx prettier --write contracts/**/*.sol",
     "clean": "npx hardhat clean",

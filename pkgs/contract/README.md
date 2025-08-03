@@ -74,9 +74,6 @@ pnpm deploy:nft --network sepolia
 
 # マーケットプレイスのみデプロイ
 pnpm deploy:marketplace --network sepolia
-
-# 全てのコントラクトをデプロイ
-pnpm deploy:full --network sepolia
 ```
 
 #### カスタムパラメータでのデプロイ
