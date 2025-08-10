@@ -16,6 +16,7 @@ import { TOKEN_INFO, getCurrentContracts } from "@/config/contracts";
 import {
   useAddLiquidity,
   useLPTokenBalance,
+  useOptimalLiquidityAmount,
   usePairInfo,
   useRemoveLiquidity,
 } from "@/hooks/useLiquidity";
@@ -85,6 +86,21 @@ export default function LiquidityPage() {
   );
   const pairInfo = usePairInfo(pairAddress as `0x${string}`);
 
+  // 最適量計算とベーストークンの状態
+  const [baseToken, setBaseToken] = useState<"A" | "B">("A");
+  
+  const {
+    optimalAmountA,
+    optimalAmountB,
+    needsCalculation,
+    reserveA,
+    reserveB,
+    ratio,
+    isCalculating,
+    hasError,
+    error,
+  } = useOptimalLiquidityAmount(pairAddress as `0x${string}`, amountA, amountB, baseToken);
+
   // 承認状況
   const allowanceA = useTokenAllowance(
     contracts.tokens[tokenA],
@@ -108,9 +124,24 @@ export default function LiquidityPage() {
   const handleAddLiquidity = useCallback(async () => {
     if (!address || !amountA || !amountB) return;
 
+    // 最適量を使用
+    const finalAmountA = needsCalculation ? optimalAmountA : amountA;
+    const finalAmountB = needsCalculation ? optimalAmountB : amountB;
+
+    console.log("流動性追加 - 計算された最適量:", {
+      originalA: amountA,
+      originalB: amountB,
+      optimalA: finalAmountA,
+      optimalB: finalAmountB,
+      needsCalculation,
+      reserveA,
+      reserveB,
+      ratio,
+    });
+
     // 承認が必要かチェック
-    const amountAWei = parseEther(amountA);
-    const amountBWei = parseEther(amountB);
+    const amountAWei = parseEther(finalAmountA);
+    const amountBWei = parseEther(finalAmountB);
 
     // TokenAの承認チェック
     if ((allowanceA.data ?? BigInt(0)) < amountAWei) {
@@ -118,7 +149,7 @@ export default function LiquidityPage() {
       await approveTokenA(
         contracts.tokens[tokenA],
         contracts.dex.DexRouter,
-        amountA
+        finalAmountA
       );
       return;
     }
@@ -129,20 +160,20 @@ export default function LiquidityPage() {
       await approveTokenB(
         contracts.tokens[tokenB],
         contracts.dex.DexRouter,
-        amountB
+        finalAmountB
       );
       return;
     }
 
     // 流動性追加実行
-    const amountAMin = (parseEther(amountA) * BigInt(95)) / BigInt(100); // 5%スリッページ許容
-    const amountBMin = (parseEther(amountB) * BigInt(95)) / BigInt(100); // 5%スリッページ許容
+    const amountAMin = (parseEther(finalAmountA) * BigInt(95)) / BigInt(100); // 5%スリッページ許容
+    const amountBMin = (parseEther(finalAmountB) * BigInt(95)) / BigInt(100); // 5%スリッページ許容
 
     await addLiquidity(
       contracts.tokens[tokenA],
       contracts.tokens[tokenB],
-      amountA,
-      amountB,
+      finalAmountA,
+      finalAmountB,
       formatEther(amountAMin),
       formatEther(amountBMin),
       address
@@ -151,6 +182,12 @@ export default function LiquidityPage() {
     address,
     amountA,
     amountB,
+    needsCalculation,
+    optimalAmountA,
+    optimalAmountB,
+    reserveA,
+    reserveB,
+    ratio,
     allowanceA.data,
     allowanceB.data,
     tokenA,
@@ -207,6 +244,39 @@ export default function LiquidityPage() {
     approveLPToken,
     removeLiquidity,
   ]);
+
+  // 最適量の自動入力機能
+  useEffect(() => {
+    if (!needsCalculation || isCalculating) return;
+
+    // TokenAがベースの場合、TokenBを自動更新
+    if (baseToken === "A" && amountA && optimalAmountB !== amountB) {
+      const numOptimalB = Number(optimalAmountB);
+      if (!Number.isNaN(numOptimalB) && numOptimalB > 0) {
+        setAmountB(numOptimalB.toFixed(8).replace(/\.?0+$/, ""));
+      }
+    }
+
+    // TokenBがベースの場合、TokenAを自動更新
+    if (baseToken === "B" && amountB && optimalAmountA !== amountA) {
+      const numOptimalA = Number(optimalAmountA);
+      if (!Number.isNaN(numOptimalA) && numOptimalA > 0) {
+        setAmountA(numOptimalA.toFixed(8).replace(/\.?0+$/, ""));
+      }
+    }
+  }, [optimalAmountA, optimalAmountB, needsCalculation, isCalculating, baseToken, amountA, amountB]);
+
+  // TokenA入力時の処理
+  const handleAmountAChange = useCallback((value: string) => {
+    setAmountA(value);
+    setBaseToken("A");
+  }, []);
+
+  // TokenB入力時の処理
+  const handleAmountBChange = useCallback((value: string) => {
+    setAmountB(value);
+    setBaseToken("B");
+  }, []);
 
   // 承認完了後の自動進行
   useEffect(() => {
@@ -296,7 +366,8 @@ export default function LiquidityPage() {
                       type="number"
                       placeholder="0.0"
                       value={amountA}
-                      onChange={(e) => setAmountA(e.target.value)}
+                      onChange={(e) => handleAmountAChange(e.target.value)}
+                      disabled={isCalculating}
                     />
                     <p className="text-sm text-gray-600">
                       残高:{" "}
@@ -304,6 +375,11 @@ export default function LiquidityPage() {
                         ? formatEther(tokenABalance.data)
                         : "0"}{" "}
                       {TOKEN_INFO[tokenA].symbol}
+                      {baseToken === "A" && (
+                        <span className="ml-2 text-blue-600 font-medium">
+                          (基準)
+                        </span>
+                      )}
                     </p>
                   </div>
 
@@ -332,7 +408,8 @@ export default function LiquidityPage() {
                       type="number"
                       placeholder="0.0"
                       value={amountB}
-                      onChange={(e) => setAmountB(e.target.value)}
+                      onChange={(e) => handleAmountBChange(e.target.value)}
+                      disabled={isCalculating}
                     />
                     <p className="text-sm text-gray-600">
                       残高:{" "}
@@ -340,9 +417,44 @@ export default function LiquidityPage() {
                         ? formatEther(tokenBBalance.data)
                         : "0"}{" "}
                       {TOKEN_INFO[tokenB].symbol}
+                      {baseToken === "B" && (
+                        <span className="ml-2 text-blue-600 font-medium">
+                          (基準)
+                        </span>
+                      )}
                     </p>
                   </div>
                 </div>
+
+                {/* 最適量計算情報とローディング */}
+                {isCalculating && (
+                  <div className="p-4 bg-yellow-50 rounded-lg flex items-center space-x-3">
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-yellow-600" />
+                    <p className="text-yellow-700 font-medium">最適量を計算中...</p>
+                  </div>
+                )}
+
+                {hasError && error && (
+                  <div className="p-4 bg-red-50 rounded-lg">
+                    <p className="text-red-700 font-medium">❌ エラー: {error.message || "計算に失敗しました"}</p>
+                  </div>
+                )}
+
+                {!isCalculating && !hasError && needsCalculation && reserveA && reserveB && (
+                  <div className="p-4 bg-blue-50 rounded-lg space-y-2">
+                    <h4 className="font-medium text-blue-900">📊 プール情報</h4>
+                    <div className="text-sm text-blue-700 space-y-1">
+                      <p>現在のリザーブ: {reserveA.toFixed(6)} TKA / {reserveB.toFixed(6)} TKB</p>
+                      <p>プール比率: 1 TKA = {(reserveB / reserveA).toFixed(6)} TKB</p>
+                      <p className="font-medium">
+                        最適量: {Number(optimalAmountA).toFixed(6)} TKA / {Number(optimalAmountB).toFixed(6)} TKB
+                      </p>
+                      <p className="text-xs text-blue-600">
+                        💡 {baseToken === "A" ? "TokenA" : "TokenB"}を基準にして自動計算されました
+                      </p>
+                    </div>
+                  </div>
+                )}
 
                 <Button
                   onClick={handleAddLiquidity}
