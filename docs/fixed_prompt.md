@@ -21,7 +21,7 @@ NFTマーケットプレイスを開発します。OpenSeaのUI/UXを参考に�
   - ERC721規格準拠のNFTコントラクト
   - NFTマーケットプレイスコントラクト
 
-## フロントUI/UX
+## フロントUI/UXの要件
 - モダンで魅力的なデザイン
 - レスポンシブ
 - Shadcn/ui & Tailwindベース
@@ -78,6 +78,23 @@ NFTマーケットプレイスを開発します。OpenSeaのUI/UXを参考に�
 
 ## フロントエンドの作成を依頼した時のプロンプト
 
+まず要件定義書とタスク一覧表を作成してもらう
+
+```markdown
+スマートコントラクトの開発まであなたに実施してもらったので次はフロントエンドの実装に移行してもらいたいと考えています。
+
+実装を始める前にNFTマーケットプレイスの要件を満たすフロントエンドアプリケーションの要件定義書を作成してもらいたいです。
+
+要件定義書は docs配下にマークダウンファイルで出力してください。
+よろしくお願いします
+```
+
+```markdown
+ここまでの内容を踏まえつつ、フロントエンドアプリケーションを完成させるために必要なタスクをステップごとに箇条書きで列挙していただけないでしょうか？？
+
+その際、docs/task_frontend.md というファイルを作成し、そこに内容を出力してください。よろしくお願いします。
+```
+
 ```markdown
 pkgs/contractにはNFTとNFTマーケットプレイスが実装されたファイル群が格納されています。
 
@@ -91,16 +108,11 @@ Biconomy と Privyインテグレーション例
 GitHub mashharuki/serverless_zk_nft_app
 https://github.com/mashharuki/serverless_zk_nft_app/tree/main/pkgs/frontend
 
-Next.js と Privyインテグレーション例
-以下のリポジトリを参考にしてください。
-https://github.com/privy-io/create-next-app
 
 Tailwind のカスタマイズガイドへのリンク
 https://tailwindcss.com/docs/theme
 https://ui.shadcn.com/docs/theming
 
-Next.jsとBicnomyのインテグレーション例
-https://github.com/bcnmy/examples/tree/main/nextjs-quickstart
 
 use context7
 use deepwiki

@@ -1,0 +1,26 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="512" height="512" rx="64" fill="#3b82f6"/>
+  
+  <!-- NFT Frame -->
+  <rect x="96" y="128" width="320" height="320" rx="24" fill="#ffffff" stroke="#e5e7eb" stroke-width="4"/>
+  
+  <!-- NFT Content -->
+  <rect x="128" y="160" width="256" height="192" rx="12" fill="#f3f4f6"/>
+  
+  <!-- Image Icon -->
+  <circle cx="176" cy="208" r="16" fill="#9ca3af"/>
+  <path d="M144 320L176 288L208 320L256 272L320 336V320H144V320Z" fill="#9ca3af"/>
+  
+  <!-- Text Lines -->
+  <rect x="144" y="368" width="160" height="8" rx="4" fill="#d1d5db"/>
+  <rect x="144" y="392" width="120" height="8" rx="4" fill="#d1d5db"/>
+  
+  <!-- Blockchain Elements -->
+  <circle cx="384" cy="160" r="24" fill="#10b981"/>
+  <path d="M376 152L384 160L392 152M384 160V168" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+  
+  <!-- Currency Symbol -->
+  <circle cx="144" cy="96" r="20" fill="#f59e0b"/>
+  <text x="144" y="102" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="16" font-weight="bold">Ξ</text>
+</svg>

@@ -1,0 +1,26 @@
+<svg width="180" height="180" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background with rounded corners for iOS -->
+  <rect width="180" height="180" rx="24" fill="#3b82f6"/>
+  
+  <!-- NFT Frame -->
+  <rect x="30" y="45" width="120" height="120" rx="8" fill="#ffffff" stroke="#e5e7eb" stroke-width="2"/>
+  
+  <!-- NFT Content -->
+  <rect x="40" y="55" width="100" height="80" rx="4" fill="#f3f4f6"/>
+  
+  <!-- Image Icon -->
+  <circle cx="60" cy="75" r="6" fill="#9ca3af"/>
+  <path d="M40 125L60 105L80 125L110 95L140 125V120H40V125Z" fill="#9ca3af"/>
+  
+  <!-- Text Lines -->
+  <rect x="45" y="145" width="60" height="3" rx="1.5" fill="#d1d5db"/>
+  <rect x="45" y="155" width="45" height="3" rx="1.5" fill="#d1d5db"/>
+  
+  <!-- Blockchain Elements -->
+  <circle cx="135" cy="60" r="8" fill="#10b981"/>
+  <path d="M131 56L135 60L139 56M135 60V64" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round"/>
+  
+  <!-- Currency Symbol -->
+  <circle cx="55" y="30" r="8" fill="#f59e0b"/>
+  <text x="55" y="35" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="8" font-weight="bold">Ξ</text>
+</svg>
