@@ -57,7 +57,7 @@ pnpm contract run deploy --network sepolia
   pnpm contract run mintToken --token TokenB --amount 1000 --network sepolia
   ```
 
-- DEXのトークンの残高状況
+- 各トークンの残高状況(LPも含む)
 
   ```bash
   pnpm contract run checkBalances --network sepolia
@@ -69,10 +69,16 @@ pnpm contract run deploy --network sepolia
   pnpm contract run addLiquidity --amount-a 50 --amount-b 50 --network sepolia
   ```
 
+- 最適流動性の提供タスク(2回目以降はこちらの利用を推奨)
+
+  ```bash
+  pnpm contract run addLiquidityOptimal --amount 100 --token B --network sepolia
+  ```
+
 - 流動性の取り出し
 
   ```bash
-  pnpm contract run removeLiquidity --liquidity 10 --network sepolia
+  pnpm contract run removeLiquidity --liquidity 20 --network sepolia
   ```
 
 - Swap前のクォート
@@ -85,4 +91,12 @@ pnpm contract run deploy --network sepolia
 
   ```bash
   pnpm contract run swap --amount-in 5 --token-in TokenA --slippage 1 --network sepolia
+  ```
+
+## デバッグタスク
+
+- 流動性削除のデバッグ
+
+  ```bash
+  pnpm contract run debugRemoveLiquidity --liquidity 20 --network sepolia
   ```

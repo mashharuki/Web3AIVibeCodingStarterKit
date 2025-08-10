@@ -20,6 +20,7 @@
     "mintToken": "npx hardhat mintTokens",
     "checkBalances": "npx hardhat checkBalances",
     "addLiquidity": "npx hardhat addLiquidity",
+    "addLiquidityOptimal": "npx hardhat addLiquidityOptimal",
     "removeLiquidity": "npx hardhat removeLiquidity",
     "swap": "npx hardhat swapTokens",
     "quote": "npx hardhat getSwapQuote"
