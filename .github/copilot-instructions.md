@@ -55,8 +55,6 @@
 │   ├── frontend
 │   └── contract
 ├── .github
-│   ├── workflows
-│   │   └── ci.yml
 │   └── instructions
 │       ├── frontend.instructions.md
 │       ├── contracts.instructions.md

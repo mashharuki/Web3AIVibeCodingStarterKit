@@ -1,23 +1,5 @@
-# Web3 AI Vibe Coding Starter Kit - NFT Marketplace
+# Web3 AI Vibe Coding Starter Kit 
 
-完全なWeb3 NFTマーケットプレイスのモノレポプロジェクト
+AI VibeCodingでWeb3アプリを開発するためのスターターキットです！
 
-## NFTマーケットプレイスの開発を依頼したときのプロンプト
-
-MCPは有効化しておくこと！
-
-```markdown
-あなたは超優秀なWeb3エンジニアです。
-
-@workspace /docs/prompt.md にはNFTマーケットプレイスの開発要件をまとめてあります。
-
-ファイルの内容を読み込み、要件を満たす最適なプロダクトを開発してください。
-
-instructionsファイルの内容も必ず読み込んで、指示された条件を守りながら開発してください。
-
-必要に応じてMCPを利用し、最新のドキュメントも参照するようにしてください。
-よろしくお願いします。
-
-use context7
-use deepwiki
-```
+## AI VibeCodingでWeb3アプリを開発する時の手順

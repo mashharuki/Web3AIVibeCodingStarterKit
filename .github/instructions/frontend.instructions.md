@@ -21,9 +21,8 @@ applyTo: './pkgs/frontend/**'
 
 - viem
 - ethers
-- privy
-- Account Abstraction
-- Biconomy
+- wagmi
+- rainbowkit
 
 # shadcn / UIの設定ファイル
 
@@ -63,7 +62,8 @@ pkgs/frontend/
 |    └── api/           # APIの実装を格納するディレクトリ
 ├── components/         # UIコンポーネントディレクトリ
 ├── hooks/              # カスタムフックディレクトリ
-├── lib/                # ユーティリティ関数やその他のライブラリ用の関数群を格納するディレクトリ
+├── lib/                # ライブラリ用の関数群を格納するディレクトリ
+├── utils/              # ユーティリティ関数群を格納するディレクトリ
 ├── styles/             # グローバルスタイルやテーマを格納するディレクトリ
 ├── public/             # 静的ファイル群を格納するディレクトリ
 ├── components.json     # shadcn / UIの設定ファイル
@@ -77,15 +77,3 @@ pkgs/frontend/
 ├── .env.example        # 環境変数のサンプルファイル
 └── .gitignore          # Gitの無視設定ファイル
 ```
-
-# Biconomy と Privyインテグレーション例
-
-以下のドキュメントを参考にしてください。
-
-🔐 EIP-7702 Gas Abstracted Transactions with Privy
-https://github.com/bcnmy/abstract-docs/blob/main/docs/pages/new/integration-guides/wallets-and-signers/privy.mdx
-
-# Next.js と Privyインテグレーション例
-
-以下のリポジトリを参考にしてください。
-https://github.com/privy-io/create-next-app
