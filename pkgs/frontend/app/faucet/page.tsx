@@ -86,114 +86,187 @@ export default function FaucetPage() {
   const tokenBBalance = useTokenBalance(contracts.tokens.TokenB, address);
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <Card className="max-w-2xl mx-auto">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold text-center">
-            🚰 Test Token Faucet
-          </CardTitle>
-          <p className="text-center text-gray-600">
-            テスト用トークンを無料で取得できます（1日1回、100トークンまで）
+    <div className="min-h-screen py-12">
+      <div className="max-w-4xl mx-auto">
+        {/* ヒーローセクション */}
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-white mb-4">
+            テストトークン Faucet
+          </h1>
+          <p className="text-gray-300 text-lg">
+            DeFiテスト用トークンを無料で取得
           </p>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {!address ? (
-            <div className="text-center py-8">
-              <p className="text-gray-500 mb-4">ウォレットを接続してください</p>
-            </div>
-          ) : (
-            <div className="space-y-6">
-              {/* TokenA Faucet */}
-              <div className="p-6 border rounded-lg">
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <h3 className="text-lg font-semibold">
-                      {TOKEN_INFO.TokenA.name} ({TOKEN_INFO.TokenA.symbol})
-                    </h3>
-                    <p className="text-sm text-gray-600">
-                      現在の残高:{" "}
-                      {tokenABalance.data
-                        ? formatEther(tokenABalance.data)
-                        : "0"}{" "}
-                      {TOKEN_INFO.TokenA.symbol}
-                    </p>
-                  </div>
-                  <Button
-                    onClick={faucetTokenA.requestTokens}
-                    disabled={faucetTokenA.isPending}
-                    className="min-w-[120px]"
-                  >
-                    {faucetTokenA.isPending ? "取得中..." : "100 TKA取得"}
-                  </Button>
+        </div>
+
+        {/* メインカード */}
+        <Card className="backdrop-blur-sm bg-white/10 border-white/20 shadow-2xl rounded-3xl overflow-hidden">
+          <CardContent className="p-8">
+            {!address ? (
+              <div className="text-center py-12">
+                <div className="w-16 h-16 bg-gray-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <span className="text-3xl">🔐</span>
+                </div>
+                <p className="text-white text-lg mb-6">ウォレットを接続してください</p>
+                <div className="text-gray-400">
+                  Faucetを利用するにはウォレット接続が必要です
                 </div>
               </div>
-
-              {/* TokenB Faucet */}
-              <div className="p-6 border rounded-lg">
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <h3 className="text-lg font-semibold">
-                      {TOKEN_INFO.TokenB.name} ({TOKEN_INFO.TokenB.symbol})
-                    </h3>
-                    <p className="text-sm text-gray-600">
-                      現在の残高:{" "}
-                      {tokenBBalance.data
-                        ? formatEther(tokenBBalance.data)
-                        : "0"}{" "}
-                      {TOKEN_INFO.TokenB.symbol}
-                    </p>
-                  </div>
-                  <Button
-                    onClick={faucetTokenB.requestTokens}
-                    disabled={faucetTokenB.isPending}
-                    className="min-w-[120px]"
-                  >
-                    {faucetTokenB.isPending ? "取得中..." : "100 TKB取得"}
-                  </Button>
-                </div>
-              </div>
-
-              {/* 注意事項 */}
-              <div className="bg-blue-50 p-4 rounded-lg">
-                <h4 className="font-semibold text-blue-900 mb-2">
-                  📝 注意事項
-                </h4>
-                <ul className="text-sm text-blue-800 space-y-1">
-                  <li>• 各トークンは1日1回まで取得可能です</li>
-                  <li>• 1回につき100トークンが取得できます</li>
-                  <li>• これらはテスト用トークンで、実際の価値はありません</li>
-                  <li>• Sepoliaテストネット上でのみ利用可能です</li>
-                </ul>
-              </div>
-
-              {/* コントラクトアドレス情報 */}
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <h4 className="font-semibold text-gray-900 mb-2">
-                  📋 コントラクトアドレス
-                </h4>
-                <div className="space-y-2 text-sm">
-                  <div>
-                    <span className="font-medium">
-                      {TOKEN_INFO.TokenA.symbol}:
-                    </span>
-                    <code className="ml-2 text-xs bg-gray-200 px-2 py-1 rounded">
-                      {contracts.tokens.TokenA}
-                    </code>
-                  </div>
-                  <div>
-                    <span className="font-medium">
-                      {TOKEN_INFO.TokenB.symbol}:
-                    </span>
-                    <code className="ml-2 text-xs bg-gray-200 px-2 py-1 rounded">
-                      {contracts.tokens.TokenB}
-                    </code>
+            ) : (
+              <div className="space-y-8">
+                {/* TokenA Faucet */}
+                <div className="bg-gradient-to-br from-yellow-500/10 to-orange-500/10 backdrop-blur-sm p-8 rounded-2xl border border-yellow-400/20">
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-3">
+                        <span className="text-2xl">🟡</span>
+                        <h3 className="text-xl font-bold text-white">
+                          {TOKEN_INFO.TokenA.name} ({TOKEN_INFO.TokenA.symbol})
+                        </h3>
+                      </div>
+                      <div className="bg-black/20 px-4 py-3 rounded-xl">
+                        <p className="text-gray-300 text-sm mb-1">現在の残高</p>
+                        <p className="text-white text-lg font-bold">
+                          {tokenABalance.data
+                            ? Number(formatEther(tokenABalance.data)).toLocaleString()
+                            : "0"}{" "}
+                          {TOKEN_INFO.TokenA.symbol}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="ml-6">
+                      <Button
+                        onClick={faucetTokenA.requestTokens}
+                        disabled={faucetTokenA.isPending}
+                        className="h-14 px-8 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl text-white font-bold rounded-xl disabled:opacity-50 disabled:transform-none"
+                      >
+                        <div className="flex items-center gap-3">
+                          {faucetTokenA.isPending ? (
+                            <>
+                              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white" />
+                              <span>取得中...</span>
+                            </>
+                          ) : (
+                            <>
+                              <span className="text-lg">💰</span>
+                              <span>100 TKA取得</span>
+                            </>
+                          )}
+                        </div>
+                      </Button>
+                    </div>
                   </div>
                 </div>
+
+                {/* TokenB Faucet */}
+                <div className="bg-gradient-to-br from-blue-500/10 to-purple-500/10 backdrop-blur-sm p-8 rounded-2xl border border-blue-400/20">
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-3">
+                        <span className="text-2xl">🔵</span>
+                        <h3 className="text-xl font-bold text-white">
+                          {TOKEN_INFO.TokenB.name} ({TOKEN_INFO.TokenB.symbol})
+                        </h3>
+                      </div>
+                      <div className="bg-black/20 px-4 py-3 rounded-xl">
+                        <p className="text-gray-300 text-sm mb-1">現在の残高</p>
+                        <p className="text-white text-lg font-bold">
+                          {tokenBBalance.data
+                            ? Number(formatEther(tokenBBalance.data)).toLocaleString()
+                            : "0"}{" "}
+                          {TOKEN_INFO.TokenB.symbol}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="ml-6">
+                      <Button
+                        onClick={faucetTokenB.requestTokens}
+                        disabled={faucetTokenB.isPending}
+                        className="h-14 px-8 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl text-white font-bold rounded-xl disabled:opacity-50 disabled:transform-none"
+                      >
+                        <div className="flex items-center gap-3">
+                          {faucetTokenB.isPending ? (
+                            <>
+                              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white" />
+                              <span>取得中...</span>
+                            </>
+                          ) : (
+                            <>
+                              <span className="text-lg">💰</span>
+                              <span>100 TKB取得</span>
+                            </>
+                          )}
+                        </div>
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 注意事項 */}
+                <div className="bg-gradient-to-br from-cyan-500/10 to-blue-500/10 backdrop-blur-sm p-6 rounded-2xl border border-cyan-400/20">
+                  <h4 className="font-bold text-lg text-white mb-4 flex items-center gap-2">
+                    <span className="text-xl">📝</span>
+                    重要な注意事項
+                  </h4>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 text-cyan-200">
+                        <span className="text-sm">⏰</span>
+                        <span className="text-sm">各トークンは1日1回まで取得可能</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-cyan-200">
+                        <span className="text-sm">💎</span>
+                        <span className="text-sm">1回につき100トークンが取得可能</span>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 text-cyan-200">
+                        <span className="text-sm">🧪</span>
+                        <span className="text-sm">テスト用トークン（実際の価値なし）</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-cyan-200">
+                        <span className="text-sm">🔗</span>
+                        <span className="text-sm">Sepoliaテストネット専用</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* コントラクトアドレス情報 */}
+                <div className="bg-gradient-to-br from-gray-500/10 to-slate-500/10 backdrop-blur-sm p-6 rounded-2xl border border-gray-400/20">
+                  <h4 className="font-bold text-lg text-white mb-4 flex items-center gap-2">
+                    <span className="text-xl">📋</span>
+                    コントラクトアドレス
+                  </h4>
+                  <div className="space-y-4">
+                    <div className="bg-black/20 p-4 rounded-xl">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-lg">🟡</span>
+                        <span className="font-semibold text-white">
+                          {TOKEN_INFO.TokenA.symbol}:
+                        </span>
+                      </div>
+                      <code className="text-xs text-gray-300 bg-black/30 px-3 py-2 rounded-lg block break-all">
+                        {contracts.tokens.TokenA}
+                      </code>
+                    </div>
+                    <div className="bg-black/20 p-4 rounded-xl">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-lg">🔵</span>
+                        <span className="font-semibold text-white">
+                          {TOKEN_INFO.TokenB.symbol}:
+                        </span>
+                      </div>
+                      <code className="text-xs text-gray-300 bg-black/30 px-3 py-2 rounded-lg block break-all">
+                        {contracts.tokens.TokenB}
+                      </code>
+                    </div>
+                  </div>
+                </div>
               </div>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+            )}
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
