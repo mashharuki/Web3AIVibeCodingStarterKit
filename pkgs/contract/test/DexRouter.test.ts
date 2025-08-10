@@ -1,7 +1,13 @@
 import type { HardhatEthersSigner } from "@nomicfoundation/hardhat-ethers/signers";
 import { expect } from "chai";
 import { ethers } from "hardhat";
-import type { DexFactory, DexPair, DexRouter, TokenA, TokenB } from "../typechain-types";
+import type {
+  DexFactory,
+  DexPair,
+  DexRouter,
+  TokenA,
+  TokenB,
+} from "../typechain-types";
 
 describe("DexRouter", () => {
   let factory: DexFactory;
@@ -26,12 +32,12 @@ describe("DexRouter", () => {
     // トークンをデプロイ
     const TokenAFactory = await ethers.getContractFactory("TokenA");
     const TokenBFactory = await ethers.getContractFactory("TokenB");
-    
+
     const tokenAContract = await TokenAFactory.deploy(owner.address);
     const tokenBContract = await TokenBFactory.deploy(owner.address);
     tokenA = tokenAContract as unknown as TokenA;
     tokenB = tokenBContract as unknown as TokenB;
-    
+
     await tokenA.waitForDeployment();
     await tokenB.waitForDeployment();
 
@@ -43,7 +49,9 @@ describe("DexRouter", () => {
 
     // ルーターをデプロイ
     const DexRouterFactory = await ethers.getContractFactory("DexRouter");
-    const routerContract = await DexRouterFactory.deploy(await factory.getAddress());
+    const routerContract = await DexRouterFactory.deploy(
+      await factory.getAddress()
+    );
     router = routerContract as unknown as DexRouter;
     await router.waitForDeployment();
 
@@ -72,8 +80,9 @@ describe("DexRouter", () => {
 
     it("ゼロアドレスのファクトリーでは失敗する", async () => {
       const DexRouterFactory = await ethers.getContractFactory("DexRouter");
-      await expect(DexRouterFactory.deploy(ethers.ZeroAddress))
-        .to.be.revertedWithCustomError(router, "ZeroAddress");
+      await expect(
+        DexRouterFactory.deploy(ethers.ZeroAddress)
+      ).to.be.revertedWithCustomError(router, "ZeroAddress");
     });
   });
 
@@ -82,25 +91,27 @@ describe("DexRouter", () => {
       const amountA = ethers.parseEther("10");
       const amountB = ethers.parseEther("10");
       const deadline = Math.floor(Date.now() / 1000) + 86400; // 24時間後
-      
+
       // ルーターにトークンの使用を承認
       await tokenA.connect(user1).approve(await router.getAddress(), amountA);
       await tokenB.connect(user1).approve(await router.getAddress(), amountB);
-      
+
       await expect(
         // 流動性を追加
-        router.connect(user1).addLiquidity(
-          await tokenA.getAddress(),
-          await tokenB.getAddress(),
-          amountA,
-          amountB,
-          amountA,
-          amountB,
-          user1.address,
-          deadline
-        )
+        router
+          .connect(user1)
+          .addLiquidity(
+            await tokenA.getAddress(),
+            await tokenB.getAddress(),
+            amountA,
+            amountB,
+            amountA,
+            amountB,
+            user1.address,
+            deadline
+          )
       ).to.not.be.reverted;
-      
+
       // LPトークンが発行されたことを確認
       expect(await pair.balanceOf(user1.address)).to.be.gt(0);
     });
@@ -109,44 +120,56 @@ describe("DexRouter", () => {
       // 初回流動性追加
       const initialAmountA = ethers.parseEther("10");
       const initialAmountB = ethers.parseEther("20");
-      
-      await tokenA.connect(user1).approve(await router.getAddress(), initialAmountA);
-      await tokenB.connect(user1).approve(await router.getAddress(), initialAmountB);
-      
+
+      await tokenA
+        .connect(user1)
+        .approve(await router.getAddress(), initialAmountA);
+      await tokenB
+        .connect(user1)
+        .approve(await router.getAddress(), initialAmountB);
+
       const deadline = Math.floor(Date.now() / 1000) + 86400;
-      
-      await router.connect(user1).addLiquidity(
-        await tokenA.getAddress(),
-        await tokenB.getAddress(),
-        initialAmountA,
-        initialAmountB,
-        initialAmountA,
-        initialAmountB,
-        user1.address,
-        deadline
-      );
-      
+
+      await router
+        .connect(user1)
+        .addLiquidity(
+          await tokenA.getAddress(),
+          await tokenB.getAddress(),
+          initialAmountA,
+          initialAmountB,
+          initialAmountA,
+          initialAmountB,
+          user1.address,
+          deadline
+        );
+
       // 追加流動性提供
       const additionalAmountA = ethers.parseEther("5");
       const additionalAmountB = ethers.parseEther("10");
-      
-      await tokenA.connect(user2).approve(await router.getAddress(), additionalAmountA);
-      await tokenB.connect(user2).approve(await router.getAddress(), additionalAmountB);
-      
+
+      await tokenA
+        .connect(user2)
+        .approve(await router.getAddress(), additionalAmountA);
+      await tokenB
+        .connect(user2)
+        .approve(await router.getAddress(), additionalAmountB);
+
       await expect(
         // 別ユーザーから追加流動性を提供
-        router.connect(user2).addLiquidity(
-          await tokenA.getAddress(),
-          await tokenB.getAddress(),
-          additionalAmountA,
-          additionalAmountB,
-          0,
-          0,
-          user2.address,
-          deadline
-        )
+        router
+          .connect(user2)
+          .addLiquidity(
+            await tokenA.getAddress(),
+            await tokenB.getAddress(),
+            additionalAmountA,
+            additionalAmountB,
+            0,
+            0,
+            user2.address,
+            deadline
+          )
       ).to.not.be.reverted;
-      
+
       expect(await pair.balanceOf(user2.address)).to.be.gt(0);
     });
 
@@ -154,21 +177,23 @@ describe("DexRouter", () => {
       const amountA = ethers.parseEther("10");
       const amountB = ethers.parseEther("10");
       const pastDeadline = Math.floor(Date.now() / 1000) - 3600; // 1時間前
-      
+
       await tokenA.connect(user1).approve(await router.getAddress(), amountA);
       await tokenB.connect(user1).approve(await router.getAddress(), amountB);
-      
+
       await expect(
-        router.connect(user1).addLiquidity(
-          await tokenA.getAddress(),
-          await tokenB.getAddress(),
-          amountA,
-          amountB,
-          amountA,
-          amountB,
-          user1.address,
-          pastDeadline
-        )
+        router
+          .connect(user1)
+          .addLiquidity(
+            await tokenA.getAddress(),
+            await tokenB.getAddress(),
+            amountA,
+            amountB,
+            amountA,
+            amountB,
+            user1.address,
+            pastDeadline
+          )
       ).to.be.revertedWithCustomError(router, "DeadlineExpired");
     });
   });
@@ -179,48 +204,54 @@ describe("DexRouter", () => {
       const amountA = ethers.parseEther("20");
       const amountB = ethers.parseEther("20");
       const deadline = Math.floor(Date.now() / 1000) + 86400;
-      
+
       await tokenA.connect(user1).approve(await router.getAddress(), amountA);
       await tokenB.connect(user1).approve(await router.getAddress(), amountB);
-      
-      await router.connect(user1).addLiquidity(
-        await tokenA.getAddress(),
-        await tokenB.getAddress(),
-        amountA,
-        amountB,
-        amountA,
-        amountB,
-        user1.address,
-        deadline
-      );
+
+      await router
+        .connect(user1)
+        .addLiquidity(
+          await tokenA.getAddress(),
+          await tokenB.getAddress(),
+          amountA,
+          amountB,
+          amountA,
+          amountB,
+          user1.address,
+          deadline
+        );
     });
 
     it("流動性削除が正常に動作する", async () => {
       const lpBalance = await pair.balanceOf(user1.address);
       const removeLiquidity = lpBalance / 2n;
       const deadline = Math.floor(Date.now() / 1000) + 86400;
-      
-      await pair.connect(user1).approve(await router.getAddress(), removeLiquidity);
-      
+
+      await pair
+        .connect(user1)
+        .approve(await router.getAddress(), removeLiquidity);
+
       const balanceABefore = await tokenA.balanceOf(user1.address);
       const balanceBBefore = await tokenB.balanceOf(user1.address);
-      
+
       await expect(
         // 流動性削除
-        router.connect(user1).removeLiquidity(
-          await tokenA.getAddress(),
-          await tokenB.getAddress(),
-          removeLiquidity,
-          0,
-          0,
-          user1.address,
-          deadline
-        )
+        router
+          .connect(user1)
+          .removeLiquidity(
+            await tokenA.getAddress(),
+            await tokenB.getAddress(),
+            removeLiquidity,
+            0,
+            0,
+            user1.address,
+            deadline
+          )
       ).to.not.be.reverted;
-      
+
       const balanceAAfter = await tokenA.balanceOf(user1.address);
       const balanceBAfter = await tokenB.balanceOf(user1.address);
-      
+
       expect(balanceAAfter).to.be.gt(balanceABefore);
       expect(balanceBAfter).to.be.gt(balanceBBefore);
     });
@@ -228,19 +259,21 @@ describe("DexRouter", () => {
     it("存在しないペアでは失敗する", async () => {
       const DummyTokenFactory = await ethers.getContractFactory("TokenA");
       const dummyToken = await DummyTokenFactory.deploy(owner.address);
-      
+
       const deadline = Math.floor(Date.now() / 1000) + 86400;
-      
+
       await expect(
-        router.connect(user1).removeLiquidity(
-          await tokenA.getAddress(),
-          await dummyToken.getAddress(),
-          ethers.parseEther("1"),
-          0,
-          0,
-          user1.address,
-          deadline
-        )
+        router
+          .connect(user1)
+          .removeLiquidity(
+            await tokenA.getAddress(),
+            await dummyToken.getAddress(),
+            ethers.parseEther("1"),
+            0,
+            0,
+            user1.address,
+            deadline
+          )
       ).to.be.revertedWithCustomError(router, "PairDoesNotExist");
     });
   });
@@ -251,42 +284,48 @@ describe("DexRouter", () => {
       const amountA = ethers.parseEther("100");
       const amountB = ethers.parseEther("100");
       const deadline = Math.floor(Date.now() / 1000) + 86400;
-      
+
       await tokenA.connect(user1).approve(await router.getAddress(), amountA);
       await tokenB.connect(user1).approve(await router.getAddress(), amountB);
-      
-      await router.connect(user1).addLiquidity(
-        await tokenA.getAddress(),
-        await tokenB.getAddress(),
-        amountA,
-        amountB,
-        amountA,
-        amountB,
-        user1.address,
-        deadline
-      );
+
+      await router
+        .connect(user1)
+        .addLiquidity(
+          await tokenA.getAddress(),
+          await tokenB.getAddress(),
+          amountA,
+          amountB,
+          amountA,
+          amountB,
+          user1.address,
+          deadline
+        );
     });
 
     it("正確な入力量でのスワップが正常に動作する", async () => {
       const swapAmount = ethers.parseEther("1");
       const deadline = Math.floor(Date.now() / 1000) + 86400;
       const path = [await tokenA.getAddress(), await tokenB.getAddress()];
-      
-      await tokenA.connect(user2).approve(await router.getAddress(), swapAmount);
-      
+
+      await tokenA
+        .connect(user2)
+        .approve(await router.getAddress(), swapAmount);
+
       const balanceBBefore = await tokenB.balanceOf(user2.address);
-      
+
       await expect(
         // トークンをスワップする
-        router.connect(user2).swapExactTokensForTokens(
-          swapAmount,
-          0,
-          path,
-          user2.address,
-          deadline
-        )
+        router
+          .connect(user2)
+          .swapExactTokensForTokens(
+            swapAmount,
+            0,
+            path,
+            user2.address,
+            deadline
+          )
       ).to.not.be.reverted;
-      
+
       const balanceBAfter = await tokenB.balanceOf(user2.address);
       expect(balanceBAfter).to.be.gt(balanceBBefore);
     });
@@ -296,25 +335,29 @@ describe("DexRouter", () => {
       const maxInputAmount = ethers.parseEther("2");
       const deadline = Math.floor(Date.now() / 1000) + 86400;
       const path = [await tokenA.getAddress(), await tokenB.getAddress()];
-      
-      await tokenA.connect(user2).approve(await router.getAddress(), maxInputAmount);
-      
+
+      await tokenA
+        .connect(user2)
+        .approve(await router.getAddress(), maxInputAmount);
+
       const balanceABefore = await tokenA.balanceOf(user2.address);
       const balanceBBefore = await tokenB.balanceOf(user2.address);
-      
+
       await expect(
-        router.connect(user2).swapTokensForExactTokens(
-          outputAmount,
-          maxInputAmount,
-          path,
-          user2.address,
-          deadline
-        )
+        router
+          .connect(user2)
+          .swapTokensForExactTokens(
+            outputAmount,
+            maxInputAmount,
+            path,
+            user2.address,
+            deadline
+          )
       ).to.not.be.reverted;
-      
+
       const balanceAAfter = await tokenA.balanceOf(user2.address);
       const balanceBAfter = await tokenB.balanceOf(user2.address);
-      
+
       expect(balanceAAfter).to.be.lt(balanceABefore);
       expect(balanceBAfter - balanceBBefore).to.equal(outputAmount);
     });
@@ -323,17 +366,21 @@ describe("DexRouter", () => {
       const swapAmount = ethers.parseEther("1");
       const deadline = Math.floor(Date.now() / 1000) + 86400;
       const invalidPath = [await tokenA.getAddress()]; // 1つのトークンのみ
-      
-      await tokenA.connect(user2).approve(await router.getAddress(), swapAmount);
-      
+
+      await tokenA
+        .connect(user2)
+        .approve(await router.getAddress(), swapAmount);
+
       await expect(
-        router.connect(user2).swapExactTokensForTokens(
-          swapAmount,
-          0,
-          invalidPath,
-          user2.address,
-          deadline
-        )
+        router
+          .connect(user2)
+          .swapExactTokensForTokens(
+            swapAmount,
+            0,
+            invalidPath,
+            user2.address,
+            deadline
+          )
       ).to.be.revertedWithCustomError(router, "InvalidPath");
     });
   });
@@ -341,23 +388,25 @@ describe("DexRouter", () => {
   describe("ユーティリティ関数", () => {
     beforeEach(async () => {
       // 流動性を事前に追加
-      const amountA = ethers.parseEther("50");  // 100から50に減らす
-      const amountB = ethers.parseEther("50");  // 200から50に減らす
+      const amountA = ethers.parseEther("50"); // 100から50に減らす
+      const amountB = ethers.parseEther("50"); // 200から50に減らす
       const deadline = Math.floor(Date.now() / 1000) + 86400;
-      
+
       await tokenA.connect(user1).approve(await router.getAddress(), amountA);
       await tokenB.connect(user1).approve(await router.getAddress(), amountB);
-      
-      await router.connect(user1).addLiquidity(
-        await tokenA.getAddress(),
-        await tokenB.getAddress(),
-        amountA,
-        amountB,
-        amountA,
-        amountB,
-        user1.address,
-        deadline
-      );
+
+      await router
+        .connect(user1)
+        .addLiquidity(
+          await tokenA.getAddress(),
+          await tokenB.getAddress(),
+          amountA,
+          amountB,
+          amountA,
+          amountB,
+          user1.address,
+          deadline
+        );
     });
 
     it("getReservesが正確な値を返す", async () => {
@@ -365,7 +414,7 @@ describe("DexRouter", () => {
         await tokenA.getAddress(),
         await tokenB.getAddress()
       );
-      
+
       expect(reserves.reserveA).to.be.gt(0);
       expect(reserves.reserveB).to.be.gt(0);
     });
@@ -376,13 +425,13 @@ describe("DexRouter", () => {
         await tokenA.getAddress(),
         await tokenB.getAddress()
       );
-      
+
       const amountOut = await router.getAmountOut(
         amountIn,
         reserves.reserveA,
         reserves.reserveB
       );
-      
+
       expect(amountOut).to.be.gt(0);
       expect(amountOut).to.be.lt(amountIn * 2n); // 2:1の比率なので
     });
@@ -393,22 +442,22 @@ describe("DexRouter", () => {
         await tokenA.getAddress(),
         await tokenB.getAddress()
       );
-      
+
       const amountIn = await router.getAmountIn(
         amountOut,
         reserves.reserveA,
         reserves.reserveB
       );
-      
+
       expect(amountIn).to.be.gt(0);
     });
 
     it("getAmountsOutが正確な値を返す", async () => {
       const amountIn = ethers.parseEther("1");
       const path = [await tokenA.getAddress(), await tokenB.getAddress()];
-      
+
       const amounts = await router.getAmountsOut(amountIn, path);
-      
+
       expect(amounts.length).to.equal(2);
       expect(amounts[0]).to.equal(amountIn);
       expect(amounts[1]).to.be.gt(0);
@@ -417,9 +466,9 @@ describe("DexRouter", () => {
     it("getAmountsInが正確な値を返す", async () => {
       const amountOut = ethers.parseEther("1");
       const path = [await tokenA.getAddress(), await tokenB.getAddress()];
-      
+
       const amounts = await router.getAmountsIn(amountOut, path);
-      
+
       expect(amounts.length).to.equal(2);
       expect(amounts[0]).to.be.gt(0);
       expect(amounts[1]).to.equal(amountOut);

@@ -2,9 +2,9 @@ import { buildModule } from "@nomicfoundation/hardhat-ignition/modules";
 
 /**
  * TokenA Ignition モジュール
- * 
+ *
  * フォーセット機能付きERC20トークン（TokenA）をデプロイするモジュール
- * 
+ *
  * @param owner トークンのオーナーアドレス（省略時はデプロイアカウント）
  */
 const TokenAModule = buildModule("TokenAModule", (m) => {

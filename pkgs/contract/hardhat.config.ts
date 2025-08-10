@@ -57,8 +57,8 @@ const config: HardhatUserConfig = {
       "https://api.etherscan.io/api?module=proxy&action=eth_gasPrice",
   },
   sourcify: {
-    enabled: true
-  }
+    enabled: true,
+  },
 };
 
 export default config;

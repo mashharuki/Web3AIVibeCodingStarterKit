@@ -43,40 +43,40 @@ describe("TokenA", () => {
   describe("Faucet機能", () => {
     it("初回faucetは正常に実行される", async () => {
       const initialBalance = await tokenA.balanceOf(user1.address);
-      
+
       const tx = await tokenA.connect(user1).faucet();
-      await expect(tx)
-        .to.emit(tokenA, "FaucetUsed");
-      
+      await expect(tx).to.emit(tokenA, "FaucetUsed");
+
       const finalBalance = await tokenA.balanceOf(user1.address);
       expect(finalBalance - initialBalance).to.equal(FAUCET_AMOUNT);
     });
 
     it("24時間以内の再faucetは失敗する", async () => {
       await tokenA.connect(user1).faucet();
-      
-      await expect(tokenA.connect(user1).faucet())
-        .to.be.revertedWithCustomError(tokenA, "FaucetCooldownActive");
+
+      await expect(
+        tokenA.connect(user1).faucet()
+      ).to.be.revertedWithCustomError(tokenA, "FaucetCooldownActive");
     });
 
     it("24時間後のfaucetは成功する", async () => {
       await tokenA.connect(user1).faucet();
-      
+
       // 24時間経過をシミュレート
       await ethers.provider.send("evm_increaseTime", [FAUCET_COOLDOWN + 1]);
       await ethers.provider.send("evm_mine", []);
-      
+
       const balanceBefore = await tokenA.balanceOf(user1.address);
       await expect(tokenA.connect(user1).faucet()).to.not.be.reverted;
       const balanceAfter = await tokenA.balanceOf(user1.address);
-      
+
       expect(balanceAfter - balanceBefore).to.equal(FAUCET_AMOUNT);
     });
 
     it("複数ユーザーが同時にfaucetを使用できる", async () => {
       await expect(tokenA.connect(user1).faucet()).to.not.be.reverted;
       await expect(tokenA.connect(user2).faucet()).to.not.be.reverted;
-      
+
       expect(await tokenA.balanceOf(user1.address)).to.equal(FAUCET_AMOUNT);
       expect(await tokenA.balanceOf(user2.address)).to.equal(FAUCET_AMOUNT);
     });
@@ -90,31 +90,40 @@ describe("TokenA", () => {
 
     it("転送が正常に動作する", async () => {
       const transferAmount = ethers.parseEther("10");
-      
-      await expect(tokenA.connect(user1).transfer(user2.address, transferAmount))
+
+      await expect(
+        tokenA.connect(user1).transfer(user2.address, transferAmount)
+      )
         .to.emit(tokenA, "Transfer")
         .withArgs(user1.address, user2.address, transferAmount);
-      
+
       expect(await tokenA.balanceOf(user2.address)).to.equal(transferAmount);
     });
 
     it("承認と転送代行が正常に動作する", async () => {
       const approveAmount = ethers.parseEther("50");
       const transferAmount = ethers.parseEther("30");
-      
+
       await tokenA.connect(user1).approve(user2.address, approveAmount);
-      expect(await tokenA.allowance(user1.address, user2.address)).to.equal(approveAmount);
-      
-      await tokenA.connect(user2).transferFrom(user1.address, user2.address, transferAmount);
+      expect(await tokenA.allowance(user1.address, user2.address)).to.equal(
+        approveAmount
+      );
+
+      await tokenA
+        .connect(user2)
+        .transferFrom(user1.address, user2.address, transferAmount);
       expect(await tokenA.balanceOf(user2.address)).to.equal(transferAmount);
-      expect(await tokenA.allowance(user1.address, user2.address)).to.equal(approveAmount - transferAmount);
+      expect(await tokenA.allowance(user1.address, user2.address)).to.equal(
+        approveAmount - transferAmount
+      );
     });
 
     it("残高不足時の転送は失敗する", async () => {
       const excessiveAmount = ethers.parseEther("200");
-      
-      await expect(tokenA.connect(user1).transfer(user2.address, excessiveAmount))
-        .to.be.reverted;
+
+      await expect(
+        tokenA.connect(user1).transfer(user2.address, excessiveAmount)
+      ).to.be.reverted;
     });
   });
 

@@ -13,7 +13,8 @@
     "enabled": true,
     "indentStyle": "space",
     "indentWidth": 2,
-    "lineWidth": 80
+    "lineWidth": 80,
+    "lineEnding": "lf"
   },
   "javascript": {
     "formatter": {
@@ -23,13 +24,7 @@
     }
   },
   "files": {
-    "include": [
-      "**/*.ts",
-      "**/*.tsx",
-      "**/*.js",
-      "**/*.jsx",
-      "**/*.json"
-    ],
+    "include": ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "**/*.json"],
     "ignore": [
       "**/node_modules/**",
       "**/dist/**",
@@ -37,7 +32,8 @@
       "**/.next/**",
       "**/cache/**",
       "**/artifacts/**",
-      "**/typechain-types/**"
+      "**/typechain-types/**",
+      "./pkgs/contract/ignition/deployments/**"
     ]
   }
 }

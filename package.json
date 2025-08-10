@@ -5,6 +5,7 @@
   "private": true,
   "scripts": {
     "contract": "pnpm --filter contract",
+    "frontend": "pnpm --filter frontend",
     "lint": "pnpm biome check .",
     "lint:fix": "pnpm biome check --apply .",
     "format": "pnpm biome format --write .",

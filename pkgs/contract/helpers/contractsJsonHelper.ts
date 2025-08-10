@@ -164,6 +164,5 @@ export {
   loadDeployedContractAddresses,
   resetContractAddressesJson,
   writeContractAddress,
-  writeValueToGroup
+  writeValueToGroup,
 };
-

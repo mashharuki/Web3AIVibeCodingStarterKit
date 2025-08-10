@@ -6,14 +6,14 @@ import TokenBModule from "./TokenB";
 
 /**
  * DEX全体 Ignition モジュール
- * 
+ *
  * DEXシステム全体をデプロイするメインモジュール
  * 以下のコントラクトを順序立ててデプロイする：
  * 1. TokenA（テスト用トークン）
  * 2. TokenB（テスト用トークン）
  * 3. DexFactory（ペア管理）
  * 4. DexRouter（ユーザーインターフェース）
- * 
+ *
  * デプロイ後、TokenA-TokenBペアの作成も行う
  */
 const DexModule = buildModule("DexModule", (m) => {

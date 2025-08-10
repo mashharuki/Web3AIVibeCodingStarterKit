@@ -3,10 +3,10 @@ import DexFactoryModule from "./DexFactory";
 
 /**
  * DexRouter Ignition モジュール
- * 
+ *
  * DEXルーターコントラクトをデプロイするモジュール
  * ユーザーインターフェースとして流動性管理とスワップ機能を提供
- * 
+ *
  * DexFactoryモジュールに依存し、ファクトリーアドレスを参照する
  */
 const DexRouterModule = buildModule("DexRouterModule", (m) => {

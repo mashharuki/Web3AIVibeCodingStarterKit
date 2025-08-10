@@ -24,12 +24,12 @@ describe("DexFactory", () => {
     // TokenAとTokenBをデプロイ
     const TokenAFactory = await ethers.getContractFactory("TokenA");
     const TokenBFactory = await ethers.getContractFactory("TokenB");
-    
+
     const tokenAContract = await TokenAFactory.deploy(owner.address);
     const tokenBContract = await TokenBFactory.deploy(owner.address);
     tokenA = tokenAContract as unknown as TokenA;
     tokenB = tokenBContract as unknown as TokenB;
-    
+
     await tokenA.waitForDeployment();
     await tokenB.waitForDeployment();
 
@@ -52,15 +52,17 @@ describe("DexFactory", () => {
     it("新しいペアを作成できる", async () => {
       const tokenAAddress = await tokenA.getAddress();
       const tokenBAddress = await tokenB.getAddress();
-      
+
       // ペアを作成
-      await expect(factory.createPair(tokenAAddress, tokenBAddress))
-        .to.emit(factory, "PairCreated");
-      
+      await expect(factory.createPair(tokenAAddress, tokenBAddress)).to.emit(
+        factory,
+        "PairCreated"
+      );
+
       // ペアコントラクトのアドレスを取得
       const pairAddress = await factory.getPair(tokenAAddress, tokenBAddress);
       expect(pairAddress).to.not.equal(ethers.ZeroAddress);
-      
+
       expect(await factory.allPairsLength()).to.equal(1);
       expect(await factory.allPairs(0)).to.equal(pairAddress);
     });
@@ -68,36 +70,39 @@ describe("DexFactory", () => {
     it("同一ペアを重複作成できない", async () => {
       const tokenAAddress = await tokenA.getAddress();
       const tokenBAddress = await tokenB.getAddress();
-      
+
       await factory.createPair(tokenAAddress, tokenBAddress);
-      
-      await expect(factory.createPair(tokenAAddress, tokenBAddress))
-        .to.be.revertedWithCustomError(factory, "PairAlreadyExists");
+
+      await expect(
+        factory.createPair(tokenAAddress, tokenBAddress)
+      ).to.be.revertedWithCustomError(factory, "PairAlreadyExists");
     });
 
     it("同一トークンでペアを作成できない", async () => {
       const tokenAAddress = await tokenA.getAddress();
-      
-      await expect(factory.createPair(tokenAAddress, tokenAAddress))
-        .to.be.revertedWithCustomError(factory, "IdenticalTokens");
+
+      await expect(
+        factory.createPair(tokenAAddress, tokenAAddress)
+      ).to.be.revertedWithCustomError(factory, "IdenticalTokens");
     });
 
     it("ゼロアドレスでペアを作成できない", async () => {
       const tokenAAddress = await tokenA.getAddress();
-      
-      await expect(factory.createPair(tokenAAddress, ethers.ZeroAddress))
-        .to.be.revertedWithCustomError(factory, "ZeroAddress");
+
+      await expect(
+        factory.createPair(tokenAAddress, ethers.ZeroAddress)
+      ).to.be.revertedWithCustomError(factory, "ZeroAddress");
     });
 
     it("トークンの順序が異なっても同じペアアドレスを返す", async () => {
       const tokenAAddress = await tokenA.getAddress();
       const tokenBAddress = await tokenB.getAddress();
-      
+
       await factory.createPair(tokenAAddress, tokenBAddress);
       // トークンの順序を逆にしても同じペアアドレスが返ることを確認
       const pair1 = await factory.getPair(tokenAAddress, tokenBAddress);
       const pair2 = await factory.getPair(tokenBAddress, tokenAAddress);
-      
+
       expect(pair1).to.equal(pair2);
     });
   });
@@ -109,8 +114,9 @@ describe("DexFactory", () => {
     });
 
     it("非feeToSetterは手数料受取人を設定できない", async () => {
-      await expect(factory.connect(user1).setFeeTo(feeToSetter.address))
-        .to.be.revertedWithCustomError(factory, "Unauthorized");
+      await expect(
+        factory.connect(user1).setFeeTo(feeToSetter.address)
+      ).to.be.revertedWithCustomError(factory, "Unauthorized");
     });
 
     it("feeToSetterがfeeToSetterを変更できる", async () => {
@@ -130,11 +136,11 @@ describe("DexFactory", () => {
       const tokenAAddress = await tokenA.getAddress();
       const tokenBAddress = await tokenB.getAddress();
       const pairAddress = await factory.getPair(tokenAAddress, tokenBAddress);
-      
+
       const DexPairFactory = await ethers.getContractFactory("DexPair");
       const pairContract = DexPairFactory.attach(pairAddress);
       const pair = pairContract as unknown as DexPair;
-      
+
       expect(await pair.factory()).to.equal(await factory.getAddress());
       expect(await pair.token0()).to.not.equal(ethers.ZeroAddress);
       expect(await pair.token1()).to.not.equal(ethers.ZeroAddress);

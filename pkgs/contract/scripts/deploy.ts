@@ -1,9 +1,12 @@
 import { ethers } from "hardhat";
-import { writeContractAddress, resetContractAddressesJson } from "../helpers/contractsJsonHelper";
+import {
+  writeContractAddress,
+  resetContractAddressesJson,
+} from "../helpers/contractsJsonHelper";
 
 /**
  * 段階的DEXデプロイスクリプト (Ignitionを使わない版)
- * 
+ *
  */
 async function main() {
   console.log("🚀 DEXシステムの段階的デプロイを開始します...\n");
@@ -13,18 +16,20 @@ async function main() {
     if (!deployer) {
       throw new Error("デプロイアカウントが見つかりません");
     }
-    
+
     console.log(`📝 デプロイアカウント: ${deployer.address}`);
-    
+
     const balance = await ethers.provider.getBalance(deployer.address);
     console.log(`💰 残高: ${ethers.formatEther(balance)} ETH\n`);
 
     // ネットワーク名を取得
     const network = await ethers.provider.getNetwork();
     const networkName = network.name === "unknown" ? "localhost" : network.name;
-    
+
     // デプロイ前にJSONファイルをリセット
-    console.log(`🗑️ ${networkName}のコントラクトアドレスファイルをリセット中...`);
+    console.log(
+      `🗑️ ${networkName}のコントラクトアドレスファイルをリセット中...`
+    );
     resetContractAddressesJson({ network: networkName });
     console.log("✅ リセット完了\n");
 
@@ -35,7 +40,7 @@ async function main() {
     await tokenA.waitForDeployment();
     const tokenAAddress = await tokenA.getAddress();
     console.log(`✅ TokenA デプロイ完了: ${tokenAAddress}`);
-    
+
     // コントラクトアドレスを保存
     writeContractAddress({
       group: "tokens",
@@ -46,7 +51,7 @@ async function main() {
 
     // 少し待機
     console.log("⏰ 次のデプロイまで3秒待機...");
-    await new Promise(resolve => setTimeout(resolve, 3000));
+    await new Promise((resolve) => setTimeout(resolve, 3000));
 
     // Step 2: TokenBをデプロイ
     console.log("📦 Step 2: TokenB をデプロイ中...");
@@ -55,7 +60,7 @@ async function main() {
     await tokenB.waitForDeployment();
     const tokenBAddress = await tokenB.getAddress();
     console.log(`✅ TokenB デプロイ完了: ${tokenBAddress}`);
-    
+
     // コントラクトアドレスを保存
     writeContractAddress({
       group: "tokens",
@@ -66,7 +71,7 @@ async function main() {
 
     // 少し待機
     console.log("⏰ 次のデプロイまで3秒待機...");
-    await new Promise(resolve => setTimeout(resolve, 3000));
+    await new Promise((resolve) => setTimeout(resolve, 3000));
 
     // Step 3: DexFactoryをデプロイ
     console.log("📦 Step 3: DexFactory をデプロイ中...");
@@ -75,7 +80,7 @@ async function main() {
     await dexFactory.waitForDeployment();
     const dexFactoryAddress = await dexFactory.getAddress();
     console.log(`✅ DexFactory デプロイ完了: ${dexFactoryAddress}`);
-    
+
     // コントラクトアドレスを保存
     writeContractAddress({
       group: "dex",
@@ -86,7 +91,7 @@ async function main() {
 
     // 少し待機
     console.log("⏰ 次のデプロイまで3秒待機...");
-    await new Promise(resolve => setTimeout(resolve, 3000));
+    await new Promise((resolve) => setTimeout(resolve, 3000));
 
     // Step 4: DexRouterをデプロイ
     console.log("📦 Step 4: DexRouter をデプロイ中...");
@@ -95,7 +100,7 @@ async function main() {
     await dexRouter.waitForDeployment();
     const dexRouterAddress = await dexRouter.getAddress();
     console.log(`✅ DexRouter デプロイ完了: ${dexRouterAddress}`);
-    
+
     // コントラクトアドレスを保存
     writeContractAddress({
       group: "dex",
@@ -106,20 +111,29 @@ async function main() {
 
     // 少し待機
     console.log("⏰ ペア作成まで3秒待機...");
-    await new Promise(resolve => setTimeout(resolve, 3000));
+    await new Promise((resolve) => setTimeout(resolve, 3000));
 
     // Step 5: TokenA-TokenBペアを作成
     console.log("📦 Step 5: TokenA-TokenB ペアを作成中...");
     // DexFactoryの型問題を回避するため、直接メソッドにアクセス
     const dexFactoryContract = dexFactory as unknown as {
-      createPair: (tokenA: string, tokenB: string) => Promise<{ wait: () => Promise<void> }>;
+      createPair: (
+        tokenA: string,
+        tokenB: string
+      ) => Promise<{ wait: () => Promise<void> }>;
       getPair: (tokenA: string, tokenB: string) => Promise<string>;
     };
-    const createPairTx = await dexFactoryContract.createPair(tokenAAddress, tokenBAddress);
+    const createPairTx = await dexFactoryContract.createPair(
+      tokenAAddress,
+      tokenBAddress
+    );
     await createPairTx.wait();
-    const pairAddress = await dexFactoryContract.getPair(tokenAAddress, tokenBAddress);
+    const pairAddress = await dexFactoryContract.getPair(
+      tokenAAddress,
+      tokenBAddress
+    );
     console.log(`✅ ペア作成完了: ${pairAddress}`);
-    
+
     // ペアアドレスを保存
     writeContractAddress({
       group: "pairs",
@@ -141,14 +155,15 @@ async function main() {
     console.log("2. テストネットでTokenAとTokenBのfaucetを実行");
     console.log("3. 流動性提供とスワップをテスト");
 
-    console.log(`\n📄 コントラクトアドレスは outputs/contracts-${networkName}.json に保存されました`);
+    console.log(
+      `\n📄 コントラクトアドレスは outputs/contracts-${networkName}.json に保存されました`
+    );
 
     // 最終残高を表示
     const finalBalance = await ethers.provider.getBalance(deployer.address);
     const gasUsed = balance - finalBalance;
     console.log(`\n💰 最終残高: ${ethers.formatEther(finalBalance)} ETH`);
     console.log(`⛽ ガス使用量: ${ethers.formatEther(gasUsed)} ETH`);
-
   } catch (error) {
     console.error("❌ デプロイ中にエラーが発生しました:", error);
     process.exitCode = 1;

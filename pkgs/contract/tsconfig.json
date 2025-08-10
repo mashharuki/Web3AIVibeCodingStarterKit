@@ -40,11 +40,5 @@
     "./tasks/**/*",
     "./helpers/**/*"
   ],
-  "exclude": [
-    "node_modules",
-    "dist",
-    "cache",
-    "artifacts",
-    "typechain-types"
-  ]
+  "exclude": ["node_modules", "dist", "cache", "artifacts", "typechain-types"]
 }
