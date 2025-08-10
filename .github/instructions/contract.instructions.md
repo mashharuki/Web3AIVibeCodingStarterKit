@@ -101,6 +101,9 @@ const config: HardhatUserConfig = {
     gasPriceApi:
       "https://api.etherscan.io/api?module=proxy&action=eth_gasPrice",
   },
+  sourcify: {
+    enabled: true
+  }
 };
 
 export default config;
@@ -113,13 +116,21 @@ export default config;
 中身は以下のようにしてください。
 
 ```typescript
-import fs from "node:fs";
 import jsonfile from "jsonfile";
+import fs from "node:fs";
 
 const BASE_PATH = "outputs";
 const BASE_NAME = "contracts";
 const EXTENSTION = "json";
 
+/**
+ * ファイルパスを生成する
+ *
+ * @param network ネットワーク名
+ * @param basePath ベースパス
+ * @param suffix サフィックス
+ * @returns ファイルパス
+ */
 const getFilePath = ({
   network,
   basePath,
@@ -136,36 +147,55 @@ const getFilePath = ({
     : `${commonFilePath}.${EXTENSTION}`;
 };
 
+/**
+ * コントラクトアドレスのJSONファイルをリセットする
+ *
+ * @param network ネットワーク名
+ */
 const resetContractAddressesJson = ({ network }: { network: string }): void => {
   const fileName = getFilePath({ network: network });
   if (fs.existsSync(fileName)) {
     const folderName = "tmp";
     fs.mkdirSync(folderName, { recursive: true });
-    // get current datetime in this timezone
+    // 現在の日時を取得
     const date = new Date();
     date.setTime(date.getTime() + 9 * 60 * 60 * 1000);
     const strDate = date
       .toISOString()
       .replace(/(-|T|:)/g, "")
       .substring(0, 14);
-    // rename current file
+    // 現在のファイルをリネーム
     fs.renameSync(
       fileName,
       getFilePath({
         network: network,
         basePath: "./tmp",
         suffix: strDate,
-      }),
+      })
     );
   }
   fs.writeFileSync(fileName, JSON.stringify({}, null, 2));
 };
 
+/**
+ * デプロイされたコントラクトアドレスを読み込む
+ *
+ * @param network ネットワーク名
+ * @returns コントラクトアドレス一覧
+ */
 const loadDeployedContractAddresses = (network: string) => {
   const filePath = getFilePath({ network: network });
   return jsonfile.readFileSync(filePath);
 };
 
+/**
+ * JSONオブジェクトを更新する
+ *
+ * @param group グループ名
+ * @param name キー名
+ * @param value 値
+ * @param obj 更新対象オブジェクト
+ */
 const _updateJson = ({
   group,
   name,
@@ -182,10 +212,18 @@ const _updateJson = ({
     obj[group] = value as Record<string, string>;
   } else {
     if (obj[group][name] === undefined) obj[group][name] = "";
-    obj[group][name] = JSON.stringify(value);
+    obj[group][name] = value as string;
   }
 };
 
+/**
+ * コントラクトアドレスを書き込む
+ *
+ * @param group グループ名
+ * @param name コントラクト名
+ * @param value アドレス
+ * @param network ネットワーク名
+ */
 const writeContractAddress = ({
   group,
   name,
@@ -213,6 +251,13 @@ const writeContractAddress = ({
   }
 };
 
+/**
+ * グループに値を書き込む
+ *
+ * @param group グループ名
+ * @param value 値
+ * @param fileName ファイル名
+ */
 const writeValueToGroup = ({
   group,
   value,
@@ -237,7 +282,7 @@ export {
   loadDeployedContractAddresses,
   resetContractAddressesJson,
   writeContractAddress,
-  writeValueToGroup,
+  writeValueToGroup
 };
 ```
 
@@ -281,6 +326,23 @@ const deploy = async () => {
 };
 
 deploy();
+```
+
+コントラクトリセット用のタスクは以下のような実装にしてください。
+これは必ず順守してください。
+
+```ts
+import "dotenv/config";
+import {task} from "hardhat/config";
+import {HardhatRuntimeEnvironment} from "hardhat/types";
+import {resetContractAddressesJson} from "../../helper/contractsJsonHelper";
+
+task("resetContractAddressesJson", "resetContractAddressesJson").setAction(
+  async (taskArgs: any, hre: HardhatRuntimeEnvironment) => {
+    // call reset contract address json file
+    resetContractAddressesJson({network: hre.network.name});
+  }
+);
 ```
 
 # .solhint.json の設定

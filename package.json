@@ -1,0 +1,22 @@
+{
+  "name": "web3-ai-vibe-coding-starter-kit",
+  "version": "1.0.0",
+  "description": "A comprehensive DEX implementation starter kit with Next.js frontend and Hardhat smart contracts",
+  "private": true,
+  "scripts": {
+    "contract": "pnpm --filter contract",
+    "lint": "pnpm biome check .",
+    "lint:fix": "pnpm biome check --apply .",
+    "format": "pnpm biome format --write .",
+    "type-check": "pnpm -r type-check"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.8.3",
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "packageManager": "pnpm@9.0.0"
+}

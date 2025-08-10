@@ -1,0 +1,13 @@
+{
+  "tokens": {
+    "TokenA": "0x9987f02c5AFaa19Acd07C2d9D3b440518e3280D1",
+    "TokenB": "0x2ED83286F3eA4953f29fBBd09490e6A32E26F512"
+  },
+  "dex": {
+    "DexFactory": "0x1c71Bc825B7569c9FD5b7528EBC03A4d2919AdD4",
+    "DexRouter": "0x72800394D5e9C4a0Df5AAb2ce8D6351eF898c66d"
+  },
+  "pairs": {
+    "TokenA-TokenB": "0x6483FF87EDdFc48116AF78a94CDF67d82Ce0290c"
+  }
+}

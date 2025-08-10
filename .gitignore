@@ -1,0 +1,30 @@
+# パッケージマネージャーで生成されるファイル
+**/node_modules
+**/.DS_Store
+
+# Biome
+.biome
+
+# TypeScript
+*.tsbuildinfo
+
+# 環境変数ファイル
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDEファイル
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS生成ファイル
+Thumbs.db
+*.log
+
+# テンポラリファイル
+tmp/
+temp/

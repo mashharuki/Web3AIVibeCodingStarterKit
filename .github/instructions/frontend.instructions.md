@@ -42,11 +42,11 @@ components.jsonの中身は以下のような設定に必ずしてください�
     "prefix": ""
   },
   "aliases": {
-    "components": "@/app/components",
-    "utils": "@/app/lib/utils",
-    "ui": "@/app/components/ui",
-    "lib": "@/app/lib",
-    "hooks": "@/app/hooks"
+    "components": "@/components",
+    "utils": "@/lib/utils",
+    "ui": "@/components/ui",
+    "lib": "@/lib",
+    "hooks": "@/hooks"
   },
   "iconLibrary": "lucide"
 }

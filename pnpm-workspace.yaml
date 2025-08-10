@@ -1,0 +1,3 @@
+# pnpmワークスペース設定
+packages:
+  - 'pkgs/*'
