@@ -40,3 +40,49 @@ pnpm contract run test
 ```bash
 pnpm contract run deploy --network sepolia
 ```
+
+## タスク系
+
+- DEXの情報を取得するタスク
+
+  ```bash
+  pnpm contract run dexInfo --network sepolia
+  ```
+
+- テスト用のトークンのfaucet method
+
+  ```bash
+  pnpm contract run mintToken --token TokenA --amount 1000 --network sepolia
+
+  pnpm contract run mintToken --token TokenB --amount 1000 --network sepolia
+  ```
+
+- DEXのトークンの残高状況
+
+  ```bash
+  pnpm contract run checkBalances --network sepolia
+  ```
+
+- 流動性の提供
+
+  ```bash
+  pnpm contract run addLiquidity --amount-a 50 --amount-b 50 --network sepolia
+  ```
+
+- 流動性の取り出し
+
+  ```bash
+  pnpm contract run removeLiquidity --liquidity 10 --network sepolia
+  ```
+
+- Swap前のクォート
+
+  ```bash
+  pnpm contract run quote --amount-in 5 --token-in TokenA --network sepolia
+  ```
+
+- 実際にトークンのスワップを行う
+
+  ```bash
+  pnpm contract run swap --amount-in 5 --token-in TokenA --slippage 1 --network sepolia
+  ```

@@ -15,7 +15,14 @@
     "size": "npx hardhat size-contracts",
     "lint": "npx solhint 'contracts/**/*.sol'",
     "verify": "npx hardhat verifyContracts",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "dexInfo": "npx hardhat dexInfo",
+    "mintToken": "npx hardhat mintTokens",
+    "checkBalances": "npx hardhat checkBalances",
+    "addLiquidity": "npx hardhat addLiquidity",
+    "removeLiquidity": "npx hardhat removeLiquidity",
+    "swap": "npx hardhat swapTokens",
+    "quote": "npx hardhat getSwapQuote"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-chai-matchers": "^2.0.0",
