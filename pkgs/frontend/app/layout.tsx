@@ -36,7 +36,7 @@ export default function RootLayout({
             {/* 背景エフェクト */}
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-purple-900/20 via-transparent to-transparent pointer-events-none" />
             <div className="absolute inset-0 bg-grid-white/[0.02] pointer-events-none" />
-            
+
             <Header />
             <main className="flex-1 container mx-auto px-4 py-8 relative z-10">
               {children}

@@ -84,16 +84,16 @@ function PositionCard({
               </div>
               <h3 className="text-xl font-bold text-white">{pairName}</h3>
             </div>
-            <Badge 
-              variant="secondary" 
+            <Badge
+              variant="secondary"
               className="bg-emerald-500/20 text-emerald-300 border-emerald-400/30 font-semibold"
             >
               {sharePercentage.toFixed(4)}% のシェア
             </Badge>
           </div>
           <Link href="/liquidity">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               size="sm"
               className="bg-white/10 border-white/20 text-white hover:bg-white/20 font-semibold rounded-xl"
             >
@@ -117,7 +117,9 @@ function PositionCard({
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-yellow-500/10 p-4 rounded-xl border border-yellow-400/20">
               <div className="text-center">
-                <div className="text-yellow-300 text-xs mb-1">{tokenASymbol}</div>
+                <div className="text-yellow-300 text-xs mb-1">
+                  {tokenASymbol}
+                </div>
                 <div className="text-white font-bold text-lg">
                   {Number(formatEther(userTokenA)).toLocaleString()}
                 </div>
@@ -136,16 +138,22 @@ function PositionCard({
           {/* プール情報 */}
           {reserves && (
             <div className="bg-white/5 p-4 rounded-xl border border-white/10">
-              <p className="text-gray-300 text-sm mb-3 font-semibold">プール全体の流動性</p>
+              <p className="text-gray-300 text-sm mb-3 font-semibold">
+                プール全体の流動性
+              </p>
               <div className="grid grid-cols-2 gap-3">
                 <div className="text-center">
-                  <div className="text-yellow-300 text-xs mb-1">{tokenASymbol}</div>
+                  <div className="text-yellow-300 text-xs mb-1">
+                    {tokenASymbol}
+                  </div>
                   <div className="text-white text-sm font-medium">
                     {Number(formatEther(reserves[0])).toLocaleString()}
                   </div>
                 </div>
                 <div className="text-center">
-                  <div className="text-blue-300 text-xs mb-1">{tokenBSymbol}</div>
+                  <div className="text-blue-300 text-xs mb-1">
+                    {tokenBSymbol}
+                  </div>
                   <div className="text-white text-sm font-medium">
                     {Number(formatEther(reserves[1])).toLocaleString()}
                   </div>
@@ -157,7 +165,9 @@ function PositionCard({
 
         {/* コントラクトアドレス */}
         <div className="mt-6 pt-4 border-t border-white/10">
-          <p className="text-gray-300 text-xs mb-2 font-semibold">ペアアドレス</p>
+          <p className="text-gray-300 text-xs mb-2 font-semibold">
+            ペアアドレス
+          </p>
           <code className="text-xs bg-black/30 text-gray-300 px-3 py-2 rounded-lg block break-all">
             {pairAddress}
           </code>
@@ -195,7 +205,9 @@ export default function PositionsPage() {
                 <div className="w-20 h-20 bg-gray-500/20 rounded-2xl flex items-center justify-center mx-auto mb-6">
                   <span className="text-4xl">🔐</span>
                 </div>
-                <h3 className="text-xl font-bold text-white mb-4">ウォレットを接続してください</h3>
+                <h3 className="text-xl font-bold text-white mb-4">
+                  ウォレットを接続してください
+                </h3>
                 <p className="text-gray-400 mb-8">
                   ウォレットを接続すると、あなたの流動性ポジションが表示されます
                 </p>

@@ -132,7 +132,9 @@ export function SwapPage() {
           <CardContent className="p-8 space-y-6">
             {/* From トークン */}
             <div className="space-y-3">
-              <Label className="text-base font-semibold text-white">売却トークン</Label>
+              <Label className="text-base font-semibold text-white">
+                売却トークン
+              </Label>
               <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10">
                 <div className="flex space-x-4 mb-4">
                   <Select
@@ -143,13 +145,19 @@ export function SwapPage() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent className="bg-gray-900 border-gray-700">
-                      <SelectItem value="TokenA" className="text-white hover:bg-gray-800">
+                      <SelectItem
+                        value="TokenA"
+                        className="text-white hover:bg-gray-800"
+                      >
                         <div className="flex items-center gap-2">
                           <span className="text-lg">🟡</span>
                           {TOKEN_INFO.TokenA.symbol}
                         </div>
                       </SelectItem>
-                      <SelectItem value="TokenB" className="text-white hover:bg-gray-800">
+                      <SelectItem
+                        value="TokenB"
+                        className="text-white hover:bg-gray-800"
+                      >
                         <div className="flex items-center gap-2">
                           <span className="text-lg">🔵</span>
                           {TOKEN_INFO.TokenB.symbol}
@@ -176,7 +184,10 @@ export function SwapPage() {
                   </div>
                 </div>
                 <div className="text-sm text-gray-300 bg-black/20 px-3 py-2 rounded-lg">
-                  💰 残高: {tokenInBalance ? Number(formatEther(tokenInBalance)).toLocaleString() : "0"}{" "}
+                  💰 残高:{" "}
+                  {tokenInBalance
+                    ? Number(formatEther(tokenInBalance)).toLocaleString()
+                    : "0"}{" "}
                   {TOKEN_INFO[tokenIn].symbol}
                 </div>
               </div>
@@ -196,7 +207,9 @@ export function SwapPage() {
 
             {/* To トークン */}
             <div className="space-y-3">
-              <Label className="text-base font-semibold text-white">購入トークン</Label>
+              <Label className="text-base font-semibold text-white">
+                購入トークン
+              </Label>
               <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10">
                 <div className="flex space-x-4 mb-4">
                   <Select
@@ -207,13 +220,19 @@ export function SwapPage() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent className="bg-gray-900 border-gray-700">
-                      <SelectItem value="TokenA" className="text-white hover:bg-gray-800">
+                      <SelectItem
+                        value="TokenA"
+                        className="text-white hover:bg-gray-800"
+                      >
                         <div className="flex items-center gap-2">
                           <span className="text-lg">🟡</span>
                           {TOKEN_INFO.TokenA.symbol}
                         </div>
                       </SelectItem>
-                      <SelectItem value="TokenB" className="text-white hover:bg-gray-800">
+                      <SelectItem
+                        value="TokenB"
+                        className="text-white hover:bg-gray-800"
+                      >
                         <div className="flex items-center gap-2">
                           <span className="text-lg">🔵</span>
                           {TOKEN_INFO.TokenB.symbol}
@@ -230,7 +249,10 @@ export function SwapPage() {
                   />
                 </div>
                 <div className="text-sm text-gray-300 bg-black/20 px-3 py-2 rounded-lg">
-                  💰 残高: {tokenOutBalance ? Number(formatEther(tokenOutBalance)).toLocaleString() : "0"}{" "}
+                  💰 残高:{" "}
+                  {tokenOutBalance
+                    ? Number(formatEther(tokenOutBalance)).toLocaleString()
+                    : "0"}{" "}
                   {TOKEN_INFO[tokenOut].symbol}
                 </div>
               </div>
@@ -238,7 +260,9 @@ export function SwapPage() {
 
             {/* スリッページ設定 */}
             <div className="space-y-3">
-              <Label className="text-base font-semibold text-white">スリッページ許容度</Label>
+              <Label className="text-base font-semibold text-white">
+                スリッページ許容度
+              </Label>
               <div className="flex space-x-3">
                 {["0.5", "1", "3"].map((value) => (
                   <Button
@@ -297,7 +321,10 @@ export function SwapPage() {
 
             {/* 実行ボタン */}
             {!address ? (
-              <Button className="w-full h-16 text-lg font-bold rounded-2xl bg-gradient-to-r from-gray-500 to-gray-600 text-white" disabled>
+              <Button
+                className="w-full h-16 text-lg font-bold rounded-2xl bg-gradient-to-r from-gray-500 to-gray-600 text-white"
+                disabled
+              >
                 🔐 ウォレットを接続してください
               </Button>
             ) : needsApproval ? (

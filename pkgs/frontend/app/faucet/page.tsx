@@ -106,7 +106,9 @@ export default function FaucetPage() {
                 <div className="w-16 h-16 bg-gray-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <span className="text-3xl">🔐</span>
                 </div>
-                <p className="text-white text-lg mb-6">ウォレットを接続してください</p>
+                <p className="text-white text-lg mb-6">
+                  ウォレットを接続してください
+                </p>
                 <div className="text-gray-400">
                   Faucetを利用するにはウォレット接続が必要です
                 </div>
@@ -127,7 +129,9 @@ export default function FaucetPage() {
                         <p className="text-gray-300 text-sm mb-1">現在の残高</p>
                         <p className="text-white text-lg font-bold">
                           {tokenABalance.data
-                            ? Number(formatEther(tokenABalance.data)).toLocaleString()
+                            ? Number(
+                                formatEther(tokenABalance.data)
+                              ).toLocaleString()
                             : "0"}{" "}
                           {TOKEN_INFO.TokenA.symbol}
                         </p>
@@ -171,7 +175,9 @@ export default function FaucetPage() {
                         <p className="text-gray-300 text-sm mb-1">現在の残高</p>
                         <p className="text-white text-lg font-bold">
                           {tokenBBalance.data
-                            ? Number(formatEther(tokenBBalance.data)).toLocaleString()
+                            ? Number(
+                                formatEther(tokenBBalance.data)
+                              ).toLocaleString()
                             : "0"}{" "}
                           {TOKEN_INFO.TokenB.symbol}
                         </p>
@@ -211,17 +217,23 @@ export default function FaucetPage() {
                     <div className="space-y-2">
                       <div className="flex items-center gap-2 text-cyan-200">
                         <span className="text-sm">⏰</span>
-                        <span className="text-sm">各トークンは1日1回まで取得可能</span>
+                        <span className="text-sm">
+                          各トークンは1日1回まで取得可能
+                        </span>
                       </div>
                       <div className="flex items-center gap-2 text-cyan-200">
                         <span className="text-sm">💎</span>
-                        <span className="text-sm">1回につき100トークンが取得可能</span>
+                        <span className="text-sm">
+                          1回につき100トークンが取得可能
+                        </span>
                       </div>
                     </div>
                     <div className="space-y-2">
                       <div className="flex items-center gap-2 text-cyan-200">
                         <span className="text-sm">🧪</span>
-                        <span className="text-sm">テスト用トークン（実際の価値なし）</span>
+                        <span className="text-sm">
+                          テスト用トークン（実際の価値なし）
+                        </span>
                       </div>
                       <div className="flex items-center gap-2 text-cyan-200">
                         <span className="text-sm">🔗</span>

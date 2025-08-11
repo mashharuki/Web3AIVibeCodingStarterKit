@@ -34,30 +34,34 @@ export function useOptimalLiquidityAmount(
   baseToken: "A" | "B" = "A"
 ) {
   // プールのリザーブを取得
-  const { 
-    data: reserves, 
+  const {
+    data: reserves,
     isLoading: isLoadingReserves,
-    error: reservesError 
+    error: reservesError,
   } = useReadContract({
     address: pairAddress,
     abi: PAIR_ABI,
     functionName: "getReserves",
     query: {
-      enabled: !!pairAddress && pairAddress !== "0x0000000000000000000000000000000000000000",
+      enabled:
+        !!pairAddress &&
+        pairAddress !== "0x0000000000000000000000000000000000000000",
     },
   });
 
   // トークンの順序を取得
-  const { 
-    data: token0, 
+  const {
+    data: token0,
     isLoading: isLoadingToken0,
-    error: token0Error 
+    error: token0Error,
   } = useReadContract({
     address: pairAddress,
     abi: PAIR_ABI,
     functionName: "token0",
     query: {
-      enabled: !!pairAddress && pairAddress !== "0x0000000000000000000000000000000000000000",
+      enabled:
+        !!pairAddress &&
+        pairAddress !== "0x0000000000000000000000000000000000000000",
     },
   });
 
@@ -67,57 +71,57 @@ export function useOptimalLiquidityAmount(
 
   const calculateOptimalAmounts = useCallback(() => {
     if (isCalculating) {
-      return { 
-        optimalAmountA: "0", 
-        optimalAmountB: "0", 
+      return {
+        optimalAmountA: "0",
+        optimalAmountB: "0",
         needsCalculation: false,
         isCalculating: true,
         hasError: false,
-        error: null
+        error: null,
       };
     }
 
     if (hasError || !reserves || !token0) {
-      return { 
-        optimalAmountA: "0", 
-        optimalAmountB: "0", 
+      return {
+        optimalAmountA: "0",
+        optimalAmountB: "0",
         needsCalculation: false,
         isCalculating: false,
         hasError: !!hasError,
-        error: reservesError || token0Error
+        error: reservesError || token0Error,
       };
     }
 
     // 基準となる値が入力されていない場合
     const baseAmount = baseToken === "A" ? amountA : amountB;
     if (!baseAmount || baseAmount === "0" || Number.isNaN(Number(baseAmount))) {
-      return { 
-        optimalAmountA: amountA || "0", 
-        optimalAmountB: amountB || "0", 
+      return {
+        optimalAmountA: amountA || "0",
+        optimalAmountB: amountB || "0",
         needsCalculation: false,
         isCalculating: false,
         hasError: false,
-        error: null
+        error: null,
       };
     }
 
     const contracts = getCurrentContracts();
     const tokenAAddress = contracts.tokens.TokenA.toLowerCase();
     const isToken0A = token0.toLowerCase() === tokenAAddress;
-    
+
     const [reserve0, reserve1] = reserves as readonly [bigint, bigint, number];
     const reserveA = isToken0A ? reserve0 : reserve1;
     const reserveB = isToken0A ? reserve1 : reserve0;
 
     // リザーブが0の場合（初回流動性追加）
     if (reserveA === BigInt(0) || reserveB === BigInt(0)) {
-      return { 
-        optimalAmountA: amountA || "0", 
-        optimalAmountB: amountB || "0", 
+      return {
+        optimalAmountA: amountA || "0",
+        optimalAmountB: amountB || "0",
         needsCalculation: false,
         isCalculating: false,
         hasError: false,
-        error: null
+        error: null,
       };
     }
 
@@ -138,18 +142,28 @@ export function useOptimalLiquidityAmount(
       optimalAmountA = (Number(optimalAWei) / 1e18).toString();
     }
 
-    return { 
-      optimalAmountA, 
-      optimalAmountB, 
+    return {
+      optimalAmountA,
+      optimalAmountB,
       needsCalculation: true,
       reserveA: Number(reserveA) / 1e18,
       reserveB: Number(reserveB) / 1e18,
       ratio: Number(reserveA) / Number(reserveB),
       isCalculating: false,
       hasError: false,
-      error: null
+      error: null,
     };
-  }, [reserves, token0, amountA, amountB, baseToken, isCalculating, hasError, reservesError, token0Error]);
+  }, [
+    reserves,
+    token0,
+    amountA,
+    amountB,
+    baseToken,
+    isCalculating,
+    hasError,
+    reservesError,
+    token0Error,
+  ]);
 
   return calculateOptimalAmounts();
 }
