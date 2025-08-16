@@ -136,7 +136,7 @@ style: |
 
 <p>このワークショップが終わる頃、あなたは…</p>
 <ul>
-  <li><strong>素早くWeb3アプリのプロトタイプを開発する</strong>コツが手に入ります</li>
+  <li><strong>Web3アプリのプロトタイプを開発する</strong>方法をゲット</li>
   <br>
   <li>AIの力を最大限に引き出す<strong>
   「コツ」</strong>が手に入ります</li>
@@ -154,11 +154,11 @@ style: |
 
 ---
 
-**お題： AMM DEX**
+**お題： AMM DEXを作ろう！**
 
 <br/>
 
-1. 要件定義書の作成
+1. 要件定義書と設計書の作成
 2. タスクリストの作成
 3. 実装開始
 
@@ -175,11 +175,11 @@ AI駆動開発体験は劇的に向上します！
 
 ### **コツ①：複数のモデルを使い分ける**
 
-<p><strong>「得意なこと」はAIによって違います。</strong></p>
+<p><strong>「できること・得意なこと」はモデルで異なります</strong></p>
 <ul>
-  <li><strong>コーディングが得意なモデル</strong><br>（例: Gemini 1.5 Pro, GPT-4o）</li>
+  <li><strong>コーディングが得意なモデル</strong><br>（例: Claude）</li>
   <br>
-  <li><strong>アイデア出しや壁打ちが得意なモデル</strong><br>（例: Claude 3 Sonnet）</li>
+  <li><strong>マルチモーダル処理ができるモデル</strong><br>（例: Gemini）</li>
 </ul>
 
 ---
@@ -211,19 +211,23 @@ AI駆動開発体験は劇的に向上します！
 ### **コツ③：段階的に進める**
 
 <ul>
-  <li>要件定義とタスクリストを作成する。</li>
-  <li>次に<strong>核となる機能</strong>を実装する。</li>
-  <li>それが動くことを確認する。</li>
-  <li>次の機能を追加する。</li>
+  <li>要件定義書と設計書とタスクリストを作成する</li>
+  <li>プロジェクトの全体をセットアップする</li>
+  <li>スマートコントラクトを実装する</li>
+  <li>フロントエンドを実装する</li>
 </ul>
 
 ---
 
 ### **コツ④：カスタムインストラクション**
 
-<p>AIへの<strong>「指示の出し方」</strong>も重要です。<br>カスタムインストラクションファイルを
+<p>AIへの<strong>「指示の出し方」</strong>も重要です。
+
+<br>カスタムインストラクションファイルを
 
 事前に準備しましょう。</p>
+
+<br/>
 
 <p>明確な指示が、AIの力を最大化します！</p>
 
@@ -234,6 +238,8 @@ AI駆動開発体験は劇的に向上します！
 
 # **Hands-on Time!**
 ## **(90〜125分)**
+
+---
 
 <br>
 
@@ -250,10 +256,10 @@ AI駆動開発体験は劇的に向上します！
 ## **ハンズオンの手順**
 
 <ul>
-  <li><strong>要件定義書とタスクリストを作成する(Gemini)</strong></li>
-  <li><strong>プロジェクトのセットアップ(Claude)</strong></li>
-  <li><strong>スマートコントラクトの開発(Claude)</strong></li>
-  <li><strong>フロントエンドの開発(Claude)</strong></li>
+  <li><strong>要件定義書と設計書とタスクリストを作成する</strong></li>
+  <li><strong>プロジェクトのセットアップ</strong></li>
+  <li><strong>スマートコントラクトの開発</strong></li>
+  <li><strong>フロントエンドの開発</strong></li>
 </ul>
 
 ---
@@ -276,6 +282,24 @@ AI駆動開発体験は劇的に向上します！
 
 ---
 
+## **見本の設定ファイル**
+
+[Claude Codeの設定ファイル](https://github.com/mashharuki/Web3AIVibeCodingStarterKit/tree/main/.claude)
+
+[Gemini CLIの設定ファイル](https://github.com/mashharuki/Web3AIVibeCodingStarterKit/tree/main/.gemini)
+
+[GitHub Copilotの設定ファイル](https://github.com/mashharuki/Web3AIVibeCodingStarterKit/tree/main/.github)
+
+[Kiroの設定ファイル](https://github.com/mashharuki/Web3AIVibeCodingStarterKit/tree/main/.kiro)
+
+---
+
+<!-- _backgroundColor: var(--color-secondary) -->
+<!-- _color: #fff -->
+
+# **Q&A / 成果発表会**
+---
+
 ## **本日のまとめ**
 
 <p>今日、私たちはAI Vibe Codingの世界を探求し、
@@ -294,12 +318,6 @@ AI駆動開発体験は劇的に向上します！
   <li>✅ <strong>カスタムインストラクションのセットアップ</strong></li>
 </ul>
 
----
-
-<!-- _backgroundColor: var(--color-secondary) -->
-<!-- _color: #fff -->
-
-# **Q&A / 成果発表会**
 ---
 
 <!-- _class: lead -->
