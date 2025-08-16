@@ -1,0 +1,43 @@
+{
+  "theme": "GitHub", 
+  "contextFileName": ".gemini/GEMINI.md",
+  "preferredEditor": "vscode",  
+  "selectedAuthType": "oauth-personal",
+  "fileFiltering": {
+    "respectGitIgnore": true,  // .gitignore考慮
+    "enableRecursiveFileSearch": true  // 再帰検索
+  },
+  "checkpointing": {
+    "enabled": true
+  },
+  // バグ報告カスタマイズ
+  "bugCommand": {
+    "urlTemplate": "https://github.com/myorg/myrepo/issues/new?title={title}&body={info}"
+  },
+  // テレメトリ
+  "telemetry": {
+    "enabled": false,
+    "target": "local",  // "local" or "gcp"
+    "otlpEndpoint": "http://localhost:4317",
+    "logPrompts": true
+  },
+  // 使用統計
+  "usageStatisticsEnabled": true,
+  "mcpServers": {
+    "context7": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp@latest"]
+    },
+    "deepwiki": {
+      "url": "https://mcp.deepwiki.com/sse"
+    },
+    "sequential-thinking": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-sequential-thinking"
+      ]
+    }
+  }
+}

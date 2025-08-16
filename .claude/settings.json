@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls:*)",
+      "Bash(cat:*)",
+      "Bash(npm run dev)",
+      "Bash(npm run build)"
+    ],
+    "deny": [
+      "Bash(rm -rf:*)",
+      "Bash(sudo:*)",
+      "Read(.env)"
+    ]
+  },
+  "hooks": {
+    "before:Bash": ["echo 'Executing command: {command}'"],
+    "after:Edit": ["echo 'Executed command: {command}'"],
+  }
+}
