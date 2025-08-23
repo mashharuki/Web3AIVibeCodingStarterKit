@@ -94,7 +94,19 @@ style: |
 <!-- _class: lead -->
 <!-- _backgroundColor: #000 -->
 
-## A Hands-on Web3 AI Vibe Coding Workshop
+## LLM開発環境の構築
+
+---
+
+## **本日のアジェンダ**
+
+1.  **オープニング、自己紹介**
+2.  **本日のゴール**
+3.  **AI VibeCodingの環境全体像**
+4.  **おすすめツール等の紹介**
+5.  **AI Vibe Coding のコツ**
+6.  **まとめ**
+7.  **Q & A**
 
 ---
 
@@ -120,23 +132,11 @@ style: |
 
 ---
 
-## **本日のアジェンダ**
-
-1.  **オープニング、自己紹介 (5分)**
-2.  **本日のゴールと流れ (5分)**
-3.  **AI Vibe Coding ライブデモ (10分)**
-4.  **AI Vibe Coding のコツ (10分)**
-5.  **ハンズオン (90〜125分)**
-6.  **まとめ、振り返り (5分)**
-7.  **成果発表 & 交流会 (20〜55分)**
-
----
-
-## **本ワークショップのゴール**
+## **本日のゴール**
 
 <p>このワークショップが終わる頃、あなたは…</p>
 <ul>
-  <li><strong>Web3アプリのプロトタイプを開発する</strong>方法をゲット</li>
+  <li><strong>LLM開発環境の構築</strong>方法をゲット</li>
   <br>
   <li>AIの力を最大限に引き出す<strong>
   「コツ」</strong>が手に入ります</li>
@@ -144,23 +144,49 @@ style: |
 
 ---
 
-## **AI Vibe Coding ライブデモ**
-
-### **「AIと一緒にdAppが生まれる瞬間」**
-
-<br>
-
-これから、**AIとの対話**を中心にDEXのプロトタイプを**ゼロから構築**する様子をお見せします。
+## **AI VibeCodingの環境全体像**
 
 ---
 
-**お題： AMM DEXを作ろう！**
+## **おすすめツール等の紹介**
 
-<br/>
+---
 
-1. 要件定義書と設計書の作成
-2. タスクリストの作成
-3. 実装開始
+### IDE
+
+---
+
+- **VS Code(GitHub Copilotとの併用前提)**
+
+- **Kiro**
+
+---
+
+### Coding Agent
+
+---
+
+- **GitHub Copilot Agent Mode**
+
+- **Gemini CLI**
+
+- **Kiroに内蔵されたCoding Agent**
+
+- **Claude Code**
+
+---
+
+### MCP
+
+---
+
+- **context7**
+
+- **serena MCP**
+
+- **GitHub MCP**
+
+- **sequential-thinking**
 
 ---
 
@@ -233,37 +259,6 @@ AI駆動開発体験は劇的に向上します！
 
 ---
 
-<!-- _backgroundColor: var(--color-primary) -->
-<!-- _color: #fff -->
-
-# **Hands-on Time!**
-## **(90〜125分)**
-
----
-
-<br>
-
-1.  **基本編：DEX（分散型取引所）開発**
-    - まずは用意されたお題で、AI Vibe Codingの基本フローを体験！
-
----
-
-2.  **応用編：オリジナルdApp開発** (時間があれば)
-    - あなたの自由なアイデアで、世界に一つだけのdAppを創造しよう！
-
----
-
-## **ハンズオンの手順**
-
-<ul>
-  <li><strong>要件定義書と設計書とタスクリストを作成する</strong></li>
-  <li><strong>プロジェクトのセットアップ</strong></li>
-  <li><strong>スマートコントラクトの開発</strong></li>
-  <li><strong>フロントエンドの開発</strong></li>
-</ul>
-
----
-
 ## **見本のGitHub**
 
 [GitHub -Web3AIVibeCodingStarterKit](https://github.com/mashharuki/Web3AIVibeCodingStarterKit/tree/amm_dex)
@@ -294,17 +289,9 @@ AI駆動開発体験は劇的に向上します！
 
 ---
 
-<!-- _backgroundColor: var(--color-secondary) -->
-<!-- _color: #fff -->
-
-# **Q&A / 成果発表会**
----
-
 ## **本日のまとめ**
 
-<p>今日、私たちはAI Vibe Codingの世界を探求し、
-
-その驚くべき可能性を体験しました。</p>
+<p></p>
 
 ---
 
@@ -317,6 +304,13 @@ AI駆動開発体験は劇的に向上します！
   <li>✅ <strong>段階的に進める</strong></li>
   <li>✅ <strong>カスタムインストラクションのセットアップ</strong></li>
 </ul>
+
+---
+
+<!-- _backgroundColor: var(--color-secondary) -->
+<!-- _color: #fff -->
+
+# **Q&A**
 
 ---
 
