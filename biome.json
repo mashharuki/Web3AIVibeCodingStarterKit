@@ -111,7 +111,8 @@
       ".claude/**",
       ".gemini/**",
       ".vscode/**",
-      ".git/**"
+      ".git/**",
+      "**/deployments/**"
     ]
   }
 }

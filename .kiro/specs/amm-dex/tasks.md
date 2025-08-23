@@ -15,6 +15,7 @@
   - solhint 設定ファイル（.solhint.json、.solhintignore）の作成
   - prittier(スマートコントラクトのみ)
   - TypeScript 設定とディレクトリ構造の作成
+  - デフォルトプロジェクトでコンパイルが問題なく行えるかどうか確認する
   - _要件: 8.1, 8.2_
 
 - [x] 3. フロントエンド開発環境のセットアップ
@@ -22,6 +23,7 @@
   - 必要な依存関係のインストール（wagmi、viem、ethers、RainbowKit 等）
   - Shadcn/UI 設定（components.json）と Tailwind CSS 設定
   - PWA 設定（next.config.js）とディレクトリ構造の作成
+  - デフォルトプロジェクトでコンパイルが問題なく行えるかどうか確認する
   - _要件: 7.1, 7.2_
 
 ## スマートコントラクト実装
@@ -39,7 +41,7 @@
   - OpenZeppelin の Ownable を使用したアクセス制御
   - _要件: 3.1, 8.1, 8.2_
 
-- [x] 6. DEXPair コントラクトの実装
+- [ ] 6. DEXPair コントラクトの実装
   - ERC-20 LP トークン機能の実装
   - 流動性管理機能（mint、burn）の実装
   - スワップ機能（swap）と x\*y=k 公式の実装

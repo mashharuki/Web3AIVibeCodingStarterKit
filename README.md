@@ -91,42 +91,28 @@ pnpm dev
 ### ルートレベル
 
 ```bash
-# 全パッケージのビルド
-pnpm build
-
-# 全パッケージの開発サーバー起動
-pnpm dev
-
-# 全パッケージのテスト実行
-pnpm test
-
 # コードフォーマット
 pnpm format
-
-# コード品質チェック
-pnpm check
-
-# 全パッケージのクリーンアップ
-pnpm clean
 ```
 
 ### スマートコントラクト (pkgs/contract)
 
 ```bash
 # コンパイル
-pnpm build
+pnpm contract build
 
 # テスト実行
-pnpm test
+pnpm contract test
 
 # Sepoliaにデプロイ
-pnpm deploy
+pnpm contract deploy:DEXFactory --network sepolia
+pnpm contract deploy:TestToken --network sepolia
 
 # コントラクト検証
-pnpm verify
+pnpm contract verify
 
 # Solidityリント
-pnpm lint
+pnpm contract lint
 ```
 
 ### フロントエンド (pkgs/frontend)

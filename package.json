@@ -11,7 +11,7 @@
     "format": "biome format --write .",
     "check": "biome check .",
     "clean": "pnpm -r clean && rm -rf node_modules",
-    "contract": "pnpm --filter @amm-dex/contract"
+    "contract": "pnpm --filter contract"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.8.3",
