@@ -2,6 +2,10 @@
 
 AI VibeCodingでWeb3アプリを開発するためのスターターキットです！
 
+## AI VibeCodingの環境例
+
+![AI VibeCodingの環境例](./docs/drawio/overview.drawio.png)
+
 ## AI VibeCodingでWeb3アプリを開発する時の手順
 
 1. 作りたいものを決める。
