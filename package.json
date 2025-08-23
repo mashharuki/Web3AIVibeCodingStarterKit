@@ -10,11 +10,13 @@
     "lint": "pnpm -r lint",
     "format": "biome format --write .",
     "check": "biome check .",
-    "clean": "pnpm -r clean && rm -rf node_modules"
+    "clean": "pnpm -r clean && rm -rf node_modules",
+    "contract": "pnpm --filter @amm-dex/contract"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.8.3",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "ts-node": "^10.9.2"
   },
   "engines": {
     "node": ">=18.0.0",
