@@ -15,9 +15,11 @@ applyTo: './pkgs/contract/**'
 - pnpm
 - Hardhat
 - hardhat-gas-reporter
+- hardhat-prettier
+- prettier-plugin-solidity
 - solhint
 - viem
-- OpenZeppelin 
+- OpenZeppelin
 - AlchemyのRPC エンドポイント
 
 # フォルダ構成
@@ -28,11 +30,11 @@ applyTo: './pkgs/contract/**'
 ├── README.md
 ├── contracts         # solファイル群を格納するフォルダ
 ├── hardhat.config.ts # Hardhatの設定ファイル
-├── helpers           # ユーティリティ関数を格納するフォルダ  
+├── helpers           # ユーティリティ関数を格納するフォルダ
 ├── ignition          # スマートコントラクトのデプロイメントスクリプトを格納するフォルダ
-├── outputs           # デプロイメントの出力を格納するフォルダ  
-├── package.json    
-├── tasks             # Hardhatのタスクファイル群を格納するフォルダ   
+├── outputs           # デプロイメントの出力を格納するフォルダ
+├── package.json
+├── tasks             # Hardhatのタスクファイル群を格納するフォルダ
 ├── test              # テストコード群を格納するフォルダ
 ├── .solhint.json     # solhintの設定ファイル
 ├── .solhintignore
@@ -46,14 +48,15 @@ applyTo: './pkgs/contract/**'
 `hardhat.config.ts` の中身は以下のようにしてください。
 
 ```typescript
-import "@nomicfoundation/hardhat-ethers";
-import "@nomicfoundation/hardhat-toolbox-viem";
-import "@nomicfoundation/hardhat-viem";
-import "@openzeppelin/hardhat-upgrades";
-import * as dotenv from "dotenv";
-import "hardhat-gas-reporter";
-import type { HardhatUserConfig } from "hardhat/config";
-import "./tasks";
+import '@nomicfoundation/hardhat-ethers';
+import '@nomicfoundation/hardhat-toolbox-viem';
+import '@nomicfoundation/hardhat-viem';
+import '@openzeppelin/hardhat-upgrades';
+import * as dotenv from 'dotenv';
+import 'hardhat-gas-reporter';
+import type { HardhatUserConfig } from 'hardhat/config';
+import './tasks';
+import 'hardhat-prettier';
 
 dotenv.config();
 
@@ -69,7 +72,7 @@ const config: HardhatUserConfig = {
   solidity: {
     compilers: [
       {
-        version: "0.8.30",
+        version: '0.8.30',
         settings: {
           viaIR: true,
           optimizer: {
@@ -90,16 +93,16 @@ const config: HardhatUserConfig = {
   },
   etherscan: {
     apiKey: {
-      sepolia: ETHERSCAN_API_KEY ?? "",
+      sepolia: ETHERSCAN_API_KEY ?? '',
     },
   },
   gasReporter: {
     enabled: true,
-    currency: "USD",
-    token: "ETH",
+    currency: 'USD',
+    token: 'ETH',
     coinmarketcap: COINMARKETCAP_API_KEY,
     gasPriceApi:
-      "https://api.etherscan.io/api?module=proxy&action=eth_gasPrice",
+      'https://api.etherscan.io/api?module=proxy&action=eth_gasPrice',
   },
 };
 
@@ -113,12 +116,12 @@ export default config;
 中身は以下のようにしてください。
 
 ```typescript
-import fs from "node:fs";
-import jsonfile from "jsonfile";
+import fs from 'node:fs';
+import jsonfile from 'jsonfile';
 
-const BASE_PATH = "outputs";
-const BASE_NAME = "contracts";
-const EXTENSTION = "json";
+const BASE_PATH = 'outputs';
+const BASE_NAME = 'contracts';
+const EXTENSTION = 'json';
 
 const getFilePath = ({
   network,
@@ -139,23 +142,23 @@ const getFilePath = ({
 const resetContractAddressesJson = ({ network }: { network: string }): void => {
   const fileName = getFilePath({ network: network });
   if (fs.existsSync(fileName)) {
-    const folderName = "tmp";
+    const folderName = 'tmp';
     fs.mkdirSync(folderName, { recursive: true });
     // get current datetime in this timezone
     const date = new Date();
     date.setTime(date.getTime() + 9 * 60 * 60 * 1000);
     const strDate = date
       .toISOString()
-      .replace(/(-|T|:)/g, "")
+      .replace(/(-|T|:)/g, '')
       .substring(0, 14);
     // rename current file
     fs.renameSync(
       fileName,
       getFilePath({
         network: network,
-        basePath: "./tmp",
+        basePath: './tmp',
         suffix: strDate,
-      }),
+      })
     );
   }
   fs.writeFileSync(fileName, JSON.stringify({}, null, 2));
@@ -181,7 +184,7 @@ const _updateJson = ({
   if (name === null) {
     obj[group] = value as Record<string, string>;
   } else {
-    if (obj[group][name] === undefined) obj[group][name] = "";
+    if (obj[group][name] === undefined) obj[group][name] = '';
     obj[group][name] = JSON.stringify(value);
   }
 };
@@ -335,4 +338,3 @@ https://github.com/ConsenSysDiligence/smart-contract-best-practices
 
 Solidityの言語の仕様については以下のリポジトリを参照してください。
 https://github.com/ethereum/solidity
-

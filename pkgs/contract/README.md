@@ -1,68 +1,75 @@
-# AMM DEX スマートコントラクト
+# AMM DEX Smart Contracts
 
-UniswapライクなAMM（Automated Market Maker）DEXのスマートコントラクト実装です。
+AMM（自動マーケットメーカー）型DEXのスマートコントラクト実装です。
 
 ## 概要
 
 このパッケージには以下のコントラクトが含まれています：
 
-- **DEXFactory**: 新しい流動性ペアの作成と管理
-- **DEXPair**: 流動性プールとトークンスワップ機能
-- **DEXRouter**: ユーザーフレンドリーなインターフェース
-- **TestTokenFaucet**: 検証用トークンの配布機能
-- **TestToken**: 検証用ERC-20トークン
-
-## 技術スタック
-
-- **Solidity**: ^0.8.30
-- **Hardhat**: 開発・テスト・デプロイフレームワーク
-- **OpenZeppelin**: セキュアなコントラクトライブラリ
-- **TypeScript**: 型安全な開発環境
+- **AMMFactory**: ペア作成・管理
+- **AMMPair**: 流動性プール実装
+- **AMMRouter**: スワップ・流動性管理
 
 ## セットアップ
 
+### 1. 依存関係のインストール
+
 ```bash
-# 依存関係のインストール
 pnpm install
+```
 
-# コンパイル
+### 2. 環境変数の設定
+
+```bash
+cp .env.example .env
+# .envファイルを編集して必要な値を設定
+```
+
+### 3. コンパイル
+
+```bash
 pnpm build
+```
 
-# テスト実行
+## 開発
+
+### テスト実行
+
+```bash
+# 全テスト実行
 pnpm test
 
-# ガスレポート
-pnpm gas-report
+# カバレッジ付きテスト
+pnpm test:coverage
 ```
 
-## デプロイ
+### デプロイ
 
 ```bash
-# Sepoliaテストネットにデプロイ
-pnpm deploy
-
-# コントラクト検証
-pnpm verify
+# Sepoliaネットワークにデプロイ
+pnpm deploy --network sepolia
 ```
 
-## 環境変数
+## 使用技術
 
-`.env`ファイルを作成し、以下の変数を設定してください：
-
-```
-PRIVATE_KEY=your_private_key
-ALCHEMY_API_KEY=your_alchemy_api_key
-ETHERSCAN_API_KEY=your_etherscan_api_key
-COINMARKETCAP_API_KEY=your_coinmarketcap_api_key
-```
+| ライブラリ   | 概要                                 | バージョン |
+| ------------ | ------------------------------------ | ---------- |
+| Hardhat      | 開発・テスト・デプロイフレームワーク | ^2.19.0    |
+| OpenZeppelin | セキュアなコントラクトライブラリ     | ^5.0.0     |
+| TypeChain    | TypeScript型生成                     | ^8.3.0     |
+| ethers.js    | Ethereumライブラリ                   | ^6.4.0     |
 
 ## ディレクトリ構造
 
 ```
-contracts/          # Solidityコントラクト
-test/              # テストファイル
-ignition/          # デプロイスクリプト
-tasks/             # Hardhatタスク
-helpers/           # ヘルパー関数
-outputs/           # デプロイ結果
+contracts/
+├── core/           # コアコントラクト
+├── interfaces/     # インターフェース定義
+└── libraries/      # ライブラリコントラクト
+test/
+├── unit/          # ユニットテスト
+└── integration/   # 統合テスト
+scripts/
+├── deploy/        # デプロイスクリプト
+└── verify/        # 検証スクリプト
 ```

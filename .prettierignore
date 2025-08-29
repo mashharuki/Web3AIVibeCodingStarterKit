@@ -1,0 +1,11 @@
+node_modules/
+dist/
+build/
+coverage/
+.next/
+artifacts/
+cache/
+typechain-types/
+*.log
+*.lock
+.env*

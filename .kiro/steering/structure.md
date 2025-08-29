@@ -17,7 +17,8 @@
 ├── package.json             # ルートパッケージ設定
 ├── pnpm-lock.yaml           # pnpm依存関係ロック
 ├── pnpm-workspace.yaml      # pnpmワークスペース設定
-├── biome.json               # Biomeフォーマッター・リンター設定
+├── .prettierrc              # フォーマッター設定
+├── .prettierignore          # フォーマッター設定ファイル(フォーマッターの対象にしないものはここに含める)
 ├── README.md                # プロジェクト概要とセットアップガイド
 └── LICENSE                  # プロジェクトライセンス
 ```

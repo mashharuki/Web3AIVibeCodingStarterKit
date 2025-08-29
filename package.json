@@ -1,26 +1,22 @@
 {
   "name": "amm-dex-monorepo",
   "version": "1.0.0",
-  "description": "UniswapライクなAMM DEXのモノレポプロジェクト",
+  "description": "AMM DEX - Automated Market Maker Decentralized Exchange",
   "private": true,
   "scripts": {
     "build": "pnpm -r build",
-    "dev": "pnpm -r dev",
     "test": "pnpm -r test",
     "lint": "pnpm -r lint",
-    "format": "biome format --write .",
-    "check": "biome check .",
-    "clean": "pnpm -r clean && rm -rf node_modules",
-    "contract": "pnpm --filter contract"
+    "format": "prettier --write .",
+    "clean": "pnpm -r clean",
+    "contract": "pnpm --filter @amm-dex/contract"
   },
   "devDependencies": {
-    "@biomejs/biome": "^1.8.3",
-    "typescript": "^5.3.3",
-    "ts-node": "^10.9.2"
+    "prettier": "^3.0.0"
   },
   "engines": {
     "node": ">=18.0.0",
     "pnpm": ">=8.0.0"
   },
-  "packageManager": "pnpm@8.15.1"
+  "packageManager": "pnpm@8.15.0"
 }

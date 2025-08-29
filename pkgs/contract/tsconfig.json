@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
-    "target": "ES2022",
+    "target": "es2020",
     "module": "commonjs",
-    "lib": ["ES2022"],
+    "lib": ["es2020"],
     "outDir": "./dist",
     "rootDir": "./",
     "strict": true,
@@ -12,17 +12,13 @@
     "resolveJsonModule": true,
     "declaration": true,
     "declarationMap": true,
-    "sourceMap": true,
-    "typeRoots": ["./node_modules/@types"],
-    "moduleResolution": "node"
+    "sourceMap": true
   },
   "include": [
     "./contracts/**/*",
+    "./scripts/**/*",
     "./test/**/*",
-    "./ignition/**/*",
-    "./tasks/**/*",
-    "./helpers/**/*",
-    "./hardhat.config.ts"
+    "./typechain-types/**/*"
   ],
-  "exclude": ["node_modules", "dist", "artifacts", "cache", "typechain-types"]
+  "exclude": ["node_modules", "dist", "artifacts", "cache"]
 }

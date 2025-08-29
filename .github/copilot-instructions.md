@@ -12,24 +12,23 @@
 - コメントは必要に応じて記述し、記述する場合は日本語で記述する
 
   以下にコメントのルールを示します。
-
   - 変数系へのコメントのルール
 
     ```ts
     // 変数の概要を記述する
-    const variableName: Type = value; 
+    const variableName: Type = value;
     ```
 
   - メソッド系へのコメントのルール
 
     ```ts
     /**
-    * メソッドの概要を記述する
-    *
-    * @param param1 パラメータ1の説明
-    * @param param2 パラメータ2の説明
-    * @returns 戻り値の説明
-    */
+     * メソッドの概要を記述する
+     *
+     * @param param1 パラメータ1の説明
+     * @param param2 パラメータ2の説明
+     * @returns 戻り値の説明
+     */
     function methodName(param1: Type1, param2: Type2): ReturnType {
       // メソッドの処理内容を記述する
     }

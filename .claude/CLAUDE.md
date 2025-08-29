@@ -31,12 +31,14 @@ Web3AIVibeCodingStarterKit/
 ## 技術スタック
 
 ### Smart Contract
+
 - **Framework**: Hardhat または Foundry
 - **Language**: Solidity
 - **Standards**: ERC-721, ERC-1155
 - **Network**: Ethereum Sepolia（開発用）
 
 ### Frontend
+
 - **Framework**: React/Next.js（推奨）
 - **Web3 Library**: ethers.js または viem
 - **Wallet Integration**: MetaMask, Email Auth
@@ -53,12 +55,14 @@ Web3AIVibeCodingStarterKit/
 ## コーディング規則
 
 ### スマートコントラクト
+
 - セキュリティベストプラクティスに従う
 - OpenZeppelinライブラリを活用
 - 適切なアクセス制御とガス最適化
 - 包括的なテストカバレッジ
 
 ### フロントエンド
+
 - TypeScriptを使用
 - レスポンシブデザイン対応
 - Web3ユーザビリティを考慮
@@ -80,7 +84,7 @@ npm test
 npm run compile
 
 # フロントエンド
-cd pkgs/frontend  
+cd pkgs/frontend
 npm test
 npm run build
 npm run lint
@@ -90,6 +94,7 @@ npm run typecheck
 ## デプロイメント
 
 ### Sepolia Testnet設定
+
 - Chain ID: 11155111
 - RPC URL: https://eth-sepolia.g.alchemy.com/v2/YOUR-PROJECT-ID
 - Block Explorer: https://sepolia.etherscan.io/

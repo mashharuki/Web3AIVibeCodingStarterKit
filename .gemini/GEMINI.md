@@ -14,14 +14,14 @@
 
 開発には以下の技術スタックを使用します。
 
-| カテゴリ         | 技術/ツール                                                              | 備考                               |
-| ---------------- | ------------------------------------------------------------------------ | ---------------------------------- |
-| **全体**         | pnpm, Node.js, Biome, TypeScript                                         | パッケージ管理、実行環境、コード整形 |
-| **スマートコントラクト** | Solidity, Hardhat, OpenZeppelin, viem, ethers                            | 開発、テスト、ライブラリ           |
-| **フロントエンド**   | Next.js (Page Router), React, Tailwind CSS, Shadcn/UI, PWA               | フレームワーク、UI                 |
-| **Web3 (フロント)**  | wagmi, RainbowKit, viem, ethers                                          | ウォレット接続、コントラクト操作   |
-| **インフラ**     | Alchemy, Vercel, IPFS                                                    | RPC、ホスティング、分散ストレージ  |
-| **CI/CD**        | GitHub Actions                                                           | 自動テスト、デプロイ               |
+| カテゴリ                 | 技術/ツール                                                | 備考                                 |
+| ------------------------ | ---------------------------------------------------------- | ------------------------------------ |
+| **全体**                 | pnpm, Node.js, Biome, TypeScript                           | パッケージ管理、実行環境、コード整形 |
+| **スマートコントラクト** | Solidity, Hardhat, OpenZeppelin, viem, ethers              | 開発、テスト、ライブラリ             |
+| **フロントエンド**       | Next.js (Page Router), React, Tailwind CSS, Shadcn/UI, PWA | フレームワーク、UI                   |
+| **Web3 (フロント)**      | wagmi, RainbowKit, viem, ethers                            | ウォレット接続、コントラクト操作     |
+| **インフラ**             | Alchemy, Vercel, IPFS                                      | RPC、ホスティング、分散ストレージ    |
+| **CI/CD**                | GitHub Actions                                             | 自動テスト、デプロイ                 |
 
 ## 3. プロジェクト構造
 
@@ -76,4 +76,3 @@
 - **指示の優先順位**: この `GEMINI.md` ファイルの指示が最も優先されます。次に `.github/instructions/` や `.kiro/steering/` 内のファイルを参考にしてください。
 - **自己完結**: 各タスクは、関連ファイルを読み込み、自己完結的に解決策を提示・実装してください。
 - **確認**: 大きな変更や不明瞭な点がある場合は、実装前にユーザーに確認を取ってください。
-

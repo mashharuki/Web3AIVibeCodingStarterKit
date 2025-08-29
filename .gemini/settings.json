@@ -1,11 +1,11 @@
 {
-  "theme": "GitHub", 
+  "theme": "GitHub",
   "contextFileName": ".gemini/GEMINI.md",
-  "preferredEditor": "vscode",  
+  "preferredEditor": "vscode",
   "selectedAuthType": "oauth-personal",
   "fileFiltering": {
-    "respectGitIgnore": true,  // .gitignore考慮
-    "enableRecursiveFileSearch": true  // 再帰検索
+    "respectGitIgnore": true, // .gitignore考慮
+    "enableRecursiveFileSearch": true // 再帰検索
   },
   "checkpointing": {
     "enabled": true
@@ -17,7 +17,7 @@
   // テレメトリ
   "telemetry": {
     "enabled": false,
-    "target": "local",  // "local" or "gcp"
+    "target": "local", // "local" or "gcp"
     "otlpEndpoint": "http://localhost:4317",
     "logPrompts": true
   },
@@ -34,10 +34,7 @@
     },
     "sequential-thinking": {
       "command": "npx",
-      "args": [
-        "-y",
-        "@modelcontextprotocol/server-sequential-thinking"
-      ]
+      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"]
     },
     "serena": {
       "command": "uvx",

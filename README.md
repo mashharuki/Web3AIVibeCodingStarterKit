@@ -1,53 +1,41 @@
-# AMM DEX モノレポプロジェクト
+# AMM DEX - Automated Market Maker Decentralized Exchange
 
-UniswapライクなAMM（Automated Market Maker）DEXのモノレポプロジェクトです。Ethereum Sepoliaテストネット上で動作し、Web3初心者から上級者まで利用できるユーザーフレンドリーなインターフェースを提供します。
+Ethereum Sepolia テストネットワーク上で動作するAMM（自動マーケットメーカー）型分散型取引所（DEX）です。
 
-## プロジェクト構成
+## 概要
+
+このプロジェクトは、Uniswap V2のコア機能を参考に、流動性プール管理とトークンスワップ機能を提供するDEXです。
+
+### 対象トークン
+
+- **USDC**: `0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238`
+- **JPYC**: `0x431D5dfF03120AFA4bDf332c61A6e1766eF37BDB`
+- **PYUSD**: `0xCaC524BcA292aaade2DF8A05cC58F0a65B1B3bB9`
+
+### 主要機能
+
+- **トークンスワップ**: 自動価格計算によるトークン交換
+- **流動性プール管理**: 流動性の追加・削除
+- **リアルタイム価格表示**: 市場価格の即座な更新
+- **ウォレット統合**: MetaMask接続とアカウント管理
+
+## プロジェクト構造
 
 ```
 ├── pkgs/
-│   ├── contract/          # スマートコントラクト開発
+│   ├── contract/          # スマートコントラクト
 │   └── frontend/          # フロントエンドアプリケーション
 ├── docs/                  # ドキュメント
-├── .kiro/                 # Kiro設定とスペック
-└── README.md
+├── .kiro/                 # Kiro設定
+└── README.md              # このファイル
 ```
 
-## 技術スタック
-
-| カテゴリ | 技術 | バージョン | 概要 |
-|---------|------|-----------|------|
-| **パッケージマネージャー** | pnpm | ^8.15.1 | 高速で効率的なパッケージ管理 |
-| **フォーマッター・リンター** | Biome | ^1.8.3 | 高速なフォーマッターとリンター |
-| **言語** | TypeScript | ^5.3.3 | 型安全なJavaScript開発 |
-
-### スマートコントラクト (pkgs/contract)
-
-| 技術 | バージョン | 概要 |
-|------|-----------|------|
-| Hardhat | ^2.19.4 | 開発・テスト・デプロイフレームワーク |
-| Solidity | 0.8.30 | スマートコントラクト実装言語 |
-| OpenZeppelin | ^5.0.1 | セキュアなコントラクトライブラリ |
-| viem | ^1.21.4 | 軽量Web3ライブラリ |
-| solhint | ^4.1.1 | Solidityコードリンター |
-
-### フロントエンド (pkgs/frontend)
-
-| 技術 | バージョン | 概要 |
-|------|-----------|------|
-| Next.js | ^14.0.4 | Reactフレームワーク |
-| React | ^18.2.0 | UIライブラリ |
-| wagmi | ^1.4.13 | React Web3フック |
-| RainbowKit | ^1.3.6 | ウォレット接続UI |
-| TailwindCSS | ^3.4.0 | ユーティリティファーストCSS |
-| viem | ^1.21.4 | 軽量Web3ライブラリ |
-
-## セットアップ手順
+## セットアップ
 
 ### 前提条件
 
-- Node.js >= 18.0.0
-- pnpm >= 8.0.0
+- Node.js 18.0.0以上
+- pnpm 8.0.0以上
 
 ### 1. 依存関係のインストール
 
@@ -59,122 +47,122 @@ pnpm install
 ### 2. 環境変数の設定
 
 ```bash
-# コントラクト用環境変数
-cp pkgs/contract/.env.example pkgs/contract/.env.local
+# コントラクト用
+cp pkgs/contract/.env.example pkgs/contract/.env
 
-# フロントエンド用環境変数  
+# フロントエンド用
 cp pkgs/frontend/.env.example pkgs/frontend/.env.local
 ```
 
-必要な環境変数:
-- `PRIVATE_KEY`: デプロイ用秘密鍵
-- `ALCHEMY_API_KEY`: Alchemy RPC API キー
-- `ETHERSCAN_API_KEY`: Etherscan API キー（検証用）
-- `COINMARKETCAP_API_KEY`: ガスレポート用API キー
-
-### 3. スマートコントラクトのコンパイル
+### 3. 開発環境の起動
 
 ```bash
+# コントラクトのコンパイル
 cd pkgs/contract
 pnpm build
-```
 
-### 4. フロントエンドの起動
-
-```bash
-cd pkgs/frontend  
+# フロントエンドの開発サーバー起動
+cd pkgs/frontend
 pnpm dev
 ```
 
-## 主要コマンド
+## 開発ワークフロー
+
+### 1. スマートコントラクト開発
+
+```bash
+cd pkgs/contract
+
+# コンパイル
+pnpm build
+
+# テスト実行
+pnpm test
+
+# Sepoliaにデプロイ
+pnpm deploy:sepolia
+```
+
+### 2. フロントエンド開発
+
+```bash
+cd pkgs/frontend
+
+# 開発サーバー起動
+pnpm dev
+
+# テスト実行
+pnpm test
+
+# ビルド
+pnpm build
+```
+
+## 使用技術スタック
+
+### スマートコントラクト
+
+- **Solidity**: ^0.8.19
+- **Hardhat**: 開発・テスト・デプロイフレームワーク
+- **OpenZeppelin**: セキュアなコントラクトライブラリ
+- **TypeChain**: TypeScript型生成
+
+### フロントエンド
+
+- **Next.js 14**: App Router使用
+- **TypeScript**: 型安全な開発
+- **TailwindCSS**: ユーティリティファーストCSS
+- **wagmi + viem**: Web3ライブラリ
+- **RainbowKit**: ウォレット接続UI
+
+### 開発ツール
+
+- **pnpm**: パッケージマネージャー
+- **Prettier**: コードフォーマッター
+- **ESLint**: コード品質チェック
+- **Vitest**: テストフレームワーク
+- **Playwright**: E2Eテスト
+
+## ネットワーク設定
+
+- **チェーンID**: 11155111 (Ethereum Sepolia)
+- **RPC URL**: `https://eth-sepolia.g.alchemy.com/v2/YOUR-PROJECT-ID`
+- **ブロックエクスプローラー**: `https://sepolia.etherscan.io/`
+
+## コマンド一覧
 
 ### ルートレベル
 
 ```bash
+# 全パッケージのビルド
+pnpm build
+
+# 全パッケージのテスト
+pnpm test
+
+# 全パッケージのリント
+pnpm lint
+
 # コードフォーマット
 pnpm format
 ```
 
-### スマートコントラクト (pkgs/contract)
+### パッケージ別
 
-```bash
-# コンパイル
-pnpm contract build
+詳細なコマンドは各パッケージのREADMEを参照してください：
 
-# テスト実行
-pnpm contract test
-
-# Sepoliaにデプロイ
-pnpm contract deploy:DEXFactory --network sepolia
-pnpm contract deploy:TestToken --network sepolia
-
-# コントラクト検証
-pnpm contract verify
-
-# Solidityリント
-pnpm contract lint
-```
-
-### フロントエンド (pkgs/frontend)
-
-```bash
-# 開発サーバー起動
-pnpm dev
-
-# 本番ビルド
-pnpm build
-
-# 本番サーバー起動
-pnpm start
-
-# ESLintチェック
-pnpm lint
-
-# 型チェック
-pnpm type-check
-```
-
-## 主要機能
-
-### AMM DEX機能
-- **トークンスワップ**: ERC-20トークン間の自動取引
-- **流動性提供**: 流動性プールへの資金提供とLP トークン発行
-- **流動性管理**: プール情報の表示と管理
-- **価格表示**: リアルタイム価格情報とチャート
-- **取引履歴**: ユーザーの取引履歴管理
-- **Faucet機能**: 検証用トークンの配布
-
-### 対象ネットワーク
-- **Ethereum Sepolia** (チェーンID: 11155111)
-- RPC URL: `https://eth-sepolia.g.alchemy.com/v2/YOUR-PROJECT-ID`
-- ブロックエクスプローラー: `https://sepolia.etherscan.io/`
-
-## 開発ワークフロー
-
-1. **要件フェーズ**: `.kiro/specs/`で仕様書作成
-2. **コントラクトフェーズ**: `pkgs/contract/`で実装とテスト
-3. **フロントエンドフェーズ**: `pkgs/frontend/`でUI/UX構築
-4. **統合フェーズ**: コントラクトとフロントエンドの接続
-5. **テストフェーズ**: エンドツーエンド検証
-
-## AI VibeCoding開発手順
-
-1. **要件定義**: Kiroを使用して要件定義書と設計書を作成
-2. **タスクリスト**: 要件定義書を元にタスクリストを作成
-3. **段階的実装**: 
-   - プロジェクト全体のセットアップ ✅
-   - スマートコントラクトの実装
-   - フロントエンドの実装
-   - 統合テスト
-
-## 参考情報
-
-```bash
-.claude    # Claude Code設定例
-.gemini    # Gemini CLI設定例  
-.github    # GitHub Copilot設定例
-```
+- [Contract README](./pkgs/contract/README.md)
+- [Frontend README](./pkgs/frontend/README.md)
 
 ## ライセンス
 
-MIT License
+このプロジェクトはMITライセンスの下で公開されています。詳細は[LICENSE](./LICENSE)ファイルを参照してください。
+
+## 貢献
+
+プロジェクトへの貢献を歓迎します。プルリクエストを送信する前に、以下を確認してください：
+
+1. コードが適切にフォーマットされている
+2. テストが通過している
+3. 新機能にはテストが含まれている
+4. ドキュメントが更新されている

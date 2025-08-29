@@ -1,73 +1,57 @@
 import "@nomicfoundation/hardhat-ethers";
-import "@nomicfoundation/hardhat-ignition-ethers";
-import "@nomicfoundation/hardhat-toolbox";
-import "@nomicfoundation/hardhat-verify";
-import * as dotenv from "dotenv";
-import "hardhat-gas-reporter";
-import type { HardhatUserConfig } from "hardhat/config";
-import "./tasks";
+import '@nomicfoundation/hardhat-toolbox';
+import '@nomicfoundation/hardhat-verify';
+import 'hardhat-gas-reporter';
+import 'hardhat-prettier';
+import { HardhatUserConfig } from 'hardhat/config';
+import 'solidity-coverage';
+import './tasks';
 
-dotenv.config();
-
-const { PRIVATE_KEY, ALCHEMY_API_KEY, COINMARKETCAP_API_KEY, ETHERSCAN_API_KEY, GAS_REPORT } =
-  process.env;
+// 環境変数の読み込み
+const SEPOLIA_RPC_URL =
+  process.env.SEPOLIA_RPC_URL ||
+  'https://eth-sepolia.g.alchemy.com/v2/YOUR-PROJECT-ID';
+const PRIVATE_KEY =
+  process.env.PRIVATE_KEY ||
+  '0x0000000000000000000000000000000000000000000000000000000000000000';
+const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY || '';
 
 const config: HardhatUserConfig = {
   solidity: {
-    compilers: [
-      {
-        version: "0.8.30",
-        settings: {
-          viaIR: true,
-          optimizer: {
-            enabled: true,
-            runs: 200,
-          },
-        },
+    version: '0.8.20',
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 200,
       },
-    ],
+    },
   },
   networks: {
     hardhat: {
-      allowUnlimitedContractSize: true,
       chainId: 31337,
     },
     sepolia: {
-      url: `https://eth-sepolia.g.alchemy.com/v2/${ALCHEMY_API_KEY}`,
-      accounts: PRIVATE_KEY !== undefined ? [PRIVATE_KEY] : [],
+      url: SEPOLIA_RPC_URL,
+      accounts: [PRIVATE_KEY],
+      chainId: 11155111,
     },
   },
   etherscan: {
-    apiKey: {
-      sepolia: ETHERSCAN_API_KEY ?? "",
-    },
+    apiKey: ETHERSCAN_API_KEY,
   },
   gasReporter: {
-    enabled: GAS_REPORT !== undefined,
-    currency: "USD",
-    token: "ETH",
-    coinmarketcap: COINMARKETCAP_API_KEY,
-    gasPriceApi: "https://api.etherscan.io/api?module=proxy&action=eth_gasPrice",
-    showTimeSpent: true,
-    showMethodSig: true,
+    enabled: process.env.REPORT_GAS !== undefined,
+    currency: 'USD',
   },
-  ignition: {
-    maxFeeBumps: 1,
-    blockPollingInterval: 1_500,
-    chainSpecific: {
-      sepolia: {
-        maxFeeBumps: 1,
-      },
-    },
+  typechain: {
+    outDir: 'typechain-types',
+    target: 'ethers-v6',
   },
   paths: {
-    sources: "./contracts",
-    tests: "./test",
-    cache: "./cache",
-    artifacts: "./artifacts",
-  },
-  mocha: {
-    timeout: 40000,
+    sources: './contracts',
+    tests: './test',
+    cache: './cache',
+    artifacts: './artifacts',
   },
   sourcify: {
     enabled: true,
