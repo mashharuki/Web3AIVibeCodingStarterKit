@@ -11,9 +11,9 @@
       "disabled": false
     },
     "OpenZeppelinSolidityContracts": {
-        "type": "streamable-http",
-        "url": "https://mcp.openzeppelin.com/contracts/solidity/mcp",
-        "disabled": false
+     "command": "npx",
+      "args": ["mcp-remote", "https://mcp.openzeppelin.com/contracts/solidity/mcp"],
+      "disabled": false
     }
   }
 }
