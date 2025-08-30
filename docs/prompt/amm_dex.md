@@ -27,6 +27,7 @@ https://github.com/unchain-tech/AVAX-AMM
 成果物は、docs/design 配下にマークダウンファイルで出力してください。
 
 use context7
+use OpenZeppelinSolidityContracts
 ```
 
 ## DEX実装までのやることをステップバイステップで洗い出してもらう時のプロンプト
