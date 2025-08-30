@@ -1,3 +1,8 @@
+---
+inclusion: always
+---
+
+
 # 技術スタック
 
 ## アーキテクチャ
@@ -22,7 +27,7 @@
 - Solidity
 - TypeScript
 - pnpm
-- Hardhat
+- Hardhat(安定している V2を必ず使ってください。)
 - hardhat-gas-reporter
 - solhint
 - viem
