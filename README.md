@@ -2,6 +2,10 @@
 
 AI VibeCodingでWeb3アプリを開発するためのスターターキットです！
 
+## イベントページ
+
+[Luma - Build the Future with AI! A Hands-on Web3 AI Vibe Coding Workshop](https://luma.com/um87sb5p)
+
 ## AI VibeCodingの環境例
 
 ![AI VibeCodingの環境例](./docs/drawio/overview.drawio.png)
