@@ -26,116 +26,43 @@
 
 ### `/pkgs/contract/` 詳細構成
 
-```
-pkgs/contract/
-├── contracts/               # Solidityコントラクトソース
-│   ├── core/               # コアコントラクト
-│   │   ├── NFT.sol         # ERC-721 NFTコントラクト
-│   │   └── Marketplace.sol # マーケットプレイスコントラクト
-│   ├── interfaces/         # インターフェース定義
-│   │   ├── INFT.sol        # NFTインターフェース
-│   │   └── IMarketplace.sol # マーケットプレイスインターフェース
-│   ├── libraries/          # ライブラリコントラクト
-│   │   └── SafeMath.sol    # 数学演算ライブラリ
-│   └── utils/              # ユーティリティコントラクト
-│       └── Ownable.sol     # 所有権管理
-├── test/                   # テストファイル
-│   ├── unit/               # ユニットテスト
-│   │   ├── NFT.test.ts     # NFTコントラクトテスト
-│   │   └── Marketplace.test.ts # マーケットプレイステスト
-│   ├── integration/        # 統合テスト
-│   │   └── marketplace-integration.test.ts
-│   └── fixtures/           # テスト用データ
-│       └── sample-metadata.json
-├── scripts/                # デプロイ・管理スクリプト
-│   ├── deploy/             # デプロイスクリプト
-│   │   ├── 01-deploy-nft.ts
-│   │   └── 02-deploy-marketplace.ts
-│   ├── verify/             # 検証スクリプト
-│   │   └── verify-contracts.ts
-│   └── tasks/              # Hardhatタスク
-│       └── mint-nft.ts
-├── artifacts/              # コンパイル済みアーティファクト（Git除外）
-├── cache/                  # キャッシュファイル（Git除外）
-├── typechain-types/        # TypeScript型定義（自動生成）
-├── hardhat.config.ts       # Hardhat設定
-├── package.json            # パッケージ設定
-├── tsconfig.json           # TypeScript設定
-└── README.md               # コントラクト説明書
+```bash
+├── README.md
+├── contracts         # solファイル群を格納するフォルダ
+├── hardhat.config.ts # Hardhatの設定ファイル
+├── helpers           # ユーティリティ関数を格納するフォルダ  
+├── ignition          # スマートコントラクトのデプロイメントスクリプトを格納するフォルダ
+├── outputs           # デプロイメントの出力を格納するフォルダ  
+├── package.json    
+├── tasks             # Hardhatのタスクファイル群を格納するフォルダ   
+├── test              # テストコード群を格納するフォルダ
+├── .solhint.json     # solhintの設定ファイル
+├── .solhintignore
+└── tsconfig.json
 ```
 
-### `/pkgs/frontend/` 詳細構成
+### `/pkgs/frotnend/` 詳細構成
 
-```
+```bash
 pkgs/frontend/
-├── src/                    # ソースコード
-│   ├── app/                # Next.js App Router
-│   │   ├── (routes)/       # ルートグループ
-│   │   │   ├── marketplace/ # マーケットプレイスページ
-│   │   │   ├── collection/ # コレクションページ
-│   │   │   ├── profile/    # プロフィールページ
-│   │   │   └── create/     # NFT作成ページ
-│   │   ├── api/            # APIルート
-│   │   │   ├── nfts/       # NFT関連API
-│   │   │   └── metadata/   # メタデータAPI
-│   │   ├── globals.css     # グローバルスタイル
-│   │   ├── layout.tsx      # ルートレイアウト
-│   │   └── page.tsx        # ホームページ
-│   ├── components/         # Reactコンポーネント
-│   │   ├── ui/             # 基本UIコンポーネント
-│   │   │   ├── Button.tsx  # ボタンコンポーネント
-│   │   │   ├── Modal.tsx   # モーダルコンポーネント
-│   │   │   └── Input.tsx   # 入力コンポーネント
-│   │   ├── layout/         # レイアウトコンポーネント
-│   │   │   ├── Header.tsx  # ヘッダー
-│   │   │   ├── Footer.tsx  # フッター
-│   │   │   └── Sidebar.tsx # サイドバー
-│   │   ├── nft/            # NFT関連コンポーネント
-│   │   │   ├── NFTCard.tsx # NFTカード
-│   │   │   ├── NFTGrid.tsx # NFTグリッド
-│   │   │   └── NFTDetail.tsx # NFT詳細
-│   │   └── web3/           # Web3関連コンポーネント
-│   │       ├── WalletConnect.tsx # ウォレット接続
-│   │       └── TransactionStatus.tsx # トランザクション状態
-│   ├── hooks/              # カスタムフック
-│   │   ├── useWallet.ts    # ウォレット管理フック
-│   │   ├── useContract.ts  # コントラクト操作フック
-│   │   └── useNFT.ts       # NFT操作フック
-│   ├── lib/                # ライブラリとユーティリティ
-│   │   ├── web3/           # Web3関連
-│   │   │   ├── contracts.ts # コントラクト設定
-│   │   │   ├── providers.ts # プロバイダー設定
-│   │   │   └── utils.ts    # Web3ユーティリティ
-│   │   ├── api/            # API関連
-│   │   │   ├── client.ts   # APIクライアント
-│   │   │   └── endpoints.ts # エンドポイント定義
-│   │   ├── utils/          # 汎用ユーティリティ
-│   │   │   ├── format.ts   # フォーマット関数
-│   │   │   └── validation.ts # バリデーション
-│   │   └── constants.ts    # 定数定義
-│   ├── types/              # TypeScript型定義
-│   │   ├── nft.ts          # NFT関連型
-│   │   ├── user.ts         # ユーザー関連型
-│   │   └── contract.ts     # コントラクト関連型
-│   ├── styles/             # スタイルファイル
-│   │   ├── globals.css     # グローバルスタイル
-│   │   └── components/     # コンポーネント別スタイル
-│   └── assets/             # 静的アセット
-│       ├── images/         # 画像ファイル
-│       ├── icons/          # アイコンファイル
-│       └── fonts/          # フォントファイル
-├── public/                 # 公開ファイル
-│   ├── favicon.ico         # ファビコン
-│   └── images/             # 公開画像
-├── __tests__/              # テストファイル
-│   ├── components/         # コンポーネントテスト
-│   ├── hooks/              # フックテスト
-│   └── utils/              # ユーティリティテスト
-├── next.config.js          # Next.js設定
-├── tailwind.config.js      # Tailwind CSS設定
-├── package.json            # パッケージ設定
-├── tsconfig.json           # TypeScript設定
-└── README.md               # フロントエンド説明書
+├── app/                # Next.jsのApp Routerディレクトリ
+|    └── api/           # APIの実装を格納するディレクトリ
+├── components/         # UIコンポーネントディレクトリ
+├── hooks/              # カスタムフックディレクトリ
+├── lib/                # ライブラリ用の関数群を格納するディレクトリ
+├── utils/              # ユーティリティ関数群を格納するディレクトリ
+├── styles/             # グローバルスタイルやテーマを格納するディレクトリ
+├── public/             # 静的ファイル群を格納するディレクトリ
+├── components.json     # shadcn / UIの設定ファイル
+├── package.json        # パッケージ設定ファイル
+├── tsconfig.json       # TypeScript設定ファイル
+├── tailwind.config.js  # Tailwind CSS設定ファイル
+├── postcss.config.js   # PostCSS設定ファイル
+├── next.config.js      # Next.js設定ファイル
+├── next-env.d.ts       # Next.jsの型定義ファイル
+├── .env.local          # 環境変数設定ファイル
+├── .env.example        # 環境変数のサンプルファイル
+└── .gitignore          # Gitの無視設定ファイル
 ```
 
 ### パッケージ固有の規約
