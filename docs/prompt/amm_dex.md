@@ -21,10 +21,15 @@ UniswapのようなAMMのDEXを作成するための要件定義を実施して�
 UNCHAINで紹介している以下の学習コンテンツで作成できるような完成度のものをイメージしています。
 https://github.com/unchain-tech/AVAX-AMM
 
-このDEXは検証用のDEXです。
-ネットワークは sepoliaを使います。
+このDEXは学習用に開発するDEXです。
+ネットワークは sepoliaを使ってください。
 
-成果物は、docs/design 配下にマークダウンファイルで出力してください。
+ERC20トークンとして以下の3つのトークンを使用してください。
+
+- Sepolia ネットワーク
+  - USDC: 0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238
+  - JPYC: 0x431D5dfF03120AFA4bDf332c61A6e1766eF37BDB
+  - PYUSD: 0xCaC524BcA292aaade2DF8A05cC58F0a65B1B3bB9
 
 use context7
 use OpenZeppelinSolidityContracts
