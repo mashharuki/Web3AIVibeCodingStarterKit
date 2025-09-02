@@ -1,0 +1,28 @@
+{
+  "name": "amm-dex-monorepo",
+  "version": "1.0.0",
+  "description": "UniswapライクなAMM DEXの学習用プロジェクト",
+  "private": true,
+  "scripts": {
+    "build": "pnpm -r build",
+    "dev": "pnpm -r dev",
+    "test": "pnpm -r test",
+    "lint": "pnpm -r lint",
+    "format": "biome format --write .",
+    "check": "biome check .",
+    "clean": "pnpm -r clean && rm -rf node_modules",
+    "contract": "pnpm --filter @amm-dex/contract",
+    "frontend": "pnpm --filter @amm-dex/frontend"
+  },
+  "keywords": ["web3", "defi", "amm", "dex", "ethereum", "solidity", "nextjs", "typescript"],
+  "author": "Web3 AI VibeCoding",
+  "license": "MIT",
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "packageManager": "pnpm@8.15.0"
+}

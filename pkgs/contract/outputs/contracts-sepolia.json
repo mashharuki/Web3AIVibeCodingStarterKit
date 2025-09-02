@@ -1,0 +1,6 @@
+{
+  "contracts": {
+    "AMMFactory": "0x57811ce07C616db1373b77ed97A2BDCEA336Fb73",
+    "AMMRouter": "0x29C854E385bdf0d9Df1e6C71B7E82580adaE41C0"
+  }
+}
