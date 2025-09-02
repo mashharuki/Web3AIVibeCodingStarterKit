@@ -1225,10 +1225,10 @@ Ethereum Sepolia テストネットワーク上で動作する自動マーケッ
 │   ├── frontend
 │   └── contract
 ├── .github
-│   └── instructions
-│       ├── frontend.instructions.md
-│       ├── contracts.instructions.md
-│       └── general.instructions.md
+│   ├── instructions
+│   │   ├── frontend.instructions.md
+│   │   ├── contracts.instructions.md
+│   └── copilot-instructions.md
 ├── .gitignore
 ├── package.json
 ├── pnpm-lock.yaml
