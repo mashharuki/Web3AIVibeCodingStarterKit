@@ -11,7 +11,7 @@
       "disabled": false
     },
     "OpenZeppelinSolidityContracts": {
-     "command": "npx",
+      "command": "npx",
       "args": ["mcp-remote", "https://mcp.openzeppelin.com/contracts/solidity/mcp"],
       "disabled": false
     }
