@@ -117,12 +117,26 @@ pnpm task:remove-liquidity:router \
   --amount-a-min 900000 --amount-b-min 135000000 \
   --network sepolia
 
-# スワップ（Router 経由）
+# スワップ（Router 経由） 入力値固定
 pnpm task:swap-exact:router \
   --token-in USDC --token-out JPYC \
-  --amount-in 1000 --amount-out-min 14500 \
+  --amount-in 1000000 --amount-out-min 1 \
+  --slippage-bps 50 --auto-min true \
   --network sepolia
 
+pnpm task:swap-exact:router \
+  --token-in USDC --token-out PYUSD \
+  --amount-in 1000000 --amount-out-min 1 \
+  --slippage-bps 50 --auto-min true \
+  --network sepolia
+
+pnpm task:swap-exact:router \
+  --token-in PYUSD --token-out JPYC \
+  --amount-in 1000000 --amount-out-min 1 \
+  --slippage-bps 50 --auto-min true \
+  --network sepolia
+
+# 出力値固定
 pnpm task:swap-for-exact:router \
   --token-in USDC --token-out JPYC \
   --amount-out 15000 --amount-in-max 10500 \

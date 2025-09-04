@@ -370,3 +370,181 @@ RouterコントラクトからトークンSwap実行
    希望出力量: 15000
    実際出力量: 15000
 ```
+
+修正後のスクリプトで流動性追加
+
+```bash
+ Router経由で USDC/PYUSD ペアに流動性を追加中...
+📡 ネットワーク: sepolia
+📍 USDC アドレス: 0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238
+📍 PYUSD アドレス: 0xCaC524BcA292aaade2DF8A05cC58F0a65B1B3bB9
+💰 希望追加量 USDC: 150000000
+💰 希望追加量 PYUSD: 150
+🔒 最小許容量 USDC: 10686
+🔒 最小許容量 PYUSD: 10
+🛣️  Router アドレス: 0x29C854E385bdf0d9Df1e6C71B7E82580adaE41C0
+
+💳 現在の残高:
+   USDC: 819928123
+   PYUSD: 297983350
+
+🔐 現在の承認状況:
+   USDC: 789900
+   PYUSD: 149998500
+⏳ USDCの承認を実行中...
+📝 USDC承認トランザクション: 0x0637f397e8d42a0bf9bc5aeac7425b4010330f293bba3844b6d06d90eb46399a
+✅ USDCの承認完了
+
+📊 現在のプールリザーブ (tokenA/tokenB 並び):
+   reserveA(USDC): 2311100
+   reserveB(PYUSD): 16500
+
+🧮 最適量の試算:
+   amountBOptimal (A=150000000 のとき): 1070918
+   amountAOptimal (B=150 のとき): 21010
+
+⏳ Router経由で流動性追加を実行中...
+📝 流動性追加トランザクション: 0xb523da528ec77515d8ec8bb318a93f010c5df2e8d072ae0a6889345020685482
+✅ Router経由での流動性追加成功!
+⛽ ガス使用量: 154914
+🔗 Etherscan: https://sepolia.etherscan.io/tx/0xb523da528ec77515d8ec8bb318a93f010c5df2e8d072ae0a6889345020685482
+
+📊 追加後の残高:
+   USDC: 819907113
+   PYUSD: 297983200
+
+💸 実際に使用された量:
+   USDC: 21010
+   PYUSD: 150
+
+🎯 LPトークン情報:
+   ペアアドレス: 0xe9EaE488565dCCB22C6147160B0efe1a6b3Cca17
+   取得したLPトークン: 196051
+   LPトークン総供給量: 197051
+   プールシェア: 99.4925%
+```
+
+3つのペアに流動性を追加した後の全てのペア情報
+
+```bash
+🔍 全ペア情報を取得中...
+📡 ネットワーク: sepolia
+🏭 Factory アドレス: 0x57811ce07C616db1373b77ed97A2BDCEA336Fb73
+📊 総ペア数: 3
+
+📋 ペア一覧:
+================================================================================
+
+1. ペアアドレス: 0x9f055248E74850Ffad7A448cF79cEcb74bA76881
+   Token0: USDC (0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238)
+   Token1: JPYC (0x431D5dfF03120AFA4bDf332c61A6e1766eF37BDB)
+   Reserve0: 1918789
+   Reserve1: 66033048
+   LP Token総供給量: 11247448
+   価格: 1 USDC = 34.413918 JPYC
+   価格: 1 JPYC = 0.029058 USDC
+   Etherscan: https://sepolia.etherscan.io/address/0x9f055248E74850Ffad7A448cF79cEcb74bA76881
+
+2. ペアアドレス: 0xe9EaE488565dCCB22C6147160B0efe1a6b3Cca17
+   Token0: USDC (0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238)
+   Token1: PYUSD (0xCaC524BcA292aaade2DF8A05cC58F0a65B1B3bB9)
+   Reserve0: 2332110
+   Reserve1: 16650
+   LP Token総供給量: 197051
+   価格: 1 USDC = 0.007139 PYUSD
+   価格: 1 PYUSD = 140.066667 USDC
+   Etherscan: https://sepolia.etherscan.io/address/0xe9EaE488565dCCB22C6147160B0efe1a6b3Cca17
+
+3. ペアアドレス: 0x9d150802af41a9521e7A146b537BbE44251FF581
+   Token0: JPYC (0x431D5dfF03120AFA4bDf332c61A6e1766eF37BDB)
+   Token1: PYUSD (0xCaC524BcA292aaade2DF8A05cC58F0a65B1B3bB9)
+   Reserve0: 150000000
+   Reserve1: 2000150
+   LP Token総供給量: 17321157
+   価格: 1 JPYC = 0.013334 PYUSD
+   価格: 1 PYUSD = 74.994375 JPYC
+   Etherscan: https://sepolia.etherscan.io/address/0x9d150802af41a9521e7A146b537BbE44251FF581
+
+================================================================================
+✅ 全ペア情報の取得完了
+```
+
+残りのペアでのswap
+
+```bash
+🔄 Router経由で USDC → PYUSD スワップを実行中...
+📡 ネットワーク: sepolia
+📍 USDC アドレス: 0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238
+📍 PYUSD アドレス: 0xCaC524BcA292aaade2DF8A05cC58F0a65B1B3bB9
+💰 入力量 USDC: 1000000
+🔒 最小出力量 PYUSD: 1
+⚙️  slippage: 50 bps (auto-min 有効)
+🛣️  Router アドレス: 0x29C854E385bdf0d9Df1e6C71B7E82580adaE41C0
+
+📊 スワップ情報を計算中...
+💡 予想される出力量: 4986
+🧮 推奨最小出力量 (slippage 50bps ≈ 0.5%): 4961
+🤖 auto-min 適用: amountOutMin = 4961
+
+💳 スワップ前の残高:
+   USDC: 818907113
+   PYUSD: 297983200
+
+🔐 現在の承認状況:
+   USDC: 148978990
+
+⏳ Router経由でスワップを実行中...
+📝 スワップトランザクション: 0x9c72767bed295f6dda68119abdc972a398c03c71e3450e78e7d8101d4fa2950a
+✅ Router経由でのスワップ成功!
+⛽ ガス使用量: 144475
+🔗 Etherscan: https://sepolia.etherscan.io/tx/0x9c72767bed295f6dda68119abdc972a398c03c71e3450e78e7d8101d4fa2950a
+
+📊 スワップ後の残高:
+   USDC: 817907113
+   PYUSD: 297988186
+
+💸 実際の交換量:
+   消費したUSDC: 1000000
+   取得したPYUSD: 4986
+   交換レート: 1 USDC = 0.004986 PYUSD
+   実際のスリッページ: 0.0000%
+```
+
+```bash
+🔄 Router経由で PYUSD → JPYC スワップを実行中...
+📡 ネットワーク: sepolia
+📍 PYUSD アドレス: 0xCaC524BcA292aaade2DF8A05cC58F0a65B1B3bB9
+📍 JPYC アドレス: 0x431D5dfF03120AFA4bDf332c61A6e1766eF37BDB
+💰 入力量 PYUSD: 1000000
+🔒 最小出力量 JPYC: 1
+⚙️  slippage: 50 bps (auto-min 有効)
+🛣️  Router アドレス: 0x29C854E385bdf0d9Df1e6C71B7E82580adaE41C0
+
+📊 スワップ情報を計算中...
+💡 予想される出力量: 49897402
+🧮 推奨最小出力量 (slippage 50bps ≈ 0.5%): 49647914
+🤖 auto-min 適用: amountOutMin = 49647914
+
+💳 スワップ前の残高:
+   PYUSD: 297988186
+   JPYC: 9999999999999806545728
+
+🔐 現在の承認状況:
+   PYUSD: 149998350
+
+⏳ Router経由でスワップを実行中...
+📝 スワップトランザクション: 0xc205e929672ac70705043d724c4e59a8d4129902cf0cda0c97a512ac24c72fbf
+✅ Router経由でのスワップ成功!
+⛽ ガス使用量: 179523
+🔗 Etherscan: https://sepolia.etherscan.io/tx/0xc205e929672ac70705043d724c4e59a8d4129902cf0cda0c97a512ac24c72fbf
+
+📊 スワップ後の残高:
+   PYUSD: 296988186
+   JPYC: 9999999999999856443130
+
+💸 実際の交換量:
+   消費したPYUSD: 1000000
+   取得したJPYC: 49897402
+   交換レート: 1 PYUSD = 49.897402 JPYC
+   実際のスリッページ: 0.0000%
+```

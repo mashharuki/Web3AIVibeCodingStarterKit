@@ -19,9 +19,12 @@ task("swapExactTokensViaRouter", "Router経由で正確な入力量でトーク�
   .addParam("tokenOut", "出力トークンシンボル (USDC, JPYC, PYUSD)")
   .addParam("amountIn", "入力するトークンの量（最小単位）")
   .addParam("amountOutMin", "許容する出力トークンの最小量（最小単位）")
+  .addOptionalParam("slippageBps", "スリッページ許容(bps: 100=1%)。推奨: 50-300", "500")
+  .addOptionalParam("autoMin", "出力最小量を自動計算して適用する (true/false)", "false")
+  .addOptionalParam("preview", "送信せずに見積もりのみ表示 (true/false)", "false")
   .addOptionalParam("deadline", "トランザクションの有効期限（秒）", "1800") // デフォルト30分
   .setAction(async (taskArgs, hre: HardhatRuntimeEnvironment) => {
-    const { tokenIn, tokenOut, amountIn, amountOutMin, deadline } = taskArgs;
+    const { tokenIn, tokenOut, amountIn, amountOutMin, slippageBps, autoMin, preview, deadline } = taskArgs;
     const { network } = hre;
 
     console.log(`🔄 Router経由で ${tokenIn} → ${tokenOut} スワップを実行中...`);
@@ -41,6 +44,9 @@ task("swapExactTokensViaRouter", "Router経由で正確な入力量でトーク�
     // 金額の検証
     const amountInBigInt = BigInt(amountIn);
     const amountOutMinBigInt = BigInt(amountOutMin);
+    const slippageBpsBigInt = BigInt(slippageBps ?? "500");
+    const autoMinEnabled = String(autoMin).toLowerCase() === "true" || String(autoMin) === "1";
+    const previewOnly = String(preview).toLowerCase() === "true" || String(preview) === "1";
     
     if (amountInBigInt <= 0n) {
       throw new Error("❌ 入力量は0より大きい値を指定してください");
@@ -57,6 +63,7 @@ task("swapExactTokensViaRouter", "Router経由で正確な入力量でトーク�
     console.log(`📍 ${tokenOut} アドレス: ${tokenOutAddress}`);
     console.log(`💰 入力量 ${tokenIn}: ${amountIn}`);
     console.log(`🔒 最小出力量 ${tokenOut}: ${amountOutMin}`);
+    console.log(`⚙️  slippage: ${slippageBpsBigInt.toString()} bps${autoMinEnabled ? " (auto-min 有効)" : ""}${previewOnly ? " (preview)" : ""}`);
 
     try {
       // デプロイ済みコントラクトアドレスを読み込み
@@ -82,13 +89,19 @@ task("swapExactTokensViaRouter", "Router経由で正確な入力量でトーク�
 
       console.log(`💡 予想される出力量: ${expectedAmountOut.toString()}`);
 
-      // スリッページを計算
-      if (expectedAmountOut < amountOutMinBigInt) {
+      // 推奨最小出力量: expected × (1 - slippage)
+      const ONE_BPS = 10000n;
+      const recommendedAmountOutMin = (expectedAmountOut * (ONE_BPS - slippageBpsBigInt)) / ONE_BPS;
+      const slippagePctStr = (Number(slippageBpsBigInt) / 100).toString();
+      console.log(`🧮 推奨最小出力量 (slippage ${slippageBpsBigInt.toString()}bps ≈ ${slippagePctStr}%): ${recommendedAmountOutMin.toString()}`);
+
+      let finalAmountOutMin = amountOutMinBigInt;
+      if (autoMinEnabled) {
+        finalAmountOutMin = recommendedAmountOutMin;
+        console.log(`🤖 auto-min 適用: amountOutMin = ${finalAmountOutMin.toString()}`);
+      } else if (!previewOnly && expectedAmountOut < amountOutMinBigInt) {
         throw new Error(`❌ スリッページが大きすぎます。予想出力量: ${expectedAmountOut.toString()}, 最小許容量: ${amountOutMin}`);
       }
-
-      const slippage = ((Number(expectedAmountOut) - Number(amountOutMinBigInt)) / Number(expectedAmountOut)) * 100;
-      console.log(`📉 設定スリッページ: ${slippage.toFixed(2)}%`);
 
       // トークンコントラクトに接続
       const TokenIn = await hre.viem.getContractAt("IERC20", tokenInAddress);
@@ -102,26 +115,38 @@ task("swapExactTokensViaRouter", "Router経由で正確な入力量でトーク�
       console.log(`   ${tokenIn}: ${balanceInBefore.toString()}`);
       console.log(`   ${tokenOut}: ${balanceOutBefore.toString()}`);
 
-      // 残高チェック
+      // 残高チェック（preview時は警告のみ）
       if (balanceInBefore < amountInBigInt) {
-        throw new Error(`❌ ${tokenIn}の残高が不足しています。必要: ${amountIn}, 現在: ${balanceInBefore.toString()}`);
+        const msg = `❌ ${tokenIn}の残高が不足しています。必要: ${amountIn}, 現在: ${balanceInBefore.toString()}`;
+        if (!previewOnly) throw new Error(msg);
+        console.warn(`⚠️  preview: ${msg}`);
       }
 
-      // 承認状況を確認
-      const allowance = await TokenIn.read.allowance([userAddress, routerAddress]);
-
-      console.log(`\n🔐 現在の承認状況:`);
-      console.log(`   ${tokenIn}: ${allowance.toString()}`);
-
-      // 必要に応じて承認を実行
-      if (allowance < amountInBigInt) {
-        console.log(`⏳ ${tokenIn}の承認を実行中...`);
-        const approveHash = await TokenIn.write.approve([routerAddress, amountInBigInt]);
-        console.log(`📝 ${tokenIn}承認トランザクション: ${approveHash}`);
-        
-        const publicClient = await hre.viem.getPublicClient();
-        await publicClient.waitForTransactionReceipt({ hash: approveHash });
-        console.log(`✅ ${tokenIn}の承認完了`);
+      // 承認状況（previewではスキップ）
+      if (!previewOnly) {
+        const allowance = await TokenIn.read.allowance([userAddress, routerAddress]);
+        console.log(`\n🔐 現在の承認状況:`);
+        console.log(`   ${tokenIn}: ${allowance.toString()}`);
+        if (allowance < amountInBigInt) {
+          console.log(`⏳ ${tokenIn}の承認を実行中...`);
+          const approveHash = await TokenIn.write.approve([routerAddress, amountInBigInt]);
+          console.log(`📝 ${tokenIn}承認トランザクション: ${approveHash}`);
+          
+          const publicClient = await hre.viem.getPublicClient();
+          await publicClient.waitForTransactionReceipt({ hash: approveHash });
+          console.log(`✅ ${tokenIn}の承認完了`);
+        }
+      } else {
+        console.log("\n🔐 preview モード: 承認チェックと送信は行いません");
+        console.log("▶️  再現コマンド例 (min 指定)");
+        console.log(
+          `  pnpm task:swap-exact:router \\\n+  --token-in ${tokenIn} --token-out ${tokenOut} \\\n+  --amount-in ${amountIn} --amount-out-min ${recommendedAmountOutMin.toString()} \\\n+  --slippage-bps ${slippageBpsBigInt.toString()} \\\n+  --network ${network.name}`
+        );
+        console.log("\n▶️  再現コマンド例 (auto-min 採用)");
+        console.log(
+          `  pnpm task:swap-exact:router \\\n+  --token-in ${tokenIn} --token-out ${tokenOut} \\\n+  --amount-in ${amountIn} --amount-out-min 1 \\\n+  --slippage-bps ${slippageBpsBigInt.toString()} --auto-min true \\\n+  --network ${network.name}`
+        );
+        return;
       }
 
       // デッドラインを計算（現在時刻 + 指定秒数）
@@ -131,7 +156,7 @@ task("swapExactTokensViaRouter", "Router経由で正確な入力量でトーク�
       console.log(`\n⏳ Router経由でスワップを実行中...`);
       const swapHash = await AMMRouter.write.swapExactTokensForTokens([
         amountInBigInt,
-        amountOutMinBigInt,
+        finalAmountOutMin,
         path,
         userAddress,
         BigInt(deadlineTimestamp)
@@ -196,9 +221,12 @@ task("swapTokensForExactViaRouter", "Router経由で正確な出力量でトー�
   .addParam("tokenOut", "出力トークンシンボル (USDC, JPYC, PYUSD)")
   .addParam("amountOut", "出力するトークンの量（最小単位）")
   .addParam("amountInMax", "許容する入力トークンの最大量（最小単位）")
+  .addOptionalParam("slippageBps", "スリッページ許容(bps: 100=1%)。推奨: 50-300", "500")
+  .addOptionalParam("autoMax", "入力最大量を自動計算して適用する (true/false)", "false")
+  .addOptionalParam("preview", "送信せずに見積もりのみ表示 (true/false)", "false")
   .addOptionalParam("deadline", "トランザクションの有効期限（秒）", "1800") // デフォルト30分
   .setAction(async (taskArgs, hre: HardhatRuntimeEnvironment) => {
-    const { tokenIn, tokenOut, amountOut, amountInMax, deadline } = taskArgs;
+    const { tokenIn, tokenOut, amountOut, amountInMax, slippageBps, autoMax, preview, deadline } = taskArgs;
     const { network } = hre;
 
     console.log(`🔄 Router経由で ${tokenIn} → ${tokenOut} 正確な出力量スワップを実行中...`);
@@ -218,6 +246,9 @@ task("swapTokensForExactViaRouter", "Router経由で正確な出力量でトー�
     // 金額の検証
     const amountOutBigInt = BigInt(amountOut);
     const amountInMaxBigInt = BigInt(amountInMax);
+    const slippageBpsBigInt = BigInt(slippageBps ?? "500");
+    const autoMaxEnabled = String(autoMax).toLowerCase() === "true" || String(autoMax) === "1";
+    const previewOnly = String(preview).toLowerCase() === "true" || String(preview) === "1";
     
     if (amountOutBigInt <= 0n) {
       throw new Error("❌ 出力量は0より大きい値を指定してください");
@@ -234,6 +265,7 @@ task("swapTokensForExactViaRouter", "Router経由で正確な出力量でトー�
     console.log(`📍 ${tokenOut} アドレス: ${tokenOutAddress}`);
     console.log(`🎯 希望出力量 ${tokenOut}: ${amountOut}`);
     console.log(`🔒 最大入力量 ${tokenIn}: ${amountInMax}`);
+    console.log(`⚙️  slippage: ${slippageBpsBigInt.toString()} bps${autoMaxEnabled ? " (auto-max 有効)" : ""}${previewOnly ? " (preview)" : ""}`);
 
     try {
       // デプロイ済みコントラクトアドレスを読み込み
@@ -259,13 +291,20 @@ task("swapTokensForExactViaRouter", "Router経由で正確な出力量でトー�
 
       console.log(`💡 必要な入力量: ${requiredAmountIn.toString()}`);
 
-      // 入力量チェック
-      if (requiredAmountIn > amountInMaxBigInt) {
+      // 推奨最大入力量: required × (1 + slippage)
+      const ONE_BPS = 10000n;
+      // 丸め上げして安全側に
+      const recommendedAmountInMax = (requiredAmountIn * (ONE_BPS + slippageBpsBigInt) + (ONE_BPS - 1n)) / ONE_BPS;
+      const slippagePctStr = (Number(slippageBpsBigInt) / 100).toString();
+      console.log(`🧮 推奨最大入力量 (slippage ${slippageBpsBigInt.toString()}bps ≈ ${slippagePctStr}%): ${recommendedAmountInMax.toString()}`);
+
+      let finalAmountInMax = amountInMaxBigInt;
+      if (autoMaxEnabled) {
+        finalAmountInMax = recommendedAmountInMax;
+        console.log(`🤖 auto-max 適用: amountInMax = ${finalAmountInMax.toString()}`);
+      } else if (!previewOnly && requiredAmountIn > amountInMaxBigInt) {
         throw new Error(`❌ 必要な入力量が最大許容量を超えています。必要: ${requiredAmountIn.toString()}, 最大許容: ${amountInMax}`);
       }
-
-      const slippage = ((Number(amountInMaxBigInt) - Number(requiredAmountIn)) / Number(amountInMaxBigInt)) * 100;
-      console.log(`📈 設定スリッページ: ${slippage.toFixed(2)}%`);
 
       // トークンコントラクトに接続
       const TokenIn = await hre.viem.getContractAt("IERC20", tokenInAddress);
@@ -279,26 +318,38 @@ task("swapTokensForExactViaRouter", "Router経由で正確な出力量でトー�
       console.log(`   ${tokenIn}: ${balanceInBefore.toString()}`);
       console.log(`   ${tokenOut}: ${balanceOutBefore.toString()}`);
 
-      // 残高チェック
+      // 残高チェック（preview時は警告のみ）
       if (balanceInBefore < requiredAmountIn) {
-        throw new Error(`❌ ${tokenIn}の残高が不足しています。必要: ${requiredAmountIn.toString()}, 現在: ${balanceInBefore.toString()}`);
+        const msg = `❌ ${tokenIn}の残高が不足しています。必要: ${requiredAmountIn.toString()}, 現在: ${balanceInBefore.toString()}`;
+        if (!previewOnly) throw new Error(msg);
+        console.warn(`⚠️  preview: ${msg}`);
       }
 
-      // 承認状況を確認
-      const allowance = await TokenIn.read.allowance([userAddress, routerAddress]);
-
-      console.log(`\n🔐 現在の承認状況:`);
-      console.log(`   ${tokenIn}: ${allowance.toString()}`);
-
-      // 必要に応じて承認を実行（最大入力量で承認）
-      if (allowance < amountInMaxBigInt) {
-        console.log(`⏳ ${tokenIn}の承認を実行中...`);
-        const approveHash = await TokenIn.write.approve([routerAddress, amountInMaxBigInt]);
-        console.log(`📝 ${tokenIn}承認トランザクション: ${approveHash}`);
-        
-        const publicClient = await hre.viem.getPublicClient();
-        await publicClient.waitForTransactionReceipt({ hash: approveHash });
-        console.log(`✅ ${tokenIn}の承認完了`);
+      // 承認状況（previewではスキップ）
+      if (!previewOnly) {
+        const allowance = await TokenIn.read.allowance([userAddress, routerAddress]);
+        console.log(`\n🔐 現在の承認状況:`);
+        console.log(`   ${tokenIn}: ${allowance.toString()}`);
+        if (allowance < finalAmountInMax) {
+          console.log(`⏳ ${tokenIn}の承認を実行中...`);
+          const approveHash = await TokenIn.write.approve([routerAddress, finalAmountInMax]);
+          console.log(`📝 ${tokenIn}承認トランザクション: ${approveHash}`);
+          
+          const publicClient = await hre.viem.getPublicClient();
+          await publicClient.waitForTransactionReceipt({ hash: approveHash });
+          console.log(`✅ ${tokenIn}の承認完了`);
+        }
+      } else {
+        console.log("\n🔐 preview モード: 承認チェックと送信は行いません");
+        console.log("▶️  再現コマンド例 (max 指定)");
+        console.log(
+          `  pnpm task:swap-for-exact:router \\\n+  --token-in ${tokenIn} --token-out ${tokenOut} \\\n+  --amount-out ${amountOut} --amount-in-max ${recommendedAmountInMax.toString()} \\\n+  --slippage-bps ${slippageBpsBigInt.toString()} \\\n+  --network ${network.name}`
+        );
+        console.log("\n▶️  再現コマンド例 (auto-max 採用)");
+        console.log(
+          `  pnpm task:swap-for-exact:router \\\n+  --token-in ${tokenIn} --token-out ${tokenOut} \\\n+  --amount-out ${amountOut} --amount-in-max 1 \\\n+  --slippage-bps ${slippageBpsBigInt.toString()} --auto-max true \\\n+  --network ${network.name}`
+        );
+        return;
       }
 
       // デッドラインを計算（現在時刻 + 指定秒数）
@@ -308,7 +359,7 @@ task("swapTokensForExactViaRouter", "Router経由で正確な出力量でトー�
       console.log(`\n⏳ Router経由で正確な出力量スワップを実行中...`);
       const swapHash = await AMMRouter.write.swapTokensForExactTokens([
         amountOutBigInt,
-        amountInMaxBigInt,
+        finalAmountInMax,
         path,
         userAddress,
         BigInt(deadlineTimestamp)
