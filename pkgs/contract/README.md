@@ -98,6 +98,19 @@ pnpm task:add-liquidity:router \
   --amount-a-min 950000 --amount-b-min 142500000 \
   --network sepolia
 
+pnpm task:add-liquidity:router \
+  --token-a JPYC --token-b PYUSD \
+  --amount-a-desired 150000000 --amount-b-desired 150 \
+  --amount-a-min 142500000 --amount-b-min 10 \
+  --network sepolia
+
+pnpm task:add-liquidity:router \
+  --token-a USDC --token-b PYUSD \
+  --amount-a-desired 150000000 \
+  --amount-b-desired 150 \
+  --amount-a-min 10686 --amount-b-min 10 \
+  --network sepolia
+  
 pnpm task:remove-liquidity:router \
   --token-a USDC --token-b JPYC \
   --liquidity 1000000000000000000 \
@@ -119,6 +132,10 @@ pnpm task:swap-for-exact:router \
 pnpm task:swap:pair --token-in USDC --token-out JPYC --amount-in 1000000 --slippage 0.5 --network sepolia
 
 pnpm task:quote:pair --token-in USDC --token-out JPYC --amount-in 100000  --network sepolia
+
+pnpm task:quote:pair --token-in USDC --token-out PYUSD --amount-in 1000  --network sepolia
+
+pnpm task:quote:pair --token-in PYUSD --token-out JPYC --amount-in 1000  --network sepolia
 ```
 
 ### DEX 操作フロー例（タスクベース）

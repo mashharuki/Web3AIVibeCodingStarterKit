@@ -20,9 +20,12 @@ task("removeLiquidityViaRouter", "Router経由で指定されたペアから流�
   .addParam("liquidity", "除去するLPトークンの量（最小単位）")
   .addParam("amountAMin", "tokenAの最小許容量（最小単位）")
   .addParam("amountBMin", "tokenBの最小許容量（最小単位）")
+  .addOptionalParam("slippageBps", "スリッページ許容(bps: 100=1%)。推奨: 50-300", "500")
+  .addOptionalParam("autoMin", "min値を自動計算して適用する (true/false)", "false")
+  .addOptionalParam("preview", "送信せずに見積もりのみ表示 (true/false)", "false")
   .addOptionalParam("deadline", "トランザクションの有効期限（秒）", "1800") // デフォルト30分
   .setAction(async (taskArgs, hre: HardhatRuntimeEnvironment) => {
-    const { tokenA, tokenB, liquidity, amountAMin, amountBMin, deadline } = taskArgs;
+    const { tokenA, tokenB, liquidity, amountAMin, amountBMin, deadline, slippageBps, autoMin, preview } = taskArgs;
     const { network } = hre;
 
     console.log(`🔥 Router経由で ${tokenA}/${tokenB} ペアから流動性を除去中...`);
@@ -43,6 +46,9 @@ task("removeLiquidityViaRouter", "Router経由で指定されたペアから流�
     const liquidityBigInt = BigInt(liquidity);
     const amountAMinBigInt = BigInt(amountAMin);
     const amountBMinBigInt = BigInt(amountBMin);
+    const slippageBpsBigInt = BigInt(slippageBps ?? "500");
+    const autoMinEnabled = String(autoMin).toLowerCase() === "true" || String(autoMin) === "1";
+    const previewOnly = String(preview).toLowerCase() === "true" || String(preview) === "1";
     
     if (liquidityBigInt <= 0n) {
       throw new Error("❌ 除去するLPトークン量は0より大きい値を指定してください");
@@ -110,19 +116,70 @@ task("removeLiquidityViaRouter", "Router経由で指定されたペアから流�
         console.log(`   除去予定のシェア: ${removeSharePercentage.toFixed(4)}%`);
       }
 
-      // 現在のリザーブを確認
+      // token0/token1 とリザーブを取得し、tokenA/tokenB に正しくマッピング
+      const token0 = await AMMPair.read.token0();
+      const token1 = await AMMPair.read.token1();
       const reserves = await AMMPair.read.getReserves();
-      console.log(`\n📊 現在のリザーブ:`);
-      console.log(`   Reserve0: ${reserves[0].toString()}`);
-      console.log(`   Reserve1: ${reserves[1].toString()}`);
+      const tokenAIsToken0 = tokenAAddress.toLowerCase() === token0.toLowerCase();
+      const reserveA = tokenAIsToken0 ? reserves[0] : reserves[1];
+      const reserveB = tokenAIsToken0 ? reserves[1] : reserves[0];
 
-      // 予想される返還量を計算
-      const expectedAmountA = (liquidityBigInt * reserves[0]) / totalSupply;
-      const expectedAmountB = (liquidityBigInt * reserves[1]) / totalSupply;
+      console.log(`\n📊 現在のリザーブ (tokenA/tokenB 並び):`);
+      console.log(`   reserveA(${tokenA}): ${reserveA.toString()}`);
+      console.log(`   reserveB(${tokenB}): ${reserveB.toString()}`);
+
+      // 予想される返還量を計算（LP持分 × 各リザーブ / 総供給）
+      const expectedAmountA = (liquidityBigInt * reserveA) / totalSupply;
+      const expectedAmountB = (liquidityBigInt * reserveB) / totalSupply;
 
       console.log(`\n💰 予想される返還量:`);
       console.log(`   予想 ${tokenA}: ${expectedAmountA.toString()}`);
       console.log(`   予想 ${tokenB}: ${expectedAmountB.toString()}`);
+
+      // 推奨最小許容量（slippageBps を適用）
+      const ONE_BPS = 10000n;
+      const recommendedAMin = (expectedAmountA * (ONE_BPS - slippageBpsBigInt)) / ONE_BPS;
+      const recommendedBMin = (expectedAmountB * (ONE_BPS - slippageBpsBigInt)) / ONE_BPS;
+      const slippagePctStr = (Number(slippageBpsBigInt) / 100).toString();
+      console.log(`\n🧮 推奨最小許容量 (slippage ${slippageBpsBigInt.toString()}bps ≈ ${slippagePctStr}%):`);
+      console.log(`   推奨 ${tokenA} Min: ${recommendedAMin.toString()}`);
+      console.log(`   推奨 ${tokenB} Min: ${recommendedBMin.toString()}`);
+
+      // preview モードではここまでの情報のみ表示して終了
+      if (previewOnly) {
+        console.log("\n👀 preview モード: 送信しません。再現コマンド例:");
+        console.log(
+          `  pnpm task:remove-liquidity:router \\\n+  --token-a ${tokenA} --token-b ${tokenB} \\\n+  --liquidity ${liquidity} \\\n+  --amount-a-min ${recommendedAMin.toString()} \\\n+  --amount-b-min ${recommendedBMin.toString()} \\\n+  --slippage-bps ${slippageBpsBigInt.toString()} \\\n+  --network ${network.name}`
+        );
+        return;
+      }
+
+      // auto-min の適用またはバリデーション
+      let finalAmountAMin = amountAMinBigInt;
+      let finalAmountBMin = amountBMinBigInt;
+
+      if (autoMinEnabled) {
+        finalAmountAMin = recommendedAMin;
+        finalAmountBMin = recommendedBMin;
+        console.log("\n🤖 auto-min 有効: 推奨 min を適用します");
+        console.log(`   適用 AMin: ${finalAmountAMin.toString()}`);
+        console.log(`   適用 BMin: ${finalAmountBMin.toString()}`);
+      } else {
+        if (amountAMinBigInt > expectedAmountA) {
+          console.error("\n⛔ 事前検証エラー: amountAMin が高すぎます (返還見込み量を上回る)");
+          console.error(`   指定 AMin: ${amountAMinBigInt.toString()} / 予想 A: ${expectedAmountA.toString()}`);
+          console.error(`   推奨 AMin: ${recommendedAMin.toString()} (slippage ${slippageBpsBigInt.toString()}bps)`);
+          console.error("   → 推奨値で再実行するか --auto-min true を指定してください");
+          throw new Error("Pre-check failed: amountAMin exceeds expected return");
+        }
+        if (amountBMinBigInt > expectedAmountB) {
+          console.error("\n⛔ 事前検証エラー: amountBMin が高すぎます (返還見込み量を上回る)");
+          console.error(`   指定 BMin: ${amountBMinBigInt.toString()} / 予想 B: ${expectedAmountB.toString()}`);
+          console.error(`   推奨 BMin: ${recommendedBMin.toString()} (slippage ${slippageBpsBigInt.toString()}bps)`);
+          console.error("   → 推奨値で再実行するか --auto-min true を指定してください");
+          throw new Error("Pre-check failed: amountBMin exceeds expected return");
+        }
+      }
 
       // LPトークンの承認状況を確認
       const allowance = await AMMPair.read.allowance([userAddress, routerAddress]);
@@ -158,8 +215,8 @@ task("removeLiquidityViaRouter", "Router経由で指定されたペアから流�
         tokenAAddress,
         tokenBAddress,
         liquidityBigInt,
-        amountAMinBigInt,
-        amountBMinBigInt,
+        finalAmountAMin,
+        finalAmountBMin,
         userAddress,
         BigInt(deadlineTimestamp)
       ]);
