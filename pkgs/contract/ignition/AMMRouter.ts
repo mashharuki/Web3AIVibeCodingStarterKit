@@ -1,8 +1,8 @@
 import * as dotenv from "dotenv";
 import { network } from "hardhat";
 import {
-    loadDeployedContractAddresses,
-    writeContractAddress,
+  loadDeployedContractAddresses,
+  writeContractAddress,
 } from "../helpers/contractsJsonHelper";
 const { ethers } = require("hardhat");
 
@@ -10,28 +10,31 @@ dotenv.config();
 
 /**
  * AMM Router コントラクトをデプロイする
- * 
+ *
  * このスクリプトは以下の処理を行います：
  * 1. デプロイ済みの AMMFactory アドレスを読み込み
  * 2. AMMRouter コントラクトをデプロイ（Factory アドレスを指定）
  * 3. デプロイ済みアドレスを outputs/contracts-{network}.json に保存
  * 4. デプロイ情報をコンソールに出力
- * 
+ *
  * 注意: このスクリプトを実行する前に AMMFactory がデプロイされている必要があります
- * 
+ *
  * @returns Promise<void>
  */
 const deployAMMRouter = async (): Promise<void> => {
   console.log(
-    "##################################### [AMM Router Deploy START] #####################################",
+    "##################################### [AMM Router Deploy START] #####################################"
   );
 
   try {
     // Hardhat の ethers を使用してデプロイ
     const [deployer] = await ethers.getSigners();
-    
+
     console.log("Deploying contracts with the account:", deployer.address);
-    console.log("Account balance:", (await deployer.provider.getBalance(deployer.address)).toString());
+    console.log(
+      "Account balance:",
+      (await deployer.provider.getBalance(deployer.address)).toString()
+    );
     console.log("Network:", network.name);
 
     // デプロイ済みコントラクトアドレスを読み込み
@@ -56,17 +59,17 @@ const deployAMMRouter = async (): Promise<void> => {
     // WETH アドレス（今回のプロジェクトでは使用しないが、コンストラクタで必要）
     // Sepolia テストネットの WETH アドレスを使用
     const WETH_ADDRESS = "0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14"; // Sepolia WETH
-    
+
     console.log("Using WETH address:", WETH_ADDRESS);
 
     // AMMRouter コントラクトをデプロイ
     const AMMRouter = await ethers.getContractFactory("AMMRouter");
     const ammRouter = await AMMRouter.deploy(factoryAddress, WETH_ADDRESS);
-    
+
     // デプロイ完了を待機
     await ammRouter.waitForDeployment();
     const routerAddress = await ammRouter.getAddress();
-    
+
     console.log("AMMRouter deployed to:", routerAddress);
     console.log("Factory address:", factoryAddress);
     console.log("WETH address:", WETH_ADDRESS);
@@ -82,11 +85,11 @@ const deployAMMRouter = async (): Promise<void> => {
     // デプロイ情報を表示
     console.log("✅ AMMRouter deployment completed successfully!");
     console.log("📄 Contract address saved to outputs/contracts-" + network.name + ".json");
-    
+
     // コントラクトの基本情報を確認
     const routerFactory = await ammRouter.factory();
     const routerWETH = await ammRouter.WETH();
-    
+
     console.log("📊 Contract Information:");
     console.log("  - Factory address:", routerFactory);
     console.log("  - WETH address:", routerWETH);
@@ -98,15 +101,16 @@ const deployAMMRouter = async (): Promise<void> => {
     console.log("2. Add initial liquidity to pairs");
     console.log("3. Test swap functionality");
     console.log("\nUse Hardhat tasks to interact with the deployed contracts:");
-    console.log(`npx hardhat createPair --factory ${factoryAddress} --tokena <TOKEN_A> --tokenb <TOKEN_B> --network ${network.name}`);
-
+    console.log(
+      `npx hardhat createPair --factory ${factoryAddress} --tokena <TOKEN_A> --tokenb <TOKEN_B> --network ${network.name}`
+    );
   } catch (error) {
     console.error("❌ Error during AMMRouter deployment:", error);
     throw error;
   }
 
   console.log(
-    "##################################### [AMM Router Deploy END] #####################################",
+    "##################################### [AMM Router Deploy END] #####################################"
   );
 };
 

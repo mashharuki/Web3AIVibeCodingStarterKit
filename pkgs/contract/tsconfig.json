@@ -29,10 +29,5 @@
     "./helpers/**/*",
     "./ignition/**/*"
   ],
-  "exclude": [
-    "node_modules",
-    "dist",
-    "cache",
-    "artifacts"
-  ]
+  "exclude": ["node_modules", "dist", "cache", "artifacts"]
 }

@@ -34,14 +34,7 @@
     "task:verify:router": "npx hardhat verify:router",
     "task:verify:all": "npx hardhat verify:contracts"
   },
-  "keywords": [
-    "ethereum",
-    "solidity",
-    "hardhat",
-    "amm",
-    "dex",
-    "defi"
-  ],
+  "keywords": ["ethereum", "solidity", "hardhat", "amm", "dex", "defi"],
   "author": "",
   "license": "MIT",
   "devDependencies": {

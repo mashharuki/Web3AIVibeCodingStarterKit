@@ -50,7 +50,7 @@ describe("AMMRouter", function () {
     tokenA = await MockERC20.deploy("Token A", "TKA");
     tokenB = await MockERC20.deploy("Token B", "TKB");
     tokenC = await MockERC20.deploy("Token C", "TKC");
-    
+
     await tokenA.waitForDeployment();
     await tokenB.waitForDeployment();
     await tokenC.waitForDeployment();
@@ -58,7 +58,7 @@ describe("AMMRouter", function () {
     // トークンアドレスをソート（token0 < token1）
     const tokenAAddr = await tokenA.getAddress();
     const tokenBAddr = await tokenB.getAddress();
-    
+
     if (tokenAAddr.toLowerCase() > tokenBAddr.toLowerCase()) {
       [tokenA, tokenB] = [tokenB, tokenA];
     }
@@ -123,7 +123,10 @@ describe("AMMRouter", function () {
       expect(receipt?.status).to.equal(1);
 
       // ペアが作成されることを確認
-      const pairAddress = await factory.getPair(await tokenA.getAddress(), await tokenB.getAddress());
+      const pairAddress = await factory.getPair(
+        await tokenA.getAddress(),
+        await tokenB.getAddress()
+      );
       expect(pairAddress).to.not.equal(ethers.ZeroAddress);
 
       // LPトークンが発行されることを確認
@@ -149,21 +152,26 @@ describe("AMMRouter", function () {
       const amountADesired = ethers.parseEther("50");
       const amountBDesired = ethers.parseEther("100");
 
-      const tx = await router.connect(addr1).addLiquidity(
-        await tokenA.getAddress(),
-        await tokenB.getAddress(),
-        amountADesired,
-        amountBDesired,
-        ethers.parseEther("45"),
-        ethers.parseEther("90"),
-        addr1.address,
-        DEADLINE
-      );
+      const tx = await router
+        .connect(addr1)
+        .addLiquidity(
+          await tokenA.getAddress(),
+          await tokenB.getAddress(),
+          amountADesired,
+          amountBDesired,
+          ethers.parseEther("45"),
+          ethers.parseEther("90"),
+          addr1.address,
+          DEADLINE
+        );
 
       expect(tx).to.not.be.reverted;
 
       // 比例的に流動性が追加されることを確認
-      const pairAddress = await factory.getPair(await tokenA.getAddress(), await tokenB.getAddress());
+      const pairAddress = await factory.getPair(
+        await tokenA.getAddress(),
+        await tokenB.getAddress()
+      );
       const pair = await ethers.getContractAt("AMMPair", pairAddress);
       const lpBalance = await pair.balanceOf(addr1.address);
       expect(lpBalance).to.be.greaterThan(0);
@@ -249,7 +257,7 @@ describe("AMMRouter", function () {
         await tokenB.getAddress(),
         ethers.parseEther("150"), // 希望: 150
         ethers.parseEther("200"), // 希望: 200 (3:4の比率)
-        ethers.parseEther("50"),  // 最小: 50
+        ethers.parseEther("50"), // 最小: 50
         ethers.parseEther("100"), // 最小: 100
         addr1.address,
         DEADLINE
@@ -395,7 +403,7 @@ describe("AMMRouter", function () {
       );
 
       // 比例的にトークンが返還されることを確認（約1:2の比率）
-      const ratio = result.amountB * 1000n / result.amountA;
+      const ratio = (result.amountB * 1000n) / result.amountA;
       expect(ratio).to.be.closeTo(2000n, 50n); // 2.0 ± 0.05
     });
   });
@@ -430,7 +438,7 @@ describe("AMMRouter", function () {
       it("Should execute single-hop swap successfully", async function () {
         const amountIn = ethers.parseEther("100");
         const path = [await tokenA.getAddress(), await tokenB.getAddress()];
-        
+
         // 期待される出力量を計算
         const amounts = await router.getAmountsOut(amountIn, path);
         const expectedAmountOut = amounts[1];
@@ -439,7 +447,7 @@ describe("AMMRouter", function () {
 
         const tx = await router.connect(addr1).swapExactTokensForTokens(
           amountIn,
-          expectedAmountOut * 95n / 100n, // 5%のスリッページ許容
+          (expectedAmountOut * 95n) / 100n, // 5%のスリッページ許容
           path,
           addr1.address,
           DEADLINE
@@ -449,7 +457,9 @@ describe("AMMRouter", function () {
 
         // トークンBの残高が増加することを確認
         const tokenBBalanceAfter = await tokenB.balanceOf(addr1.address);
-        expect(tokenBBalanceAfter - tokenBBalanceBefore).to.be.greaterThanOrEqual(expectedAmountOut * 95n / 100n);
+        expect(tokenBBalanceAfter - tokenBBalanceBefore).to.be.greaterThanOrEqual(
+          (expectedAmountOut * 95n) / 100n
+        );
       });
 
       it("Should execute multi-hop swap successfully", async function () {
@@ -457,7 +467,7 @@ describe("AMMRouter", function () {
         const path = [
           await tokenA.getAddress(),
           await tokenB.getAddress(),
-          await tokenC.getAddress()
+          await tokenC.getAddress(),
         ];
 
         // 期待される出力量を計算
@@ -468,7 +478,7 @@ describe("AMMRouter", function () {
 
         const tx = await router.connect(addr1).swapExactTokensForTokens(
           amountIn,
-          expectedAmountOut * 90n / 100n, // 10%のスリッページ許容（マルチホップ）
+          (expectedAmountOut * 90n) / 100n, // 10%のスリッページ許容（マルチホップ）
           path,
           addr1.address,
           DEADLINE
@@ -478,7 +488,9 @@ describe("AMMRouter", function () {
 
         // トークンCの残高が増加することを確認
         const tokenCBalanceAfter = await tokenC.balanceOf(addr1.address);
-        expect(tokenCBalanceAfter - tokenCBalanceBefore).to.be.greaterThanOrEqual(expectedAmountOut * 90n / 100n);
+        expect(tokenCBalanceAfter - tokenCBalanceBefore).to.be.greaterThanOrEqual(
+          (expectedAmountOut * 90n) / 100n
+        );
       });
 
       it("Should fail when deadline is expired", async function () {
@@ -488,27 +500,23 @@ describe("AMMRouter", function () {
         const expiredDeadline = Number(blk3!.timestamp) - 3600;
 
         await expect(
-          router.connect(addr1).swapExactTokensForTokens(
-            amountIn,
-            0,
-            path,
-            addr1.address,
-            expiredDeadline
-          )
+          router
+            .connect(addr1)
+            .swapExactTokensForTokens(amountIn, 0, path, addr1.address, expiredDeadline)
         ).to.be.revertedWith("AMMRouter: EXPIRED");
       });
 
       it("Should fail when slippage protection is triggered", async function () {
         const amountIn = ethers.parseEther("100");
         const path = [await tokenA.getAddress(), await tokenB.getAddress()];
-        
+
         const amounts = await router.getAmountsOut(amountIn, path);
         const expectedAmountOut = amounts[1];
 
         await expect(
           router.connect(addr1).swapExactTokensForTokens(
             amountIn,
-            expectedAmountOut * 110n / 100n, // 不可能な最小出力量
+            (expectedAmountOut * 110n) / 100n, // 不可能な最小出力量
             path,
             addr1.address,
             DEADLINE
@@ -521,13 +529,9 @@ describe("AMMRouter", function () {
         const invalidPath = [await tokenA.getAddress()]; // 長さが1
 
         await expect(
-          router.connect(addr1).swapExactTokensForTokens(
-            amountIn,
-            0,
-            invalidPath,
-            addr1.address,
-            DEADLINE
-          )
+          router
+            .connect(addr1)
+            .swapExactTokensForTokens(amountIn, 0, invalidPath, addr1.address, DEADLINE)
         ).to.be.revertedWith("AMMRouter: INVALID_PATH");
       });
 
@@ -536,13 +540,9 @@ describe("AMMRouter", function () {
         const path = [await tokenA.getAddress(), await tokenB.getAddress()];
 
         await expect(
-          router.connect(addr1).swapExactTokensForTokens(
-            amountIn,
-            0,
-            path,
-            ethers.ZeroAddress,
-            DEADLINE
-          )
+          router
+            .connect(addr1)
+            .swapExactTokensForTokens(amountIn, 0, path, ethers.ZeroAddress, DEADLINE)
         ).to.be.revertedWith("AMMRouter: INVALID_TO");
       });
 
@@ -550,13 +550,7 @@ describe("AMMRouter", function () {
         const path = [await tokenA.getAddress(), await tokenB.getAddress()];
 
         await expect(
-          router.connect(addr1).swapExactTokensForTokens(
-            0,
-            0,
-            path,
-            addr1.address,
-            DEADLINE
-          )
+          router.connect(addr1).swapExactTokensForTokens(0, 0, path, addr1.address, DEADLINE)
         ).to.be.revertedWith("AMMRouter: INSUFFICIENT_INPUT_AMOUNT");
       });
     });
@@ -565,7 +559,7 @@ describe("AMMRouter", function () {
       it("Should execute exact output swap successfully", async function () {
         const amountOut = ethers.parseEther("50");
         const path = [await tokenA.getAddress(), await tokenB.getAddress()];
-        
+
         // 必要な入力量を計算
         const amounts = await router.getAmountsIn(amountOut, path);
         const expectedAmountIn = amounts[0];
@@ -575,7 +569,7 @@ describe("AMMRouter", function () {
 
         const tx = await router.connect(addr1).swapTokensForExactTokens(
           amountOut,
-          expectedAmountIn * 105n / 100n, // 5%のスリッページ許容
+          (expectedAmountIn * 105n) / 100n, // 5%のスリッページ許容
           path,
           addr1.address,
           DEADLINE
@@ -590,20 +584,20 @@ describe("AMMRouter", function () {
         // 入力量が期待値以下であることを確認
         const tokenABalanceAfter = await tokenA.balanceOf(addr1.address);
         const actualAmountIn = tokenABalanceBefore - tokenABalanceAfter;
-        expect(actualAmountIn).to.be.lessThanOrEqual(expectedAmountIn * 105n / 100n);
+        expect(actualAmountIn).to.be.lessThanOrEqual((expectedAmountIn * 105n) / 100n);
       });
 
       it("Should fail when maximum input amount is exceeded", async function () {
         const amountOut = ethers.parseEther("50");
         const path = [await tokenA.getAddress(), await tokenB.getAddress()];
-        
+
         const amounts = await router.getAmountsIn(amountOut, path);
         const expectedAmountIn = amounts[0];
 
         await expect(
           router.connect(addr1).swapTokensForExactTokens(
             amountOut,
-            expectedAmountIn * 90n / 100n, // 不可能な最大入力量
+            (expectedAmountIn * 90n) / 100n, // 不可能な最大入力量
             path,
             addr1.address,
             DEADLINE
@@ -615,13 +609,9 @@ describe("AMMRouter", function () {
         const path = [await tokenA.getAddress(), await tokenB.getAddress()];
 
         await expect(
-          router.connect(addr1).swapTokensForExactTokens(
-            0,
-            ethers.parseEther("100"),
-            path,
-            addr1.address,
-            DEADLINE
-          )
+          router
+            .connect(addr1)
+            .swapTokensForExactTokens(0, ethers.parseEther("100"), path, addr1.address, DEADLINE)
         ).to.be.revertedWith("AMMRouter: INSUFFICIENT_OUTPUT_AMOUNT");
       });
     });
@@ -649,7 +639,7 @@ describe("AMMRouter", function () {
         const reserveB = ethers.parseEther("2000");
 
         const quote = await router.quote(amountA, reserveA, reserveB);
-        const expectedQuote = amountA * reserveB / reserveA;
+        const expectedQuote = (amountA * reserveB) / reserveA;
 
         expect(quote).to.equal(expectedQuote);
       });
@@ -678,7 +668,7 @@ describe("AMMRouter", function () {
         const reserveOut = ethers.parseEther("2000");
 
         const amountOut = await router.getAmountOut(amountIn, reserveIn, reserveOut);
-        
+
         // 手数料を考慮した計算（0.3%手数料）
         const amountInWithFee = amountIn * 997n;
         const numerator = amountInWithFee * reserveOut;
@@ -708,7 +698,7 @@ describe("AMMRouter", function () {
         const reserveOut = ethers.parseEther("2000");
 
         const amountIn = await router.getAmountIn(amountOut, reserveIn, reserveOut);
-        
+
         // 手数料を考慮した計算
         const numerator = reserveIn * amountOut * 1000n;
         const denominator = (reserveOut - amountOut) * 997n;
@@ -725,7 +715,11 @@ describe("AMMRouter", function () {
 
       it("Should fail with insufficient reserves", async function () {
         await expect(
-          router.getAmountIn(ethers.parseEther("2001"), ethers.parseEther("1000"), ethers.parseEther("2000"))
+          router.getAmountIn(
+            ethers.parseEther("2001"),
+            ethers.parseEther("1000"),
+            ethers.parseEther("2000")
+          )
         ).to.be.reverted; // Division by zero when amountOut >= reserveOut
       });
     });
@@ -759,7 +753,7 @@ describe("AMMRouter", function () {
         const path = [
           await tokenA.getAddress(),
           await tokenB.getAddress(),
-          await tokenC.getAddress()
+          await tokenC.getAddress(),
         ];
 
         const amounts = await router.getAmountsOut(amountIn, path);
@@ -774,9 +768,9 @@ describe("AMMRouter", function () {
         const amountIn = ethers.parseEther("100");
         const invalidPath = [await tokenA.getAddress()];
 
-        await expect(
-          router.getAmountsOut(amountIn, invalidPath)
-        ).to.be.revertedWith("AMMRouter: INVALID_PATH");
+        await expect(router.getAmountsOut(amountIn, invalidPath)).to.be.revertedWith(
+          "AMMRouter: INVALID_PATH"
+        );
       });
     });
 
@@ -796,9 +790,9 @@ describe("AMMRouter", function () {
         const amountOut = ethers.parseEther("100");
         const invalidPath = [await tokenA.getAddress()];
 
-        await expect(
-          router.getAmountsIn(amountOut, invalidPath)
-        ).to.be.revertedWith("AMMRouter: INVALID_PATH");
+        await expect(router.getAmountsIn(amountOut, invalidPath)).to.be.revertedWith(
+          "AMMRouter: INVALID_PATH"
+        );
       });
     });
   });
@@ -821,57 +815,45 @@ describe("AMMRouter", function () {
     it("Should protect against excessive slippage in swaps", async function () {
       const amountIn = ethers.parseEther("500"); // 大きなスワップ
       const path = [await tokenA.getAddress(), await tokenB.getAddress()];
-      
+
       const amounts = await router.getAmountsOut(amountIn, path);
       const expectedAmountOut = amounts[1];
 
       // 厳しいスリッページ保護（期待値の99%）
-      const minAmountOut = expectedAmountOut * 99n / 100n;
+      const minAmountOut = (expectedAmountOut * 99n) / 100n;
 
       await expect(
-        router.connect(addr1).swapExactTokensForTokens(
-          amountIn,
-          minAmountOut,
-          path,
-          addr1.address,
-          DEADLINE
-        )
+        router
+          .connect(addr1)
+          .swapExactTokensForTokens(amountIn, minAmountOut, path, addr1.address, DEADLINE)
       ).to.not.be.reverted;
 
       // 不可能なスリッページ保護（期待値の101%）
-      const impossibleMinAmountOut = expectedAmountOut * 101n / 100n;
+      const impossibleMinAmountOut = (expectedAmountOut * 101n) / 100n;
 
       await expect(
-        router.connect(addr1).swapExactTokensForTokens(
-          amountIn,
-          impossibleMinAmountOut,
-          path,
-          addr1.address,
-          DEADLINE
-        )
+        router
+          .connect(addr1)
+          .swapExactTokensForTokens(amountIn, impossibleMinAmountOut, path, addr1.address, DEADLINE)
       ).to.be.revertedWith("AMMRouter: INSUFFICIENT_OUTPUT_AMOUNT");
     });
 
     it("Should protect against price manipulation", async function () {
       const normalAmountIn = ethers.parseEther("10");
       const path = [await tokenA.getAddress(), await tokenB.getAddress()];
-      
+
       // 通常のスワップレートを取得
       const normalAmounts = await router.getAmountsOut(normalAmountIn, path);
-      const normalRate = normalAmounts[1] * 1000n / normalAmounts[0];
+      const normalRate = (normalAmounts[1] * 1000n) / normalAmounts[0];
 
       // 大きなスワップを実行して価格を変動させる
-      await router.connect(addr1).swapExactTokensForTokens(
-        ethers.parseEther("400"),
-        0,
-        path,
-        addr1.address,
-        DEADLINE
-      );
+      await router
+        .connect(addr1)
+        .swapExactTokensForTokens(ethers.parseEther("400"), 0, path, addr1.address, DEADLINE);
 
       // 価格変動後のレートを確認
       const manipulatedAmounts = await router.getAmountsOut(normalAmountIn, path);
-      const manipulatedRate = manipulatedAmounts[1] * 1000n / manipulatedAmounts[0];
+      const manipulatedRate = (manipulatedAmounts[1] * 1000n) / manipulatedAmounts[0];
 
       // 価格が悪化していることを確認（スリッページ保護の重要性）
       expect(manipulatedRate).to.be.lessThan(normalRate);
@@ -900,13 +882,9 @@ describe("AMMRouter", function () {
       const path = [await tokenA.getAddress(), await tokenB.getAddress()];
 
       await expect(
-        router.connect(addr1).swapExactTokensForTokens(
-          amountIn,
-          0,
-          path,
-          addr1.address,
-          futureDeadline
-        )
+        router
+          .connect(addr1)
+          .swapExactTokensForTokens(amountIn, 0, path, addr1.address, futureDeadline)
       ).to.not.be.reverted;
     });
 
@@ -917,13 +895,9 @@ describe("AMMRouter", function () {
       const path = [await tokenA.getAddress(), await tokenB.getAddress()];
 
       await expect(
-        router.connect(addr1).swapExactTokensForTokens(
-          amountIn,
-          0,
-          path,
-          addr1.address,
-          pastDeadline
-        )
+        router
+          .connect(addr1)
+          .swapExactTokensForTokens(amountIn, 0, path, addr1.address, pastDeadline)
       ).to.be.revertedWith("AMMRouter: EXPIRED");
     });
 
@@ -938,13 +912,9 @@ describe("AMMRouter", function () {
 
       // 正確なデッドラインでの実行は成功するはず
       await expect(
-        router.connect(addr1).swapExactTokensForTokens(
-          amountIn,
-          0,
-          path,
-          addr1.address,
-          exactDeadline
-        )
+        router
+          .connect(addr1)
+          .swapExactTokensForTokens(amountIn, 0, path, addr1.address, exactDeadline)
       ).to.not.be.reverted;
     });
   });
@@ -980,7 +950,7 @@ describe("AMMRouter", function () {
       const path = [
         await tokenA.getAddress(),
         await tokenB.getAddress(),
-        await tokenC.getAddress()
+        await tokenC.getAddress(),
       ];
 
       const tokenCBalanceBefore = await tokenC.balanceOf(addr1.address);
@@ -1005,7 +975,7 @@ describe("AMMRouter", function () {
       const path = [
         await tokenA.getAddress(),
         await tokenB.getAddress(),
-        await tokenC.getAddress()
+        await tokenC.getAddress(),
       ];
 
       const amounts = await router.getAmountsOut(amountIn, path);
@@ -1020,7 +990,7 @@ describe("AMMRouter", function () {
 
       await router.connect(addr1).swapExactTokensForTokens(
         amountIn,
-        amounts[2] * 95n / 100n, // 5%のスリッページ許容
+        (amounts[2] * 95n) / 100n, // 5%のスリッページ許容
         path,
         addr1.address,
         DEADLINE
@@ -1037,18 +1007,14 @@ describe("AMMRouter", function () {
       const path = [
         await tokenC.getAddress(),
         await tokenB.getAddress(),
-        await tokenA.getAddress()
+        await tokenA.getAddress(),
       ];
 
       const tokenABalanceBefore = await tokenA.balanceOf(addr1.address);
 
-      const tx = await router.connect(addr1).swapExactTokensForTokens(
-        amountIn,
-        0,
-        path,
-        addr1.address,
-        DEADLINE
-      );
+      const tx = await router
+        .connect(addr1)
+        .swapExactTokensForTokens(amountIn, 0, path, addr1.address, DEADLINE);
 
       expect(tx).to.not.be.reverted;
 
@@ -1062,17 +1028,13 @@ describe("AMMRouter", function () {
       const amountIn = ethers.parseEther("100");
       const invalidPath = [
         await tokenA.getAddress(),
-        await tokenC.getAddress() // 直接A-Cペアは存在しない
+        await tokenC.getAddress(), // 直接A-Cペアは存在しない
       ];
 
       await expect(
-        router.connect(addr1).swapExactTokensForTokens(
-          amountIn,
-          0,
-          invalidPath,
-          addr1.address,
-          DEADLINE
-        )
+        router
+          .connect(addr1)
+          .swapExactTokensForTokens(amountIn, 0, invalidPath, addr1.address, DEADLINE)
       ).to.be.revertedWith("AMMRouter: PAIR_NOT_EXISTS");
     });
 
@@ -1082,16 +1044,16 @@ describe("AMMRouter", function () {
       const path = [
         await tokenA.getAddress(),
         await tokenB.getAddress(),
-        await tokenC.getAddress()
+        await tokenC.getAddress(),
       ];
 
       // 小さなスワップのレート
       const smallAmounts = await router.getAmountsOut(smallAmountIn, path);
-      const smallRate = smallAmounts[2] * 1000n / smallAmounts[0];
+      const smallRate = (smallAmounts[2] * 1000n) / smallAmounts[0];
 
       // 大きなスワップのレート
       const largeAmounts = await router.getAmountsOut(largeAmountIn, path);
-      const largeRate = largeAmounts[2] * 1000n / largeAmounts[0];
+      const largeRate = (largeAmounts[2] * 1000n) / largeAmounts[0];
 
       // 大きなスワップの方がレートが悪いことを確認（価格インパクト）
       expect(largeRate).to.be.lessThan(smallRate);
@@ -1181,16 +1143,18 @@ describe("AMMRouter", function () {
       const excessiveAmount = INITIAL_SUPPLY + ethers.parseEther("1");
 
       await expect(
-        router.connect(addr2).addLiquidity(
-          await tokenA.getAddress(),
-          await tokenB.getAddress(),
-          excessiveAmount,
-          ethers.parseEther("200"),
-          ethers.parseEther("95"),
-          ethers.parseEther("190"),
-          addr2.address,
-          DEADLINE
-        )
+        router
+          .connect(addr2)
+          .addLiquidity(
+            await tokenA.getAddress(),
+            await tokenB.getAddress(),
+            excessiveAmount,
+            ethers.parseEther("200"),
+            ethers.parseEther("95"),
+            ethers.parseEther("190"),
+            addr2.address,
+            DEADLINE
+          )
       ).to.be.reverted; // ERC20の残高不足エラー
     });
 
@@ -1200,16 +1164,18 @@ describe("AMMRouter", function () {
       await tokenB.mint(addr2.address, ethers.parseEther("1000"));
 
       await expect(
-        router.connect(addr2).addLiquidity(
-          await tokenA.getAddress(),
-          await tokenB.getAddress(),
-          ethers.parseEther("100"),
-          ethers.parseEther("200"),
-          ethers.parseEther("95"),
-          ethers.parseEther("190"),
-          addr2.address,
-          DEADLINE
-        )
+        router
+          .connect(addr2)
+          .addLiquidity(
+            await tokenA.getAddress(),
+            await tokenB.getAddress(),
+            ethers.parseEther("100"),
+            ethers.parseEther("200"),
+            ethers.parseEther("95"),
+            ethers.parseEther("190"),
+            addr2.address,
+            DEADLINE
+          )
       ).to.be.reverted; // ERC20の承認不足エラー
     });
 
@@ -1230,21 +1196,13 @@ describe("AMMRouter", function () {
       const amountIn = ethers.parseEther("100");
       const path = [await tokenA.getAddress(), await tokenB.getAddress()];
 
-      const swapPromise1 = router.connect(addr1).swapExactTokensForTokens(
-        amountIn,
-        0,
-        path,
-        addr1.address,
-        DEADLINE
-      );
+      const swapPromise1 = router
+        .connect(addr1)
+        .swapExactTokensForTokens(amountIn, 0, path, addr1.address, DEADLINE);
 
-      const swapPromise2 = router.connect(addr1).swapExactTokensForTokens(
-        amountIn,
-        0,
-        path,
-        addr1.address,
-        DEADLINE
-      );
+      const swapPromise2 = router
+        .connect(addr1)
+        .swapExactTokensForTokens(amountIn, 0, path, addr1.address, DEADLINE);
 
       // 両方のトランザクションが成功することを確認（リエントランシー保護が適切に動作）
       await expect(swapPromise1).to.not.be.reverted;
@@ -1268,19 +1226,21 @@ describe("AMMRouter", function () {
     });
 
     it("Should use reasonable gas for liquidity operations", async function () {
-      const tx = await router.connect(addr1).addLiquidity(
-        await tokenA.getAddress(),
-        await tokenB.getAddress(),
-        ethers.parseEther("100"),
-        ethers.parseEther("200"),
-        ethers.parseEther("95"),
-        ethers.parseEther("190"),
-        addr1.address,
-        DEADLINE
-      );
+      const tx = await router
+        .connect(addr1)
+        .addLiquidity(
+          await tokenA.getAddress(),
+          await tokenB.getAddress(),
+          ethers.parseEther("100"),
+          ethers.parseEther("200"),
+          ethers.parseEther("95"),
+          ethers.parseEther("190"),
+          addr1.address,
+          DEADLINE
+        );
 
       const receipt = await tx.wait();
-      
+
       // ガス使用量が合理的な範囲内であることを確認（500K gas未満）
       expect(Number(receipt?.gasUsed)).to.be.lessThan(500000);
     });
@@ -1289,16 +1249,12 @@ describe("AMMRouter", function () {
       const amountIn = ethers.parseEther("100");
       const path = [await tokenA.getAddress(), await tokenB.getAddress()];
 
-      const tx = await router.connect(addr1).swapExactTokensForTokens(
-        amountIn,
-        0,
-        path,
-        addr1.address,
-        DEADLINE
-      );
+      const tx = await router
+        .connect(addr1)
+        .swapExactTokensForTokens(amountIn, 0, path, addr1.address, DEADLINE);
 
       const receipt = await tx.wait();
-      
+
       // スワップのガス使用量が合理的な範囲内であることを確認（200K gas未満）
       expect(Number(receipt?.gasUsed)).to.be.lessThan(200000);
     });
@@ -1308,23 +1264,15 @@ describe("AMMRouter", function () {
       const path = [await tokenA.getAddress(), await tokenB.getAddress()];
 
       // 1回目のスワップ
-      const tx1 = await router.connect(addr1).swapExactTokensForTokens(
-        amountIn,
-        0,
-        path,
-        addr1.address,
-        DEADLINE
-      );
+      const tx1 = await router
+        .connect(addr1)
+        .swapExactTokensForTokens(amountIn, 0, path, addr1.address, DEADLINE);
       const receipt1 = await tx1.wait();
 
       // 2回目のスワップ
-      const tx2 = await router.connect(addr1).swapExactTokensForTokens(
-        amountIn,
-        0,
-        path,
-        addr1.address,
-        DEADLINE
-      );
+      const tx2 = await router
+        .connect(addr1)
+        .swapExactTokensForTokens(amountIn, 0, path, addr1.address, DEADLINE);
       const receipt2 = await tx2.wait();
 
       // ガス使用量の差が30%以内であることを確認（価格変動により差が生じる可能性）

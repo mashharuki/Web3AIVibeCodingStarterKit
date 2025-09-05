@@ -24,7 +24,8 @@ task("swapExactTokensViaRouter", "Router経由で正確な入力量でトーク�
   .addOptionalParam("preview", "送信せずに見積もりのみ表示 (true/false)", "false")
   .addOptionalParam("deadline", "トランザクションの有効期限（秒）", "1800") // デフォルト30分
   .setAction(async (taskArgs, hre: HardhatRuntimeEnvironment) => {
-    const { tokenIn, tokenOut, amountIn, amountOutMin, slippageBps, autoMin, preview, deadline } = taskArgs;
+    const { tokenIn, tokenOut, amountIn, amountOutMin, slippageBps, autoMin, preview, deadline } =
+      taskArgs;
     const { network } = hre;
 
     console.log(`🔄 Router経由で ${tokenIn} → ${tokenOut} スワップを実行中...`);
@@ -32,10 +33,14 @@ task("swapExactTokensViaRouter", "Router経由で正確な入力量でトーク�
 
     // トークンシンボルの検証
     if (!TOKENS[tokenIn as keyof typeof TOKENS]) {
-      throw new Error(`❌ 無効な入力トークン: ${tokenIn}. 利用可能: ${Object.keys(TOKENS).join(", ")}`);
+      throw new Error(
+        `❌ 無効な入力トークン: ${tokenIn}. 利用可能: ${Object.keys(TOKENS).join(", ")}`
+      );
     }
     if (!TOKENS[tokenOut as keyof typeof TOKENS]) {
-      throw new Error(`❌ 無効な出力トークン: ${tokenOut}. 利用可能: ${Object.keys(TOKENS).join(", ")}`);
+      throw new Error(
+        `❌ 無効な出力トークン: ${tokenOut}. 利用可能: ${Object.keys(TOKENS).join(", ")}`
+      );
     }
     if (tokenIn === tokenOut) {
       throw new Error("❌ 同じトークン間でスワップすることはできません");
@@ -47,7 +52,7 @@ task("swapExactTokensViaRouter", "Router経由で正確な入力量でトーク�
     const slippageBpsBigInt = BigInt(slippageBps ?? "500");
     const autoMinEnabled = String(autoMin).toLowerCase() === "true" || String(autoMin) === "1";
     const previewOnly = String(preview).toLowerCase() === "true" || String(preview) === "1";
-    
+
     if (amountInBigInt <= 0n) {
       throw new Error("❌ 入力量は0より大きい値を指定してください");
     }
@@ -63,7 +68,9 @@ task("swapExactTokensViaRouter", "Router経由で正確な入力量でトーク�
     console.log(`📍 ${tokenOut} アドレス: ${tokenOutAddress}`);
     console.log(`💰 入力量 ${tokenIn}: ${amountIn}`);
     console.log(`🔒 最小出力量 ${tokenOut}: ${amountOutMin}`);
-    console.log(`⚙️  slippage: ${slippageBpsBigInt.toString()} bps${autoMinEnabled ? " (auto-min 有効)" : ""}${previewOnly ? " (preview)" : ""}`);
+    console.log(
+      `⚙️  slippage: ${slippageBpsBigInt.toString()} bps${autoMinEnabled ? " (auto-min 有効)" : ""}${previewOnly ? " (preview)" : ""}`
+    );
 
     try {
       // デプロイ済みコントラクトアドレスを読み込み
@@ -93,14 +100,18 @@ task("swapExactTokensViaRouter", "Router経由で正確な入力量でトーク�
       const ONE_BPS = 10000n;
       const recommendedAmountOutMin = (expectedAmountOut * (ONE_BPS - slippageBpsBigInt)) / ONE_BPS;
       const slippagePctStr = (Number(slippageBpsBigInt) / 100).toString();
-      console.log(`🧮 推奨最小出力量 (slippage ${slippageBpsBigInt.toString()}bps ≈ ${slippagePctStr}%): ${recommendedAmountOutMin.toString()}`);
+      console.log(
+        `🧮 推奨最小出力量 (slippage ${slippageBpsBigInt.toString()}bps ≈ ${slippagePctStr}%): ${recommendedAmountOutMin.toString()}`
+      );
 
       let finalAmountOutMin = amountOutMinBigInt;
       if (autoMinEnabled) {
         finalAmountOutMin = recommendedAmountOutMin;
         console.log(`🤖 auto-min 適用: amountOutMin = ${finalAmountOutMin.toString()}`);
       } else if (!previewOnly && expectedAmountOut < amountOutMinBigInt) {
-        throw new Error(`❌ スリッページが大きすぎます。予想出力量: ${expectedAmountOut.toString()}, 最小許容量: ${amountOutMin}`);
+        throw new Error(
+          `❌ スリッページが大きすぎます。予想出力量: ${expectedAmountOut.toString()}, 最小許容量: ${amountOutMin}`
+        );
       }
 
       // トークンコントラクトに接続
@@ -131,7 +142,7 @@ task("swapExactTokensViaRouter", "Router経由で正確な入力量でトーク�
           console.log(`⏳ ${tokenIn}の承認を実行中...`);
           const approveHash = await TokenIn.write.approve([routerAddress, amountInBigInt]);
           console.log(`📝 ${tokenIn}承認トランザクション: ${approveHash}`);
-          
+
           const publicClient = await hre.viem.getPublicClient();
           await publicClient.waitForTransactionReceipt({ hash: approveHash });
           console.log(`✅ ${tokenIn}の承認完了`);
@@ -159,7 +170,7 @@ task("swapExactTokensViaRouter", "Router経由で正確な入力量でトーク�
         finalAmountOutMin,
         path,
         userAddress,
-        BigInt(deadlineTimestamp)
+        BigInt(deadlineTimestamp),
       ]);
 
       console.log(`📝 スワップトランザクション: ${swapHash}`);
@@ -197,14 +208,14 @@ task("swapExactTokensViaRouter", "Router経由で正確な入力量でトーク�
 
         // 実際のスリッページを計算
         if (expectedAmountOut > 0n) {
-          const actualSlippage = ((Number(expectedAmountOut) - Number(actualAmountOut)) / Number(expectedAmountOut)) * 100;
+          const actualSlippage =
+            ((Number(expectedAmountOut) - Number(actualAmountOut)) / Number(expectedAmountOut)) *
+            100;
           console.log(`   実際のスリッページ: ${actualSlippage.toFixed(4)}%`);
         }
-
       } else {
         console.log("❌ Router経由でのスワップに失敗しました");
       }
-
     } catch (error) {
       console.error("❌ エラーが発生しました:", error);
       throw error;
@@ -226,7 +237,8 @@ task("swapTokensForExactViaRouter", "Router経由で正確な出力量でトー�
   .addOptionalParam("preview", "送信せずに見積もりのみ表示 (true/false)", "false")
   .addOptionalParam("deadline", "トランザクションの有効期限（秒）", "1800") // デフォルト30分
   .setAction(async (taskArgs, hre: HardhatRuntimeEnvironment) => {
-    const { tokenIn, tokenOut, amountOut, amountInMax, slippageBps, autoMax, preview, deadline } = taskArgs;
+    const { tokenIn, tokenOut, amountOut, amountInMax, slippageBps, autoMax, preview, deadline } =
+      taskArgs;
     const { network } = hre;
 
     console.log(`🔄 Router経由で ${tokenIn} → ${tokenOut} 正確な出力量スワップを実行中...`);
@@ -234,10 +246,14 @@ task("swapTokensForExactViaRouter", "Router経由で正確な出力量でトー�
 
     // トークンシンボルの検証
     if (!TOKENS[tokenIn as keyof typeof TOKENS]) {
-      throw new Error(`❌ 無効な入力トークン: ${tokenIn}. 利用可能: ${Object.keys(TOKENS).join(", ")}`);
+      throw new Error(
+        `❌ 無効な入力トークン: ${tokenIn}. 利用可能: ${Object.keys(TOKENS).join(", ")}`
+      );
     }
     if (!TOKENS[tokenOut as keyof typeof TOKENS]) {
-      throw new Error(`❌ 無効な出力トークン: ${tokenOut}. 利用可能: ${Object.keys(TOKENS).join(", ")}`);
+      throw new Error(
+        `❌ 無効な出力トークン: ${tokenOut}. 利用可能: ${Object.keys(TOKENS).join(", ")}`
+      );
     }
     if (tokenIn === tokenOut) {
       throw new Error("❌ 同じトークン間でスワップすることはできません");
@@ -249,7 +265,7 @@ task("swapTokensForExactViaRouter", "Router経由で正確な出力量でトー�
     const slippageBpsBigInt = BigInt(slippageBps ?? "500");
     const autoMaxEnabled = String(autoMax).toLowerCase() === "true" || String(autoMax) === "1";
     const previewOnly = String(preview).toLowerCase() === "true" || String(preview) === "1";
-    
+
     if (amountOutBigInt <= 0n) {
       throw new Error("❌ 出力量は0より大きい値を指定してください");
     }
@@ -265,7 +281,9 @@ task("swapTokensForExactViaRouter", "Router経由で正確な出力量でトー�
     console.log(`📍 ${tokenOut} アドレス: ${tokenOutAddress}`);
     console.log(`🎯 希望出力量 ${tokenOut}: ${amountOut}`);
     console.log(`🔒 最大入力量 ${tokenIn}: ${amountInMax}`);
-    console.log(`⚙️  slippage: ${slippageBpsBigInt.toString()} bps${autoMaxEnabled ? " (auto-max 有効)" : ""}${previewOnly ? " (preview)" : ""}`);
+    console.log(
+      `⚙️  slippage: ${slippageBpsBigInt.toString()} bps${autoMaxEnabled ? " (auto-max 有効)" : ""}${previewOnly ? " (preview)" : ""}`
+    );
 
     try {
       // デプロイ済みコントラクトアドレスを読み込み
@@ -294,16 +312,21 @@ task("swapTokensForExactViaRouter", "Router経由で正確な出力量でトー�
       // 推奨最大入力量: required × (1 + slippage)
       const ONE_BPS = 10000n;
       // 丸め上げして安全側に
-      const recommendedAmountInMax = (requiredAmountIn * (ONE_BPS + slippageBpsBigInt) + (ONE_BPS - 1n)) / ONE_BPS;
+      const recommendedAmountInMax =
+        (requiredAmountIn * (ONE_BPS + slippageBpsBigInt) + (ONE_BPS - 1n)) / ONE_BPS;
       const slippagePctStr = (Number(slippageBpsBigInt) / 100).toString();
-      console.log(`🧮 推奨最大入力量 (slippage ${slippageBpsBigInt.toString()}bps ≈ ${slippagePctStr}%): ${recommendedAmountInMax.toString()}`);
+      console.log(
+        `🧮 推奨最大入力量 (slippage ${slippageBpsBigInt.toString()}bps ≈ ${slippagePctStr}%): ${recommendedAmountInMax.toString()}`
+      );
 
       let finalAmountInMax = amountInMaxBigInt;
       if (autoMaxEnabled) {
         finalAmountInMax = recommendedAmountInMax;
         console.log(`🤖 auto-max 適用: amountInMax = ${finalAmountInMax.toString()}`);
       } else if (!previewOnly && requiredAmountIn > amountInMaxBigInt) {
-        throw new Error(`❌ 必要な入力量が最大許容量を超えています。必要: ${requiredAmountIn.toString()}, 最大許容: ${amountInMax}`);
+        throw new Error(
+          `❌ 必要な入力量が最大許容量を超えています。必要: ${requiredAmountIn.toString()}, 最大許容: ${amountInMax}`
+        );
       }
 
       // トークンコントラクトに接続
@@ -334,7 +357,7 @@ task("swapTokensForExactViaRouter", "Router経由で正確な出力量でトー�
           console.log(`⏳ ${tokenIn}の承認を実行中...`);
           const approveHash = await TokenIn.write.approve([routerAddress, finalAmountInMax]);
           console.log(`📝 ${tokenIn}承認トランザクション: ${approveHash}`);
-          
+
           const publicClient = await hre.viem.getPublicClient();
           await publicClient.waitForTransactionReceipt({ hash: approveHash });
           console.log(`✅ ${tokenIn}の承認完了`);
@@ -362,7 +385,7 @@ task("swapTokensForExactViaRouter", "Router経由で正確な出力量でトー�
         finalAmountInMax,
         path,
         userAddress,
-        BigInt(deadlineTimestamp)
+        BigInt(deadlineTimestamp),
       ]);
 
       console.log(`📝 スワップトランザクション: ${swapHash}`);
@@ -404,11 +427,9 @@ task("swapTokensForExactViaRouter", "Router経由で正確な出力量でトー�
         console.log(`   実際入力量: ${actualAmountIn.toString()}`);
         console.log(`   希望出力量: ${amountOut}`);
         console.log(`   実際出力量: ${actualAmountOut.toString()}`);
-
       } else {
         console.log("❌ Router経由での正確な出力量スワップに失敗しました");
       }
-
     } catch (error) {
       console.error("❌ エラーが発生しました:", error);
       throw error;

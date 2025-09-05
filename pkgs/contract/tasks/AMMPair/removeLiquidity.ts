@@ -127,10 +127,7 @@ task("removeLiquidityFromPair", "指定されたペアから流動性を除去�
 
       // 現在のリザーブを確認
       const reserves = await AMMPair.read.getReserves();
-      const [token0, token1] = await Promise.all([
-        AMMPair.read.token0(),
-        AMMPair.read.token1(),
-      ]);
+      const [token0, token1] = await Promise.all([AMMPair.read.token0(), AMMPair.read.token1()]);
 
       console.log(`\n📊 現在のリザーブ:`);
       console.log(`   Token0 (${getTokenSymbol(token0)}): ${reserves[0].toString()}`);
@@ -196,11 +193,9 @@ task("removeLiquidityFromPair", "指定されたペアから流動性を除去�
         console.log(`\n💳 最終的なトークン残高:`);
         console.log(`   ${tokenA}: ${finalBalanceA.toString()}`);
         console.log(`   ${tokenB}: ${finalBalanceB.toString()}`);
-
       } else {
         console.log("❌ 流動性除去に失敗しました");
       }
-
     } catch (error) {
       console.error("❌ エラーが発生しました:", error);
       throw error;
@@ -283,7 +278,6 @@ task("removeAllLiquidity", "指定されたペアから全ての流動性を除�
         tokenB,
         liquidity: lpBalance.toString(),
       });
-
     } catch (error) {
       console.error("❌ エラーが発生しました:", error);
       throw error;

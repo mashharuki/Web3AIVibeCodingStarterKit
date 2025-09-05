@@ -64,30 +64,29 @@ task("createPair", "新しいトークンペアを作成する")
       // ペアを作成
       console.log("⏳ トランザクションを送信中...");
       const hash = await AMMFactory.write.createPair([tokenAAddress, tokenBAddress]);
-      
+
       console.log(`📝 トランザクションハッシュ: ${hash}`);
       console.log("⏳ トランザクションの確認を待機中...");
 
       // トランザクションの確認を待つ
       const publicClient = await hre.viem.getPublicClient();
       const receipt = await publicClient.waitForTransactionReceipt({ hash });
-      
+
       if (receipt.status === "success") {
         // 作成されたペアアドレスを取得
         const pairAddress = await AMMFactory.read.getPair([tokenAAddress, tokenBAddress]);
-        
+
         console.log("✅ ペア作成成功!");
         console.log(`🎯 ペアアドレス: ${pairAddress}`);
         console.log(`⛽ ガス使用量: ${receipt.gasUsed.toString()}`);
         console.log(`🔗 Etherscan: https://sepolia.etherscan.io/tx/${hash}`);
-        
+
         // ペア数を確認
         const totalPairs = await AMMFactory.read.allPairsLength();
         console.log(`📊 総ペア数: ${totalPairs.toString()}`);
       } else {
         console.log("❌ トランザクションが失敗しました");
       }
-
     } catch (error) {
       console.error("❌ エラーが発生しました:", error);
       throw error;
@@ -99,71 +98,72 @@ task("createPair", "新しいトークンペアを作成する")
  * 使用例:
  * npx hardhat createAllPairs --network sepolia
  */
-task("createAllPairs", "指定されたトークンペア（USDC/JPYC, USDC/PYUSD, JPYC/PYUSD）を一括作成する")
-  .setAction(async (taskArgs, hre: HardhatRuntimeEnvironment) => {
-    const { network } = hre;
+task(
+  "createAllPairs",
+  "指定されたトークンペア（USDC/JPYC, USDC/PYUSD, JPYC/PYUSD）を一括作成する"
+).setAction(async (taskArgs, hre: HardhatRuntimeEnvironment) => {
+  const { network } = hre;
 
-    console.log("🚀 指定されたトークンペアを一括作成中...");
-    console.log(`📡 ネットワーク: ${network.name}`);
+  console.log("🚀 指定されたトークンペアを一括作成中...");
+  console.log(`📡 ネットワーク: ${network.name}`);
 
-    // 作成するペアの定義
-    const pairs = [
-      { tokenA: "USDC", tokenB: "JPYC" },
-      { tokenA: "USDC", tokenB: "PYUSD" },
-      { tokenA: "JPYC", tokenB: "PYUSD" },
-    ];
+  // 作成するペアの定義
+  const pairs = [
+    { tokenA: "USDC", tokenB: "JPYC" },
+    { tokenA: "USDC", tokenB: "PYUSD" },
+    { tokenA: "JPYC", tokenB: "PYUSD" },
+  ];
 
-    try {
-      // デプロイ済みコントラクトアドレスを読み込み
-      const deployedContracts = loadDeployedContractAddresses(network.name);
-      const factoryAddress = deployedContracts.contracts.AMMFactory;
+  try {
+    // デプロイ済みコントラクトアドレスを読み込み
+    const deployedContracts = loadDeployedContractAddresses(network.name);
+    const factoryAddress = deployedContracts.contracts.AMMFactory;
 
-      console.log(`🏭 Factory アドレス: ${factoryAddress}`);
+    console.log(`🏭 Factory アドレス: ${factoryAddress}`);
 
-      // AMMFactory コントラクトに接続
-      const AMMFactory = await hre.viem.getContractAt("AMMFactory", factoryAddress);
+    // AMMFactory コントラクトに接続
+    const AMMFactory = await hre.viem.getContractAt("AMMFactory", factoryAddress);
 
-      for (const pair of pairs) {
-        const { tokenA, tokenB } = pair;
-        const tokenAAddress = TOKENS[tokenA as keyof typeof TOKENS];
-        const tokenBAddress = TOKENS[tokenB as keyof typeof TOKENS];
+    for (const pair of pairs) {
+      const { tokenA, tokenB } = pair;
+      const tokenAAddress = TOKENS[tokenA as keyof typeof TOKENS];
+      const tokenBAddress = TOKENS[tokenB as keyof typeof TOKENS];
 
-        console.log(`\n📝 ${tokenA}/${tokenB} ペアを処理中...`);
+      console.log(`\n📝 ${tokenA}/${tokenB} ペアを処理中...`);
 
-        // 既存のペアをチェック
-        const existingPair = await AMMFactory.read.getPair([tokenAAddress, tokenBAddress]);
-        if (existingPair !== "0x0000000000000000000000000000000000000000") {
-          console.log(`⚠️  ${tokenA}/${tokenB} ペアは既に存在します: ${existingPair}`);
-          continue;
-        }
-
-        // ペアを作成
-        console.log(`⏳ ${tokenA}/${tokenB} ペアを作成中...`);
-        const hash = await AMMFactory.write.createPair([tokenAAddress, tokenBAddress]);
-        
-        console.log(`📝 トランザクションハッシュ: ${hash}`);
-        
-        // トランザクションの確認を待つ
-        const publicClient = await hre.viem.getPublicClient();
-        const receipt = await publicClient.waitForTransactionReceipt({ hash });
-        
-        if (receipt.status === "success") {
-          const pairAddress = await AMMFactory.read.getPair([tokenAAddress, tokenBAddress]);
-          console.log(`✅ ${tokenA}/${tokenB} ペア作成成功! アドレス: ${pairAddress}`);
-        } else {
-          console.log(`❌ ${tokenA}/${tokenB} ペアの作成に失敗しました`);
-        }
-
-        // 次のペア作成前に少し待機
-        await new Promise(resolve => setTimeout(resolve, 2000));
+      // 既存のペアをチェック
+      const existingPair = await AMMFactory.read.getPair([tokenAAddress, tokenBAddress]);
+      if (existingPair !== "0x0000000000000000000000000000000000000000") {
+        console.log(`⚠️  ${tokenA}/${tokenB} ペアは既に存在します: ${existingPair}`);
+        continue;
       }
 
-      // 最終的なペア数を確認
-      const totalPairs = await AMMFactory.read.allPairsLength();
-      console.log(`\n📊 作成完了! 総ペア数: ${totalPairs.toString()}`);
+      // ペアを作成
+      console.log(`⏳ ${tokenA}/${tokenB} ペアを作成中...`);
+      const hash = await AMMFactory.write.createPair([tokenAAddress, tokenBAddress]);
 
-    } catch (error) {
-      console.error("❌ エラーが発生しました:", error);
-      throw error;
+      console.log(`📝 トランザクションハッシュ: ${hash}`);
+
+      // トランザクションの確認を待つ
+      const publicClient = await hre.viem.getPublicClient();
+      const receipt = await publicClient.waitForTransactionReceipt({ hash });
+
+      if (receipt.status === "success") {
+        const pairAddress = await AMMFactory.read.getPair([tokenAAddress, tokenBAddress]);
+        console.log(`✅ ${tokenA}/${tokenB} ペア作成成功! アドレス: ${pairAddress}`);
+      } else {
+        console.log(`❌ ${tokenA}/${tokenB} ペアの作成に失敗しました`);
+      }
+
+      // 次のペア作成前に少し待機
+      await new Promise((resolve) => setTimeout(resolve, 2000));
     }
-  });
+
+    // 最終的なペア数を確認
+    const totalPairs = await AMMFactory.read.allPairsLength();
+    console.log(`\n📊 作成完了! 総ペア数: ${totalPairs.toString()}`);
+  } catch (error) {
+    console.error("❌ エラーが発生しました:", error);
+    throw error;
+  }
+});

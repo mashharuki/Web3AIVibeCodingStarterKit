@@ -26,7 +26,18 @@ task("addLiquidityViaRouter", "Router経由で指定されたペアに流動性�
   .addOptionalParam("autoMin", "min値を自動計算して適用する (true/false)", "false")
   .addOptionalParam("deadline", "トランザクションの有効期限（秒）", "1800") // デフォルト30分
   .setAction(async (taskArgs, hre: HardhatRuntimeEnvironment) => {
-    const { tokenA, tokenB, amountADesired, amountBDesired, amountAMin, amountBMin, deadline, slippageBps, preview, autoMin } = taskArgs;
+    const {
+      tokenA,
+      tokenB,
+      amountADesired,
+      amountBDesired,
+      amountAMin,
+      amountBMin,
+      deadline,
+      slippageBps,
+      preview,
+      autoMin,
+    } = taskArgs;
     const { network } = hre;
 
     console.log(`🚀 Router経由で ${tokenA}/${tokenB} ペアに流動性を追加中...`);
@@ -51,7 +62,7 @@ task("addLiquidityViaRouter", "Router経由で指定されたペアに流動性�
     const slippageBpsBigInt = BigInt(slippageBps);
     const autoMinEnabled = String(autoMin).toLowerCase() === "true" || String(autoMin) === "1";
     const previewOnly = String(preview).toLowerCase() === "true" || String(preview) === "1";
-    
+
     if (amountADesiredBigInt <= 0n || amountBDesiredBigInt <= 0n) {
       throw new Error("❌ 希望追加量は0より大きい値を指定してください");
     }
@@ -127,7 +138,7 @@ task("addLiquidityViaRouter", "Router経由で指定されたペアに流動性�
           console.log(`⏳ ${tokenA}の承認を実行中...`);
           const approveHashA = await TokenA.write.approve([routerAddress, amountADesiredBigInt]);
           console.log(`📝 ${tokenA}承認トランザクション: ${approveHashA}`);
-          
+
           const publicClient = await hre.viem.getPublicClient();
           await publicClient.waitForTransactionReceipt({ hash: approveHashA });
           console.log(`✅ ${tokenA}の承認完了`);
@@ -137,7 +148,7 @@ task("addLiquidityViaRouter", "Router経由で指定されたペアに流動性�
           console.log(`⏳ ${tokenB}の承認を実行中...`);
           const approveHashB = await TokenB.write.approve([routerAddress, amountBDesiredBigInt]);
           console.log(`📝 ${tokenB}承認トランザクション: ${approveHashB}`);
-          
+
           const publicClient = await hre.viem.getPublicClient();
           await publicClient.waitForTransactionReceipt({ hash: approveHashB });
           console.log(`✅ ${tokenB}の承認完了`);
@@ -193,8 +204,12 @@ task("addLiquidityViaRouter", "Router経由で指定されたペアに流動性�
             ]);
 
             console.log("\n🧮 最適量の試算:");
-            console.log(`   amountBOptimal (A=${amountADesired} のとき): ${amountBOptimal.toString()}`);
-            console.log(`   amountAOptimal (B=${amountBDesired} のとき): ${amountAOptimal.toString()}`);
+            console.log(
+              `   amountBOptimal (A=${amountADesired} のとき): ${amountBOptimal.toString()}`
+            );
+            console.log(
+              `   amountAOptimal (B=${amountBDesired} のとき): ${amountAOptimal.toString()}`
+            );
 
             // どちらの枝に入るかを事前に評価
             if (amountBOptimal <= amountBDesiredBigInt) {
@@ -203,24 +218,35 @@ task("addLiquidityViaRouter", "Router経由で指定されたペアに流動性�
               previewAmountBUsed = amountBOptimal;
               const recommendedBMin = (amountBOptimal * (ONE_BPS - slippageBpsBigInt)) / ONE_BPS;
               const slippagePctStr = (Number(slippageBps) / 100).toString();
-              const recommendedAMin = (amountADesiredBigInt * (ONE_BPS - slippageBpsBigInt)) / ONE_BPS;
+              const recommendedAMin =
+                (amountADesiredBigInt * (ONE_BPS - slippageBpsBigInt)) / ONE_BPS;
               if (autoMinEnabled) {
                 // 分岐: A は希望量、B は最適量
                 finalAmountAMin = recommendedAMin;
                 finalAmountBMin = recommendedBMin;
                 console.log("\n🤖 auto-min 有効: 分岐Bを検出 (BOptimal 使用)");
-                console.log(`   適用 AMin: ${finalAmountAMin.toString()}  (A希望=${amountADesired})`);
-                console.log(`   適用 BMin: ${finalAmountBMin.toString()}  (BOptimal=${amountBOptimal.toString()})`);
+                console.log(
+                  `   適用 AMin: ${finalAmountAMin.toString()}  (A希望=${amountADesired})`
+                );
+                console.log(
+                  `   適用 BMin: ${finalAmountBMin.toString()}  (BOptimal=${amountBOptimal.toString()})`
+                );
               } else if (!previewOnly && amountBMinBigInt > amountBOptimal) {
-                console.error("\n⛔ 事前検証エラー: amountBMin が大きすぎます (AMMRouter: INSUFFICIENT_B_AMOUNT になります)");
+                console.error(
+                  "\n⛔ 事前検証エラー: amountBMin が大きすぎます (AMMRouter: INSUFFICIENT_B_AMOUNT になります)"
+                );
                 console.error(`   指定 amountBMin: ${amountBMinBigInt.toString()}`);
                 console.error(`   最適 B 使用量:  ${amountBOptimal.toString()}`);
-                console.error(`   推奨 amountBMin (slippage ${slippageBps}bps ≈ ${slippagePctStr}%): ${recommendedBMin.toString()}`);
+                console.error(
+                  `   推奨 amountBMin (slippage ${slippageBps}bps ≈ ${slippagePctStr}%): ${recommendedBMin.toString()}`
+                );
                 console.error("   → 次の値で再実行してください: ");
                 console.error(
                   `      --amount-a-desired ${amountADesired} --amount-b-desired ${amountBDesired} --amount-a-min ${amountAMin} --amount-b-min ${recommendedBMin.toString()}`
                 );
-                throw new Error("Pre-check failed: amountBMin is greater than amountBOptimal for current pool price");
+                throw new Error(
+                  "Pre-check failed: amountBMin is greater than amountBOptimal for current pool price"
+                );
               }
             } else {
               previewBranch = "AOptimal";
@@ -230,22 +256,33 @@ task("addLiquidityViaRouter", "Router経由で指定されたペアに流動性�
               const slippagePctStr = (Number(slippageBps) / 100).toString();
               if (autoMinEnabled) {
                 // 分岐: A は最適量、B は希望量
-                const recommendedBMin = (amountBDesiredBigInt * (ONE_BPS - slippageBpsBigInt)) / ONE_BPS;
+                const recommendedBMin =
+                  (amountBDesiredBigInt * (ONE_BPS - slippageBpsBigInt)) / ONE_BPS;
                 finalAmountAMin = recommendedAMin;
                 finalAmountBMin = recommendedBMin;
                 console.log("\n🤖 auto-min 有効: 分岐Aを検出 (AOptimal 使用)");
-                console.log(`   適用 AMin: ${finalAmountAMin.toString()}  (AOptimal=${amountAOptimal.toString()})`);
-                console.log(`   適用 BMin: ${finalAmountBMin.toString()}  (B希望=${amountBDesired})`);
+                console.log(
+                  `   適用 AMin: ${finalAmountAMin.toString()}  (AOptimal=${amountAOptimal.toString()})`
+                );
+                console.log(
+                  `   適用 BMin: ${finalAmountBMin.toString()}  (B希望=${amountBDesired})`
+                );
               } else if (!previewOnly && amountAMinBigInt > amountAOptimal) {
-                console.error("\n⛔ 事前検証エラー: amountAMin が大きすぎます (AMMRouter: INSUFFICIENT_A_AMOUNT になります)");
+                console.error(
+                  "\n⛔ 事前検証エラー: amountAMin が大きすぎます (AMMRouter: INSUFFICIENT_A_AMOUNT になります)"
+                );
                 console.error(`   指定 amountAMin: ${amountAMinBigInt.toString()}`);
                 console.error(`   最適 A 使用量:  ${amountAOptimal.toString()}`);
-                console.error(`   推奨 amountAMin (slippage ${slippageBps}bps ≈ ${slippagePctStr}%): ${recommendedAMin.toString()}`);
+                console.error(
+                  `   推奨 amountAMin (slippage ${slippageBps}bps ≈ ${slippagePctStr}%): ${recommendedAMin.toString()}`
+                );
                 console.error("   → 次の値で再実行してください: ");
                 console.error(
                   `      --amount-a-desired ${amountADesired} --amount-b-desired ${amountBDesired} --amount-a-min ${recommendedAMin.toString()} --amount-b-min ${amountBMin}`
                 );
-                throw new Error("Pre-check failed: amountAMin is greater than amountAOptimal for current pool price");
+                throw new Error(
+                  "Pre-check failed: amountAMin is greater than amountAOptimal for current pool price"
+                );
               }
             }
           } else {
@@ -269,7 +306,9 @@ task("addLiquidityViaRouter", "Router経由で指定されたペアに流動性�
         const ONE_BPS = 10000n;
         finalAmountAMin = (amountADesiredBigInt * (ONE_BPS - slippageBpsBigInt)) / ONE_BPS;
         finalAmountBMin = (amountBDesiredBigInt * (ONE_BPS - slippageBpsBigInt)) / ONE_BPS;
-        console.log("\n⚠️  リザーブ事前取得に失敗。auto-min/preview により希望量ベースで min を算出");
+        console.log(
+          "\n⚠️  リザーブ事前取得に失敗。auto-min/preview により希望量ベースで min を算出"
+        );
         console.log(`   適用 AMin: ${finalAmountAMin.toString()}`);
         console.log(`   適用 BMin: ${finalAmountBMin.toString()}`);
       }
@@ -284,8 +323,12 @@ task("addLiquidityViaRouter", "Router経由で指定されたペアに流動性�
         console.log(`   分岐: ${previewBranch}`);
         console.log(`   使用予定 amountA: ${previewAmountAUsed.toString()}`);
         console.log(`   使用予定 amountB: ${previewAmountBUsed.toString()}`);
-        console.log(`   推奨 amountAMin: ${recAMin.toString()}  (slippage ${slippageBpsBigInt.toString()}bps)`);
-        console.log(`   推奨 amountBMin: ${recBMin.toString()}  (slippage ${slippageBpsBigInt.toString()}bps)`);
+        console.log(
+          `   推奨 amountAMin: ${recAMin.toString()}  (slippage ${slippageBpsBigInt.toString()}bps)`
+        );
+        console.log(
+          `   推奨 amountBMin: ${recBMin.toString()}  (slippage ${slippageBpsBigInt.toString()}bps)`
+        );
         console.log("\n▶️  再現コマンド例 (min 指定)");
         console.log(
           `  pnpm task:add-liquidity:router \\\n+  --token-a ${tokenA} --token-b ${tokenB} \\\n+  --amount-a-desired ${amountADesired} --amount-b-desired ${amountBDesired} \\\n+  --amount-a-min ${recAMin.toString()} --amount-b-min ${recBMin.toString()} \\\n+  --slippage-bps ${slippageBpsBigInt.toString()} \\\n+  --network ${network.name}`
@@ -310,14 +353,16 @@ task("addLiquidityViaRouter", "Router経由で指定されたペアに流動性�
         finalAmountAMin,
         finalAmountBMin,
         userAddress,
-        BigInt(deadlineTimestamp)
+        BigInt(deadlineTimestamp),
       ]);
 
       console.log(`📝 流動性追加トランザクション: ${addLiquidityHash}`);
 
       // トランザクションの確認を待つ
       const publicClient = await hre.viem.getPublicClient();
-      const addLiquidityReceipt = await publicClient.waitForTransactionReceipt({ hash: addLiquidityHash });
+      const addLiquidityReceipt = await publicClient.waitForTransactionReceipt({
+        hash: addLiquidityHash,
+      });
 
       if (addLiquidityReceipt.status === "success") {
         console.log(`✅ Router経由での流動性追加成功!`);
@@ -344,7 +389,7 @@ task("addLiquidityViaRouter", "Router経由で指定されたペアに流動性�
         const factoryAddress = await AMMRouter.read.factory();
         const AMMFactory = await hre.viem.getContractAt("AMMFactory", factoryAddress);
         const pairAddress = await AMMFactory.read.getPair([tokenAAddress, tokenBAddress]);
-        
+
         if (pairAddress !== "0x0000000000000000000000000000000000000000") {
           const AMMPair = await hre.viem.getContractAt("AMMPair", pairAddress);
           const lpBalance = await AMMPair.read.balanceOf([userAddress]);
@@ -361,11 +406,9 @@ task("addLiquidityViaRouter", "Router経由で指定されたペアに流動性�
             console.log(`   プールシェア: ${sharePercentage.toFixed(4)}%`);
           }
         }
-
       } else {
         console.log("❌ Router経由での流動性追加に失敗しました");
       }
-
     } catch (error) {
       console.error("❌ エラーが発生しました:", error);
       throw error;

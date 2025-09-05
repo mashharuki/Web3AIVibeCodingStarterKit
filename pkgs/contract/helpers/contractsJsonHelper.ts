@@ -7,7 +7,7 @@ const EXTENSTION = "json";
 
 /**
  * ファイルパスを生成する
- * 
+ *
  * @param network ネットワーク名
  * @param basePath ベースパス（デフォルト: outputs）
  * @param suffix サフィックス（オプション）
@@ -24,15 +24,13 @@ const getFilePath = ({
 }): string => {
   const _basePath = basePath ? basePath : BASE_PATH;
   const commonFilePath = `${_basePath}/${BASE_NAME}-${network}`;
-  return suffix
-    ? `${commonFilePath}-${suffix}.${EXTENSTION}`
-    : `${commonFilePath}.${EXTENSTION}`;
+  return suffix ? `${commonFilePath}-${suffix}.${EXTENSTION}` : `${commonFilePath}.${EXTENSTION}`;
 };
 
 /**
  * コントラクトアドレスのJSONファイルをリセットする
  * 既存のファイルがある場合は、タイムスタンプ付きでtmpフォルダにバックアップする
- * 
+ *
  * @param network ネットワーク名
  */
 const resetContractAddressesJson = ({ network }: { network: string }): void => {
@@ -54,7 +52,7 @@ const resetContractAddressesJson = ({ network }: { network: string }): void => {
         network: network,
         basePath: "./tmp",
         suffix: strDate,
-      }),
+      })
     );
   }
   fs.writeFileSync(fileName, JSON.stringify({}, null, 2));
@@ -62,7 +60,7 @@ const resetContractAddressesJson = ({ network }: { network: string }): void => {
 
 /**
  * デプロイ済みコントラクトアドレスを読み込む
- * 
+ *
  * @param network ネットワーク名
  * @returns デプロイ済みコントラクトアドレスのオブジェクト
  */
@@ -73,7 +71,7 @@ const loadDeployedContractAddresses = (network: string) => {
 
 /**
  * JSONオブジェクトを更新する内部関数
- * 
+ *
  * @param group グループ名
  * @param name 名前（nullの場合はグループ全体を更新）
  * @param value 値
@@ -102,7 +100,7 @@ const _updateJson = ({
 
 /**
  * コントラクトアドレスをJSONファイルに書き込む
- * 
+ *
  * @param group グループ名
  * @param name コントラクト名
  * @param value コントラクトアドレス
@@ -137,7 +135,7 @@ const writeContractAddress = ({
 
 /**
  * 指定されたグループに値を書き込む
- * 
+ *
  * @param group グループ名
  * @param value 書き込む値
  * @param fileName ファイル名
@@ -162,9 +160,9 @@ const writeValueToGroup = ({
 };
 
 export {
-    getFilePath,
-    loadDeployedContractAddresses,
-    resetContractAddressesJson,
-    writeContractAddress,
-    writeValueToGroup
+  getFilePath,
+  loadDeployedContractAddresses,
+  resetContractAddressesJson,
+  writeContractAddress,
+  writeValueToGroup,
 };

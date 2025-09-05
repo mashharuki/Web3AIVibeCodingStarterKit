@@ -75,10 +75,7 @@ task("getPair", "指定されたトークンペアの情報を取得する")
       const AMMPair = await hre.viem.getContractAt("AMMPair", pairAddress);
 
       // ペアの詳細情報を取得
-      const [token0, token1] = await Promise.all([
-        AMMPair.read.token0(),
-        AMMPair.read.token1(),
-      ]);
+      const [token0, token1] = await Promise.all([AMMPair.read.token0(), AMMPair.read.token1()]);
 
       const [reserves, totalSupply] = await Promise.all([
         AMMPair.read.getReserves(),
@@ -95,18 +92,21 @@ task("getPair", "指定されたトークンペアの情報を取得する")
 
       // 価格情報を計算（リザーブが0でない場合）
       if (reserves[0] > 0n && reserves[1] > 0n) {
-        const price0 = (reserves[1] * 10n**18n) / reserves[0];
-        const price1 = (reserves[0] * 10n**18n) / reserves[1];
-        
+        const price0 = (reserves[1] * 10n ** 18n) / reserves[0];
+        const price1 = (reserves[0] * 10n ** 18n) / reserves[1];
+
         console.log(`\n💰 価格情報:`);
-        console.log(`   1 ${getTokenSymbol(token0)} = ${(Number(price0) / 1e18).toFixed(6)} ${getTokenSymbol(token1)}`);
-        console.log(`   1 ${getTokenSymbol(token1)} = ${(Number(price1) / 1e18).toFixed(6)} ${getTokenSymbol(token0)}`);
+        console.log(
+          `   1 ${getTokenSymbol(token0)} = ${(Number(price0) / 1e18).toFixed(6)} ${getTokenSymbol(token1)}`
+        );
+        console.log(
+          `   1 ${getTokenSymbol(token1)} = ${(Number(price1) / 1e18).toFixed(6)} ${getTokenSymbol(token0)}`
+        );
       } else {
         console.log(`\n💰 価格情報: 流動性が提供されていません`);
       }
 
       console.log(`\n🔗 Etherscan: https://sepolia.etherscan.io/address/${pairAddress}`);
-
     } catch (error) {
       console.error("❌ エラーが発生しました:", error);
       throw error;
@@ -118,8 +118,8 @@ task("getPair", "指定されたトークンペアの情報を取得する")
  * 使用例:
  * npx hardhat getAllPairs --network sepolia
  */
-task("getAllPairs", "全てのペア情報を一覧表示する")
-  .setAction(async (taskArgs, hre: HardhatRuntimeEnvironment) => {
+task("getAllPairs", "全てのペア情報を一覧表示する").setAction(
+  async (taskArgs, hre: HardhatRuntimeEnvironment) => {
     const { network } = hre;
 
     console.log("🔍 全ペア情報を取得中...");
@@ -145,7 +145,7 @@ task("getAllPairs", "全てのペア情報を一覧表示する")
       }
 
       console.log(`\n📋 ペア一覧:`);
-      console.log("=" .repeat(80));
+      console.log("=".repeat(80));
 
       // 各ペアの情報を取得
       for (let i = 0; i < Number(totalPairs); i++) {
@@ -175,116 +175,119 @@ task("getAllPairs", "全てのペア情報を一覧表示する")
 
           // 価格情報を計算（リザーブが0でない場合）
           if (reserves[0] > 0n && reserves[1] > 0n) {
-            const price0 = (reserves[1] * 10n**18n) / reserves[0];
-            const price1 = (reserves[0] * 10n**18n) / reserves[1];
-            
-            console.log(`   価格: 1 ${getTokenSymbol(token0)} = ${(Number(price0) / 1e18).toFixed(6)} ${getTokenSymbol(token1)}`);
-            console.log(`   価格: 1 ${getTokenSymbol(token1)} = ${(Number(price1) / 1e18).toFixed(6)} ${getTokenSymbol(token0)}`);
+            const price0 = (reserves[1] * 10n ** 18n) / reserves[0];
+            const price1 = (reserves[0] * 10n ** 18n) / reserves[1];
+
+            console.log(
+              `   価格: 1 ${getTokenSymbol(token0)} = ${(Number(price0) / 1e18).toFixed(6)} ${getTokenSymbol(token1)}`
+            );
+            console.log(
+              `   価格: 1 ${getTokenSymbol(token1)} = ${(Number(price1) / 1e18).toFixed(6)} ${getTokenSymbol(token0)}`
+            );
           } else {
             console.log(`   価格: 流動性が提供されていません`);
           }
 
           console.log(`   Etherscan: https://sepolia.etherscan.io/address/${pairAddress}`);
-
         } catch (error) {
           console.error(`❌ ペア ${i + 1} の情報取得に失敗:`, error);
         }
       }
 
-      console.log("\n" + "=" .repeat(80));
+      console.log("\n" + "=".repeat(80));
       console.log("✅ 全ペア情報の取得完了");
-
     } catch (error) {
       console.error("❌ エラーが発生しました:", error);
       throw error;
     }
-  });
+  }
+);
 
 /**
  * 指定されたトークンペア（USDC/JPYC, USDC/PYUSD, JPYC/PYUSD）の情報を一括取得するタスク
  * 使用例:
  * npx hardhat getTargetPairs --network sepolia
  */
-task("getTargetPairs", "指定されたトークンペア（USDC/JPYC, USDC/PYUSD, JPYC/PYUSD）の情報を一括取得する")
-  .setAction(async (taskArgs, hre: HardhatRuntimeEnvironment) => {
-    const { network } = hre;
+task(
+  "getTargetPairs",
+  "指定されたトークンペア（USDC/JPYC, USDC/PYUSD, JPYC/PYUSD）の情報を一括取得する"
+).setAction(async (taskArgs, hre: HardhatRuntimeEnvironment) => {
+  const { network } = hre;
 
-    console.log("🔍 指定されたトークンペアの情報を取得中...");
-    console.log(`📡 ネットワーク: ${network.name}`);
+  console.log("🔍 指定されたトークンペアの情報を取得中...");
+  console.log(`📡 ネットワーク: ${network.name}`);
 
-    // 対象ペアの定義
-    const targetPairs = [
-      { tokenA: "USDC", tokenB: "JPYC" },
-      { tokenA: "USDC", tokenB: "PYUSD" },
-      { tokenA: "JPYC", tokenB: "PYUSD" },
-    ];
+  // 対象ペアの定義
+  const targetPairs = [
+    { tokenA: "USDC", tokenB: "JPYC" },
+    { tokenA: "USDC", tokenB: "PYUSD" },
+    { tokenA: "JPYC", tokenB: "PYUSD" },
+  ];
 
-    try {
-      // デプロイ済みコントラクトアドレスを読み込み
-      const deployedContracts = loadDeployedContractAddresses(network.name);
-      const factoryAddress = deployedContracts.contracts.AMMFactory;
+  try {
+    // デプロイ済みコントラクトアドレスを読み込み
+    const deployedContracts = loadDeployedContractAddresses(network.name);
+    const factoryAddress = deployedContracts.contracts.AMMFactory;
 
-      console.log(`🏭 Factory アドレス: ${factoryAddress}`);
+    console.log(`🏭 Factory アドレス: ${factoryAddress}`);
 
-      // AMMFactory コントラクトに接続
-      const AMMFactory = await hre.viem.getContractAt("AMMFactory", factoryAddress);
+    // AMMFactory コントラクトに接続
+    const AMMFactory = await hre.viem.getContractAt("AMMFactory", factoryAddress);
 
-      console.log(`\n📋 対象ペア情報:`);
-      console.log("=" .repeat(80));
+    console.log(`\n📋 対象ペア情報:`);
+    console.log("=".repeat(80));
 
-      for (let i = 0; i < targetPairs.length; i++) {
-        const { tokenA, tokenB } = targetPairs[i];
-        const tokenAAddress = TOKENS[tokenA as keyof typeof TOKENS];
-        const tokenBAddress = TOKENS[tokenB as keyof typeof TOKENS];
+    for (let i = 0; i < targetPairs.length; i++) {
+      const { tokenA, tokenB } = targetPairs[i];
+      const tokenAAddress = TOKENS[tokenA as keyof typeof TOKENS];
+      const tokenBAddress = TOKENS[tokenB as keyof typeof TOKENS];
 
-        console.log(`\n${i + 1}. ${tokenA}/${tokenB} ペア`);
+      console.log(`\n${i + 1}. ${tokenA}/${tokenB} ペア`);
 
-        try {
-          // ペアアドレスを取得
-          const pairAddress = await AMMFactory.read.getPair([tokenAAddress, tokenBAddress]);
+      try {
+        // ペアアドレスを取得
+        const pairAddress = await AMMFactory.read.getPair([tokenAAddress, tokenBAddress]);
 
-          if (pairAddress === "0x0000000000000000000000000000000000000000") {
-            console.log(`   ❌ ペアは存在しません`);
-            continue;
-          }
-
-          console.log(`   ✅ ペアアドレス: ${pairAddress}`);
-
-          // ペアコントラクトに接続して詳細情報を取得
-          const AMMPair = await hre.viem.getContractAt("AMMPair", pairAddress);
-
-          const [reserves, totalSupply] = await Promise.all([
-            AMMPair.read.getReserves(),
-            AMMPair.read.totalSupply(),
-          ]);
-
-          console.log(`   Reserve ${tokenA}: ${reserves[0].toString()}`);
-          console.log(`   Reserve ${tokenB}: ${reserves[1].toString()}`);
-          console.log(`   LP Token総供給量: ${totalSupply.toString()}`);
-
-          // 価格情報を計算（リザーブが0でない場合）
-          if (reserves[0] > 0n && reserves[1] > 0n) {
-            const price0 = (reserves[1] * 10n**18n) / reserves[0];
-            const price1 = (reserves[0] * 10n**18n) / reserves[1];
-            
-            console.log(`   価格: 1 ${tokenA} = ${(Number(price0) / 1e18).toFixed(6)} ${tokenB}`);
-            console.log(`   価格: 1 ${tokenB} = ${(Number(price1) / 1e18).toFixed(6)} ${tokenA}`);
-          } else {
-            console.log(`   価格: 流動性が提供されていません`);
-          }
-
-          console.log(`   Etherscan: https://sepolia.etherscan.io/address/${pairAddress}`);
-
-        } catch (error) {
-          console.error(`   ❌ ${tokenA}/${tokenB} ペアの情報取得に失敗:`, error);
+        if (pairAddress === "0x0000000000000000000000000000000000000000") {
+          console.log(`   ❌ ペアは存在しません`);
+          continue;
         }
+
+        console.log(`   ✅ ペアアドレス: ${pairAddress}`);
+
+        // ペアコントラクトに接続して詳細情報を取得
+        const AMMPair = await hre.viem.getContractAt("AMMPair", pairAddress);
+
+        const [reserves, totalSupply] = await Promise.all([
+          AMMPair.read.getReserves(),
+          AMMPair.read.totalSupply(),
+        ]);
+
+        console.log(`   Reserve ${tokenA}: ${reserves[0].toString()}`);
+        console.log(`   Reserve ${tokenB}: ${reserves[1].toString()}`);
+        console.log(`   LP Token総供給量: ${totalSupply.toString()}`);
+
+        // 価格情報を計算（リザーブが0でない場合）
+        if (reserves[0] > 0n && reserves[1] > 0n) {
+          const price0 = (reserves[1] * 10n ** 18n) / reserves[0];
+          const price1 = (reserves[0] * 10n ** 18n) / reserves[1];
+
+          console.log(`   価格: 1 ${tokenA} = ${(Number(price0) / 1e18).toFixed(6)} ${tokenB}`);
+          console.log(`   価格: 1 ${tokenB} = ${(Number(price1) / 1e18).toFixed(6)} ${tokenA}`);
+        } else {
+          console.log(`   価格: 流動性が提供されていません`);
+        }
+
+        console.log(`   Etherscan: https://sepolia.etherscan.io/address/${pairAddress}`);
+      } catch (error) {
+        console.error(`   ❌ ${tokenA}/${tokenB} ペアの情報取得に失敗:`, error);
       }
-
-      console.log("\n" + "=" .repeat(80));
-      console.log("✅ 対象ペア情報の取得完了");
-
-    } catch (error) {
-      console.error("❌ エラーが発生しました:", error);
-      throw error;
     }
-  });
+
+    console.log("\n" + "=".repeat(80));
+    console.log("✅ 対象ペア情報の取得完了");
+  } catch (error) {
+    console.error("❌ エラーが発生しました:", error);
+    throw error;
+  }
+});

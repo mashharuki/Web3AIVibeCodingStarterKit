@@ -1,11 +1,11 @@
 import { expect } from "chai";
 import fs from "node:fs";
 import {
-    getFilePath,
-    loadDeployedContractAddresses,
-    resetContractAddressesJson,
-    writeContractAddress,
-    writeValueToGroup,
+  getFilePath,
+  loadDeployedContractAddresses,
+  resetContractAddressesJson,
+  writeContractAddress,
+  writeValueToGroup,
 } from "../helpers/contractsJsonHelper";
 
 describe("ContractsJsonHelper", () => {
@@ -39,17 +39,17 @@ describe("ContractsJsonHelper", () => {
     });
 
     it("should generate correct file path with custom base path", () => {
-      const result = getFilePath({ 
-        network: testNetwork, 
-        basePath: "custom" 
+      const result = getFilePath({
+        network: testNetwork,
+        basePath: "custom",
       });
       expect(result).to.equal(`custom/contracts-${testNetwork}.json`);
     });
 
     it("should generate correct file path with suffix", () => {
-      const result = getFilePath({ 
-        network: testNetwork, 
-        suffix: "backup" 
+      const result = getFilePath({
+        network: testNetwork,
+        suffix: "backup",
       });
       expect(result).to.equal(`outputs/contracts-${testNetwork}-backup.json`);
     });
@@ -58,7 +58,7 @@ describe("ContractsJsonHelper", () => {
   describe("resetContractAddressesJson", () => {
     it("should create new empty JSON file", () => {
       resetContractAddressesJson({ network: testNetwork });
-      
+
       expect(fs.existsSync(testFilePath)).to.be.true;
       const content = JSON.parse(fs.readFileSync(testFilePath, "utf8"));
       expect(content).to.deep.equal({});
@@ -67,13 +67,13 @@ describe("ContractsJsonHelper", () => {
     it("should backup existing file before creating new one", () => {
       // 既存ファイルを作成
       fs.writeFileSync(testFilePath, JSON.stringify({ existing: "data" }));
-      
+
       resetContractAddressesJson({ network: testNetwork });
-      
+
       // 新しいファイルが空であることを確認
       const newContent = JSON.parse(fs.readFileSync(testFilePath, "utf8"));
       expect(newContent).to.deep.equal({});
-      
+
       // tmpフォルダにバックアップが作成されていることを確認
       expect(fs.existsSync("tmp")).to.be.true;
       const tmpFiles = fs.readdirSync("tmp");
@@ -90,7 +90,7 @@ describe("ContractsJsonHelper", () => {
 
     it("should write contract address to JSON file", () => {
       const testAddress = "0x1234567890123456789012345678901234567890";
-      
+
       writeContractAddress({
         group: "contracts",
         name: "TestContract",
@@ -106,7 +106,7 @@ describe("ContractsJsonHelper", () => {
     it("should handle multiple contracts in same group", () => {
       const address1 = "0x1111111111111111111111111111111111111111";
       const address2 = "0x2222222222222222222222222222222222222222";
-      
+
       writeContractAddress({
         group: "contracts",
         name: "Contract1",
@@ -150,7 +150,7 @@ describe("ContractsJsonHelper", () => {
 
     it("should write value to specified group", () => {
       const testValue = { key1: "value1", key2: "value2" };
-      
+
       writeValueToGroup({
         group: "testGroup",
         value: testValue,

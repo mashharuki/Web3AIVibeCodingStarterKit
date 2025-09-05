@@ -1,22 +1,22 @@
 /**
  * contractsJsonHelper.ts の使用例
- * 
+ *
  * このファイルは、contractsJsonHelper.ts の各関数の使用方法を示すサンプルです。
  * 実際のデプロイメントスクリプトでこれらの関数を使用する際の参考にしてください。
  */
 
 import {
-    getFilePath,
-    loadDeployedContractAddresses,
-    resetContractAddressesJson,
-    writeContractAddress,
-    writeValueToGroup,
+  getFilePath,
+  loadDeployedContractAddresses,
+  resetContractAddressesJson,
+  writeContractAddress,
+  writeValueToGroup,
 } from "./contractsJsonHelper";
 
 // 使用例の実行
 async function exampleUsage() {
   const network = "sepolia";
-  
+
   console.log("=== contractsJsonHelper.ts 使用例 ===\n");
 
   // 1. ファイルパスの生成例
@@ -32,7 +32,7 @@ async function exampleUsage() {
 
   // 3. コントラクトアドレスの書き込み例
   console.log("3. コントラクトアドレスの書き込み:");
-  
+
   // AMMFactory コントラクトのアドレスを保存
   writeContractAddress({
     group: "contracts",
@@ -45,7 +45,7 @@ async function exampleUsage() {
   // AMMRouter コントラクトのアドレスを保存
   writeContractAddress({
     group: "contracts",
-    name: "AMMRouter", 
+    name: "AMMRouter",
     value: "0x2345678901234567890123456789012345678901",
     network,
   });
@@ -72,9 +72,9 @@ async function exampleUsage() {
   const tokenAddresses = {
     USDC: "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238",
     JPYC: "0x431D5dfF03120AFA4bDf332c61A6e1766eF37BDB",
-    PYUSD: "0xCaC524BcA292aaade2DF8A05cC58F0a65B1B3bB9"
+    PYUSD: "0xCaC524BcA292aaade2DF8A05cC58F0a65B1B3bB9",
   };
-  
+
   writeValueToGroup({
     group: "tokens",
     value: tokenAddresses,

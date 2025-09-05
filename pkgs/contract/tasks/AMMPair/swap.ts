@@ -35,7 +35,7 @@ function getAmountOut(amountIn: bigint, reserveIn: bigint, reserveOut: bigint): 
   const amountInWithFee = amountIn * 997n; // 1000 - 3 = 997
   const numerator = amountInWithFee * reserveOut;
   const denominator = reserveIn * 1000n + amountInWithFee;
-  
+
   return numerator / denominator;
 }
 
@@ -58,10 +58,14 @@ task("swapTokens", "指定されたペアでトークンスワップを実行す
 
     // トークンシンボルの検証
     if (!TOKENS[tokenIn as keyof typeof TOKENS]) {
-      throw new Error(`❌ 無効な入力トークン: ${tokenIn}. 利用可能: ${Object.keys(TOKENS).join(", ")}`);
+      throw new Error(
+        `❌ 無効な入力トークン: ${tokenIn}. 利用可能: ${Object.keys(TOKENS).join(", ")}`
+      );
     }
     if (!TOKENS[tokenOut as keyof typeof TOKENS]) {
-      throw new Error(`❌ 無効な出力トークン: ${tokenOut}. 利用可能: ${Object.keys(TOKENS).join(", ")}`);
+      throw new Error(
+        `❌ 無効な出力トークン: ${tokenOut}. 利用可能: ${Object.keys(TOKENS).join(", ")}`
+      );
     }
     if (tokenIn === tokenOut) {
       throw new Error("❌ 同じトークン同士でスワップすることはできません");
@@ -109,10 +113,7 @@ task("swapTokens", "指定されたペアでトークンスワップを実行す
       const AMMPair = await hre.viem.getContractAt("AMMPair", pairAddress);
 
       // ペアの詳細情報を取得
-      const [token0, token1] = await Promise.all([
-        AMMPair.read.token0(),
-        AMMPair.read.token1(),
-      ]);
+      const [token0, token1] = await Promise.all([AMMPair.read.token0(), AMMPair.read.token1()]);
 
       const reserves = await AMMPair.read.getReserves();
 
@@ -144,7 +145,8 @@ task("swapTokens", "指定されたペアでトークンスワップを実行す
       console.log(`💰 予想出力量: ${expectedAmountOut.toString()}`);
 
       // スリッページを考慮した最小出力量を計算
-      const minAmountOut = (expectedAmountOut * BigInt(Math.floor((100 - slippageNum) * 100))) / 10000n;
+      const minAmountOut =
+        (expectedAmountOut * BigInt(Math.floor((100 - slippageNum) * 100))) / 10000n;
       console.log(`💰 最小出力量（スリッページ考慮）: ${minAmountOut.toString()}`);
 
       // 価格インパクトを計算
@@ -173,7 +175,9 @@ task("swapTokens", "指定されたペアでトークンスワップを実行す
 
       // 残高チェック
       if (balanceIn < amountInBigInt) {
-        throw new Error(`❌ ${tokenIn}の残高が不足しています。必要: ${amountIn}, 現在: ${balanceIn.toString()}`);
+        throw new Error(
+          `❌ ${tokenIn}の残高が不足しています。必要: ${amountIn}, 現在: ${balanceIn.toString()}`
+        );
       }
 
       // 承認状況を確認
@@ -185,7 +189,7 @@ task("swapTokens", "指定されたペアでトークンスワップを実行す
         console.log(`⏳ ${tokenIn}の承認を実行中...`);
         const approveHash = await TokenIn.write.approve([pairAddress, amountInBigInt]);
         console.log(`📝 承認トランザクション: ${approveHash}`);
-        
+
         const publicClient = await hre.viem.getPublicClient();
         await publicClient.waitForTransactionReceipt({ hash: approveHash });
         console.log(`✅ 承認完了`);
@@ -207,7 +211,7 @@ task("swapTokens", "指定されたペアでトークンスワップを実行す
         amount0Out,
         amount1Out,
         userAddress,
-        "0x" // コールバックデータなし
+        "0x", // コールバックデータなし
       ]);
       console.log(`📝 スワップトランザクション: ${swapHash}`);
 
@@ -226,9 +230,10 @@ task("swapTokens", "指定されたペアでトークンスワップを実行す
         console.log(`\n📊 スワップ結果:`);
         console.log(`   実際の出力量: ${actualAmountOut.toString()}`);
         console.log(`   予想出力量: ${expectedAmountOut.toString()}`);
-        
+
         // スリッページを計算
-        const actualSlippage = ((Number(expectedAmountOut) - Number(actualAmountOut)) / Number(expectedAmountOut)) * 100;
+        const actualSlippage =
+          ((Number(expectedAmountOut) - Number(actualAmountOut)) / Number(expectedAmountOut)) * 100;
         console.log(`   実際のスリッページ: ${actualSlippage.toFixed(4)}%`);
 
         // 実効価格を計算
@@ -248,11 +253,9 @@ task("swapTokens", "指定されたペアでトークンスワップを実行す
         console.log(`\n💳 最終的な残高:`);
         console.log(`   ${tokenIn}: ${finalBalanceIn.toString()}`);
         console.log(`   ${tokenOut}: ${finalBalanceOut.toString()}`);
-
       } else {
         console.log("❌ スワップに失敗しました");
       }
-
     } catch (error) {
       console.error("❌ エラーが発生しました:", error);
       throw error;
@@ -277,10 +280,14 @@ task("getSwapQuote", "スワップの見積もりを取得する（実際のス�
 
     // トークンシンボルの検証
     if (!TOKENS[tokenIn as keyof typeof TOKENS]) {
-      throw new Error(`❌ 無効な入力トークン: ${tokenIn}. 利用可能: ${Object.keys(TOKENS).join(", ")}`);
+      throw new Error(
+        `❌ 無効な入力トークン: ${tokenIn}. 利用可能: ${Object.keys(TOKENS).join(", ")}`
+      );
     }
     if (!TOKENS[tokenOut as keyof typeof TOKENS]) {
-      throw new Error(`❌ 無効な出力トークン: ${tokenOut}. 利用可能: ${Object.keys(TOKENS).join(", ")}`);
+      throw new Error(
+        `❌ 無効な出力トークン: ${tokenOut}. 利用可能: ${Object.keys(TOKENS).join(", ")}`
+      );
     }
     if (tokenIn === tokenOut) {
       throw new Error("❌ 同じトークン同士でスワップすることはできません");
@@ -320,10 +327,7 @@ task("getSwapQuote", "スワップの見積もりを取得する（実際のス�
       const AMMPair = await hre.viem.getContractAt("AMMPair", pairAddress);
 
       // ペアの詳細情報を取得
-      const [token0, token1] = await Promise.all([
-        AMMPair.read.token0(),
-        AMMPair.read.token1(),
-      ]);
+      const [token0, token1] = await Promise.all([AMMPair.read.token0(), AMMPair.read.token1()]);
 
       const reserves = await AMMPair.read.getReserves();
 
@@ -369,7 +373,8 @@ task("getSwapQuote", "スワップの見積もりを取得する（実際のス�
       // 異なるスリッページでの最小出力量を表示
       console.log(`\n📊 スリッページ別最小出力量:`);
       for (const slippage of [0.1, 0.5, 1.0, 2.0, 5.0]) {
-        const minAmountOut = (expectedAmountOut * BigInt(Math.floor((100 - slippage) * 100))) / 10000n;
+        const minAmountOut =
+          (expectedAmountOut * BigInt(Math.floor((100 - slippage) * 100))) / 10000n;
         console.log(`   ${slippage}%: ${minAmountOut.toString()}`);
       }
 
@@ -377,7 +382,6 @@ task("getSwapQuote", "スワップの見積もりを取得する（実際のス�
         console.log(`\n⚠️  警告: 価格インパクトが大きいです (${priceImpact.toFixed(4)}%)`);
         console.log(`   大きな取引を行う場合は、複数回に分けることを検討してください。`);
       }
-
     } catch (error) {
       console.error("❌ エラーが発生しました:", error);
       throw error;

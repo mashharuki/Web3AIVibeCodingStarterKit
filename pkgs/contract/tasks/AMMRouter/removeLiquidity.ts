@@ -25,7 +25,17 @@ task("removeLiquidityViaRouter", "Router経由で指定されたペアから流�
   .addOptionalParam("preview", "送信せずに見積もりのみ表示 (true/false)", "false")
   .addOptionalParam("deadline", "トランザクションの有効期限（秒）", "1800") // デフォルト30分
   .setAction(async (taskArgs, hre: HardhatRuntimeEnvironment) => {
-    const { tokenA, tokenB, liquidity, amountAMin, amountBMin, deadline, slippageBps, autoMin, preview } = taskArgs;
+    const {
+      tokenA,
+      tokenB,
+      liquidity,
+      amountAMin,
+      amountBMin,
+      deadline,
+      slippageBps,
+      autoMin,
+      preview,
+    } = taskArgs;
     const { network } = hre;
 
     console.log(`🔥 Router経由で ${tokenA}/${tokenB} ペアから流動性を除去中...`);
@@ -49,7 +59,7 @@ task("removeLiquidityViaRouter", "Router経由で指定されたペアから流�
     const slippageBpsBigInt = BigInt(slippageBps ?? "500");
     const autoMinEnabled = String(autoMin).toLowerCase() === "true" || String(autoMin) === "1";
     const previewOnly = String(preview).toLowerCase() === "true" || String(preview) === "1";
-    
+
     if (liquidityBigInt <= 0n) {
       throw new Error("❌ 除去するLPトークン量は0より大きい値を指定してください");
     }
@@ -105,7 +115,9 @@ task("removeLiquidityViaRouter", "Router経由で指定されたペアから流�
 
       // LPトークン残高チェック
       if (lpBalance < liquidityBigInt) {
-        throw new Error(`❌ LPトークンの残高が不足しています。必要: ${liquidity}, 現在: ${lpBalance.toString()}`);
+        throw new Error(
+          `❌ LPトークンの残高が不足しています。必要: ${liquidity}, 現在: ${lpBalance.toString()}`
+        );
       }
 
       // 現在のプールシェアを計算
@@ -141,7 +153,9 @@ task("removeLiquidityViaRouter", "Router経由で指定されたペアから流�
       const recommendedAMin = (expectedAmountA * (ONE_BPS - slippageBpsBigInt)) / ONE_BPS;
       const recommendedBMin = (expectedAmountB * (ONE_BPS - slippageBpsBigInt)) / ONE_BPS;
       const slippagePctStr = (Number(slippageBpsBigInt) / 100).toString();
-      console.log(`\n🧮 推奨最小許容量 (slippage ${slippageBpsBigInt.toString()}bps ≈ ${slippagePctStr}%):`);
+      console.log(
+        `\n🧮 推奨最小許容量 (slippage ${slippageBpsBigInt.toString()}bps ≈ ${slippagePctStr}%):`
+      );
       console.log(`   推奨 ${tokenA} Min: ${recommendedAMin.toString()}`);
       console.log(`   推奨 ${tokenB} Min: ${recommendedBMin.toString()}`);
 
@@ -167,15 +181,23 @@ task("removeLiquidityViaRouter", "Router経由で指定されたペアから流�
       } else {
         if (amountAMinBigInt > expectedAmountA) {
           console.error("\n⛔ 事前検証エラー: amountAMin が高すぎます (返還見込み量を上回る)");
-          console.error(`   指定 AMin: ${amountAMinBigInt.toString()} / 予想 A: ${expectedAmountA.toString()}`);
-          console.error(`   推奨 AMin: ${recommendedAMin.toString()} (slippage ${slippageBpsBigInt.toString()}bps)`);
+          console.error(
+            `   指定 AMin: ${amountAMinBigInt.toString()} / 予想 A: ${expectedAmountA.toString()}`
+          );
+          console.error(
+            `   推奨 AMin: ${recommendedAMin.toString()} (slippage ${slippageBpsBigInt.toString()}bps)`
+          );
           console.error("   → 推奨値で再実行するか --auto-min true を指定してください");
           throw new Error("Pre-check failed: amountAMin exceeds expected return");
         }
         if (amountBMinBigInt > expectedAmountB) {
           console.error("\n⛔ 事前検証エラー: amountBMin が高すぎます (返還見込み量を上回る)");
-          console.error(`   指定 BMin: ${amountBMinBigInt.toString()} / 予想 B: ${expectedAmountB.toString()}`);
-          console.error(`   推奨 BMin: ${recommendedBMin.toString()} (slippage ${slippageBpsBigInt.toString()}bps)`);
+          console.error(
+            `   指定 BMin: ${amountBMinBigInt.toString()} / 予想 B: ${expectedAmountB.toString()}`
+          );
+          console.error(
+            `   推奨 BMin: ${recommendedBMin.toString()} (slippage ${slippageBpsBigInt.toString()}bps)`
+          );
           console.error("   → 推奨値で再実行するか --auto-min true を指定してください");
           throw new Error("Pre-check failed: amountBMin exceeds expected return");
         }
@@ -192,7 +214,7 @@ task("removeLiquidityViaRouter", "Router経由で指定されたペアから流�
         console.log(`⏳ LPトークンの承認を実行中...`);
         const approveHash = await AMMPair.write.approve([routerAddress, liquidityBigInt]);
         console.log(`📝 LPトークン承認トランザクション: ${approveHash}`);
-        
+
         const publicClient = await hre.viem.getPublicClient();
         await publicClient.waitForTransactionReceipt({ hash: approveHash });
         console.log(`✅ LPトークンの承認完了`);
@@ -218,14 +240,16 @@ task("removeLiquidityViaRouter", "Router経由で指定されたペアから流�
         finalAmountAMin,
         finalAmountBMin,
         userAddress,
-        BigInt(deadlineTimestamp)
+        BigInt(deadlineTimestamp),
       ]);
 
       console.log(`📝 流動性除去トランザクション: ${removeLiquidityHash}`);
 
       // トランザクションの確認を待つ
       const publicClient = await hre.viem.getPublicClient();
-      const removeLiquidityReceipt = await publicClient.waitForTransactionReceipt({ hash: removeLiquidityHash });
+      const removeLiquidityReceipt = await publicClient.waitForTransactionReceipt({
+        hash: removeLiquidityHash,
+      });
 
       if (removeLiquidityReceipt.status === "success") {
         console.log(`✅ Router経由での流動性除去成功!`);
@@ -258,11 +282,9 @@ task("removeLiquidityViaRouter", "Router経由で指定されたペアから流�
         } else if (lpBalanceAfter === 0n) {
           console.log(`   プールシェア: 0% (全ての流動性を除去)`);
         }
-
       } else {
         console.log("❌ Router経由での流動性除去に失敗しました");
       }
-
     } catch (error) {
       console.error("❌ エラーが発生しました:", error);
       throw error;

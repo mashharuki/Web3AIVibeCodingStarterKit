@@ -97,10 +97,14 @@ task("addLiquidityToPair", "指定されたペアに流動性を追加する")
 
       // 残高チェック
       if (balanceA < amountABigInt) {
-        throw new Error(`❌ ${tokenA}の残高が不足しています。必要: ${amountA}, 現在: ${balanceA.toString()}`);
+        throw new Error(
+          `❌ ${tokenA}の残高が不足しています。必要: ${amountA}, 現在: ${balanceA.toString()}`
+        );
       }
       if (balanceB < amountBBigInt) {
-        throw new Error(`❌ ${tokenB}の残高が不足しています。必要: ${amountB}, 現在: ${balanceB.toString()}`);
+        throw new Error(
+          `❌ ${tokenB}の残高が不足しています。必要: ${amountB}, 現在: ${balanceB.toString()}`
+        );
       }
 
       // 承認状況を確認
@@ -116,7 +120,7 @@ task("addLiquidityToPair", "指定されたペアに流動性を追加する")
         console.log(`⏳ ${tokenA}の承認を実行中...`);
         const approveHashA = await TokenA.write.approve([pairAddress, amountABigInt]);
         console.log(`📝 ${tokenA}承認トランザクション: ${approveHashA}`);
-        
+
         const publicClient = await hre.viem.getPublicClient();
         await publicClient.waitForTransactionReceipt({ hash: approveHashA });
         console.log(`✅ ${tokenA}の承認完了`);
@@ -126,7 +130,7 @@ task("addLiquidityToPair", "指定されたペアに流動性を追加する")
         console.log(`⏳ ${tokenB}の承認を実行中...`);
         const approveHashB = await TokenB.write.approve([pairAddress, amountBBigInt]);
         console.log(`📝 ${tokenB}承認トランザクション: ${approveHashB}`);
-        
+
         const publicClient = await hre.viem.getPublicClient();
         await publicClient.waitForTransactionReceipt({ hash: approveHashB });
         console.log(`✅ ${tokenB}の承認完了`);
@@ -134,10 +138,10 @@ task("addLiquidityToPair", "指定されたペアに流動性を追加する")
 
       // トークンをペアコントラクトに送信
       console.log(`\n⏳ トークンをペアコントラクトに送信中...`);
-      
+
       const transferHashA = await TokenA.write.transfer([pairAddress, amountABigInt]);
       console.log(`📝 ${tokenA}送信トランザクション: ${transferHashA}`);
-      
+
       const transferHashB = await TokenB.write.transfer([pairAddress, amountBBigInt]);
       console.log(`📝 ${tokenB}送信トランザクション: ${transferHashB}`);
 
@@ -145,7 +149,7 @@ task("addLiquidityToPair", "指定されたペアに流動性を追加する")
       const publicClient = await hre.viem.getPublicClient();
       await publicClient.waitForTransactionReceipt({ hash: transferHashA });
       await publicClient.waitForTransactionReceipt({ hash: transferHashB });
-      
+
       console.log(`✅ トークン送信完了`);
 
       // 流動性を追加（mint関数を呼び出し）
@@ -177,11 +181,9 @@ task("addLiquidityToPair", "指定されたペアに流動性を追加する")
           const sharePercentage = (Number(lpBalance) / Number(totalSupply)) * 100;
           console.log(`   プールシェア: ${sharePercentage.toFixed(4)}%`);
         }
-
       } else {
         console.log("❌ 流動性追加に失敗しました");
       }
-
     } catch (error) {
       console.error("❌ エラーが発生しました:", error);
       throw error;

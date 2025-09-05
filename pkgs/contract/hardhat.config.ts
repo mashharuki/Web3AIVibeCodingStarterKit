@@ -12,13 +12,8 @@ import "./tasks";
 
 dotenv.config();
 
-const {
-  PRIVATE_KEY,
-  ALCHEMY_API_KEY,
-  COINMARKETCAP_API_KEY,
-  ETHERSCAN_API_KEY,
-  GAS_REPORT,
-} = process.env;
+const { PRIVATE_KEY, ALCHEMY_API_KEY, COINMARKETCAP_API_KEY, ETHERSCAN_API_KEY, GAS_REPORT } =
+  process.env;
 
 const config: HardhatUserConfig = {
   solidity: {
@@ -54,8 +49,7 @@ const config: HardhatUserConfig = {
     currency: "USD",
     token: "ETH",
     coinmarketcap: COINMARKETCAP_API_KEY,
-    gasPriceApi:
-      "https://api.etherscan.io/api?module=proxy&action=eth_gasPrice",
+    gasPriceApi: "https://api.etherscan.io/api?module=proxy&action=eth_gasPrice",
   },
   contractSizer: {
     alphaSort: true,
