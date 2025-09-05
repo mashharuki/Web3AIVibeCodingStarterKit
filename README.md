@@ -1,67 +1,77 @@
-# Web3 AI Vibe Coding Starter Kit 
+# Web3 AI Vibe Coding Starter Kit
 
-AI VibeCodingでWeb3アプリを開発するためのスターターキットです！
+This is a starter kit for developing Web3 applications with AI VibeCoding!
 
-## イベントページ
+## Event Page
 
 [Luma - Build the Future with AI! A Hands-on Web3 AI Vibe Coding Workshop](https://luma.com/um87sb5p)
 
-## AI VibeCodingの環境例
+## AI VibeCoding Environment Example
 
-![AI VibeCodingの環境例](./docs/drawio/overview.drawio.png)
+![AI VibeCoding Environment Example](./docs/drawio/overview.drawio.png)
 
-## AI VibeCodingでWeb3アプリを開発する時の手順
+## Steps for Developing Web3 Apps with AI VibeCoding
 
-1. 作りたいものを決める。
+1.  **Decide what you want to build.**
+    *   For this workshop, let's build an AMM DEX!
 
-2. 作りたいものの要件定義書と設計書を作成する(Kiroの使用を推奨). 
-   ※ 生成したものを別にAIコーディングツールにレビューさせるのもあり
+2.  **Create a requirements definition and design document for what you want to build.** (Using Kiro or GitHub Spec-kit is recommended).
+    *   It's also a good idea to have a separate AI coding tool review the generated documents.
 
-3. 要件定義書を元にタスクリストを作成する(Kiroの使用を推奨). 
-   ※ 生成したものを別にAIコーディングツールにレビューさせるのもあり
+3.  **Create a task list based on the requirements definition.** (Using Kiro or GitHub Spec-kit is recommended).
+    *   It's also a good idea to have a separate AI coding tool review the generated list.
 
-4. 実装を開始する. 
-   この時、コントラクトとフロントエンドの開発を一気に進めるよりも段階的に進めた方が良い。　　
-   - プロジェクト全体のセットアップ
-    - スマートコントラクトの実装(テストやタスクファイルの実装を含む)
-    - スマートコントラクトの機能検証
-    - フロントエンドの実装
-    - デザインを整える
-    - E2Eテスト
-    - 完成
-   
-## AI VibeCodingを上手に進めるためにした方が良いこと
+4.  **Start implementation.**
+    It's better to proceed in stages rather than developing the contract and front-end all at once.
+    *   Overall project setup
+    *   Smart contract implementation (including tests and task file implementation)
+    *   Smart contract functional verification
+    *   Front-end implementation
+    *   Refine the design
+    *   E2E testing
+    *   Completion
 
-1. 複数のモデルを使い分ける
-    - 要件定義やタスクリストの洗い出し、レビュー
-      - Gemini
+## Tips for Successful AI VibeCoding
 
-    - コーディング
-      - Claude
+1.  **Use multiple models for different tasks:**
+    *   **For requirements definition, task list creation, and review:**
+        *   Gemini
+    *   **For coding:**
+        *   Claude
 
-2. MCPを使ってAIの機能を強化する
-    - プロジェクト全体の把握
-      - Serena MCP
-    - 最新のコード、ドキュメントの参照
-      - context7
-    - 複雑な問題も細かいステップに分解して思考プロセス全体の進行状況を明示的に追跡
-      - sequential-thinking
+2.  **Enhance AI capabilities using MCP:**
+    *   **For understanding the entire project:**
+        *   Serena MCP
+    *   **For referencing the latest code and documents:**
+        *   context7
+    *   **To break down complex problems into small steps and explicitly track the progress of the entire thought process:**
+        *   sequential-thinking
 
-3. 段階的に進める
-    - 要件定義の作成
-    - タスクリストの作成
-    - プロジェクト全体のセットアップ
-    - スマートコントラクトの実装
-    - フロントエンドの実装
+3.  **Proceed in stages:**
+    *   Create requirements definition
+    *   Create task list
+    *   Overall project setup
+    *   Smart contract implementation
+    *   Front-end implementation
 
-4. カスタムインストラクションファイルのセットアップ
-    - 大事！！
-    - 各コーディングエージェント毎に設定が微妙に異なるので注意！
-  
-## 参考情報
+4.  **Set up custom instruction files:**
+    *   This is very important!
+    *   Be aware that settings differ slightly for each coding agent!
+
+5.  **Specification-Driven Development is crucial!**
+    *   Once you've decided what to build, solidify the specifications instead of jumping straight into implementation.
+    *   Utilize Kiro and GitHub Spec-kit.
+
+6.  **Context Engineering is also important!**
+    *   To get higher quality output with complex configurations, context engineering is just as important as prompt engineering!
+    *   Let's solidify the specifications using Kiro or GitHub Spec-kit to provide high-quality context to the coding agent!
+
+## Reference Information
 
 ```bash
-.claude Claude Codeを使う時の設定例
-.gemini Gemini CLIを使う時の設定例
-.github GitHub Copilotを使う時の設定例
+.claude          # A folder containing configuration examples for using Claude Code.
+.gemini          # A folder containing configuration examples for using Gemini CLI.
+.github          # A folder containing configuration examples for using GitHub Copilot.
+.kiro            # A folder containing configuration examples for using Kiro.
+web3aivibecoding # A folder containing template files for GitHub Spec-kit.
 ```
