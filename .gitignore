@@ -1,3 +1,4 @@
 .serena
 **/.DS_Store
 node_modules
+**/tmp
