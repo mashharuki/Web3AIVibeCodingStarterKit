@@ -79,16 +79,13 @@ interface PizzaBoardState {
 }
 ```
 
-### 3. ウォレット接続コンポーネント
+### 3. ウォレットアドレスの取得
 
 ```typescript
-// OnChainKitのWalletコンポーネントを使用
-import { Wallet, ConnectWallet } from '@coinbase/onchainkit/wallet'
+// wagmiのReactHookを利用する
+import { useAccount } from 'wagmi';
 
-interface WalletHeaderProps {
-  isConnected: boolean
-  address?: string
-}
+const { address } = useAccount();
 ```
 
 ### 4. スコアシステム
@@ -200,6 +197,187 @@ interface MintParams {
 }
 ```
 
+### 6. トランザクションカードコンポーネント
+
+OnChainKit及びMiniAppKitの恩恵を最大限享受するためにトランザクション実行のコンポーネントは以下を共通のコンポーネントとして必ず利用する実装としてください。
+
+```ts
+import { useNotification } from '@coinbase/onchainkit/minikit';
+import {
+  Transaction,
+  TransactionButton,
+  TransactionError,
+  TransactionResponse,
+  TransactionStatus,
+  TransactionStatusAction,
+  TransactionStatusLabel,
+  TransactionToast,
+  TransactionToastAction,
+  TransactionToastIcon,
+  TransactionToastLabel,
+} from '@coinbase/onchainkit/transaction';
+import { useCallback } from 'react';
+import { Abi } from 'viem';
+import { useAccount } from 'wagmi';
+
+type TransactionProps = {
+  calls: {
+    address: `0x${string}`,
+    abi: Abi,
+    functionName: string,
+    args: (string | number | bigint | boolean | `0x${string}`)[],
+  }[];
+};
+
+/**
+ * トランザクションカードコンポーネント
+ * @returns
+ */
+export function TransactionCard({ calls }: TransactionProps) {
+  const { address } = useAccount();
+
+  const sendNotification = useNotification();
+
+  /**
+   * トランザクションが正常に実行された時に実行するコールバック関数
+   */
+  const handleSuccess = useCallback(
+    async (response: TransactionResponse) => {
+      const transactionHash = response.transactionReceipts[0].transactionHash;
+
+      console.log(`Transaction successful: ${transactionHash}`);
+
+      // トランザクション成功時に MiniKit 通知を送る
+      await sendNotification({
+        title: 'Congratulations!',
+        body: `You sent your a transaction, ${transactionHash}!`,
+      });
+    },
+    [sendNotification]
+  );
+
+  return (
+    <div className="w-full">
+      {address ? (
+        <Transaction
+          calls={calls}
+          onSuccess={handleSuccess}
+          onError={(error: TransactionError) => console.error('Transaction failed:', error)}
+        >
+          <TransactionButton className="text-md text-white" text="Mint NFT" />
+          <TransactionStatus>
+            <TransactionStatusAction />
+            <TransactionStatusLabel />
+          </TransactionStatus>
+          <TransactionToast className="mb-4">
+            <TransactionToastIcon />
+            <TransactionToastLabel />
+            <TransactionToastAction />
+          </TransactionToast>
+        </Transaction>
+      ) : (
+        <p className="mt-2 text-center text-sm text-yellow-400">
+          Connect your wallet to send a transaction
+        </p>
+      )}
+    </div>
+  );
+}
+```
+
+メソッド名の指定や引数は呼び出し元のコンポーネントにて実装する
+
+以下はERC1155のNFTをミントする時の実装例。
+
+```ts
+// NFTを発行するためのコールデータ
+  const calls = useMemo(
+    () =>
+      address && score > 0
+        ? [
+            {
+              address: NFT_ADDRESS as `0x${string}`,
+              abi: SHOOTING_GAME_NFT_ABI,
+              functionName: 'mint',
+              args: [address as `0x${string}`, 0, score, '0x'] as [
+                string,
+                number,
+                number,
+                string,
+              ],
+            },
+          ]
+        : [],
+    [address, score]
+  );
+
+  console.log('calls', calls);
+
+  return (
+    <Card title="Mini Shooting Game">
+      <div ref={containerRef} className="flex w-full flex-col items-center">
+        <canvas
+          ref={canvasRef}
+          className="rounded-lg border border-[var(--app-card-border)] bg-[var(--app-background)]"
+        />
+        {!running && !gameOver && (
+          <button
+            onClick={startGame}
+            className="mt-4 rounded-md bg-[var(--app-accent)] px-4 py-2 text-sm font-medium text-white hover:bg-[var(--app-accent-hover)] active:bg-[var(--app-accent-active)]"
+          >
+            Tap / Space to Start
+          </button>
+        )}
+        {gameOver && score > 0 && <TransactionCard calls={calls} />}
+        {gameOver && score === 0 && (
+          <p className="mt-3 text-sm text-yellow-400">
+            Score is 0 — nothing to mint. Try again!
+          </p>
+        )}
+      </div>
+    </Card>
+  );
+```
+
+### 7. Providerコンポーネント
+
+OnChainKit及びMiniAppKitの恩恵を最大限享受するために`providers.tsx`は必ず以下の実装にしてください。
+
+```ts
+'use client';
+
+// アプリ全体のプロバイダー（MiniKitProvider）
+// - OnchainKit の設定（API Key / Chain / 外観）
+// - フレームの文脈や Wagmi のコネクタを内部で設定
+import { MiniKitProvider } from '@coinbase/onchainkit/minikit';
+import { type ReactNode } from 'react';
+import { baseSepolia } from 'wagmi/chains';
+
+/**
+ * Providers コンポーネント
+ * @param props
+ * @returns
+ */
+export function Providers(props: { children: ReactNode }) {
+  return (
+    <MiniKitProvider
+      apiKey={process.env.NEXT_PUBLIC_ONCHAINKIT_API_KEY}
+      chain={baseSepolia}
+      config={{
+        appearance: {
+          mode: 'auto',
+          theme: 'mini-app-theme',
+          name: process.env.NEXT_PUBLIC_ONCHAINKIT_PROJECT_NAME,
+          logo: process.env.NEXT_PUBLIC_ICON_URL,
+        },
+      }}
+    >
+      {props.children}
+    </MiniKitProvider>
+  );
+}
+```
+
 ## Data Models
 
 ### ゲーム状態管理
@@ -242,6 +420,10 @@ contract PizzaDaoMiniHackathon is ERC721, ERC721URIStorage, Ownable {
         ERC721("PizzaDaoMiniHackathon", "PDMH")
         Ownable(initialOwner)
     {}
+
+    function _baseURI() internal pure override returns (string memory) {
+        return "https://chocolate-nice-gazelle-823.mypinata.cloud/ipfs/bafybeicqgesjwbsbs6kfe5mduz56o7ooeh7ynonjozel3lc5t2jer7v52a/";
+    }
 
     function safeMint(address to, string memory uri)
         public
@@ -464,6 +646,7 @@ pizza-roulette-game/
 │   │   ├── webhook               # Farcaster WebHookに関するAPI
 │   │   └── metadata/             # NFTメタデータ生成API
 │   ├── layout.tsx                # ルートレイアウト
+│   ├── providers.tsx             # 全コンポーネント共通のプロバイダーコンポーネント
 │   └── page.tsx                  # メインゲームページ
 ├── css
 │   ├── globals.css               # グローバルスタイル              
@@ -550,6 +733,30 @@ pizza-roulette-game/
 }
 ```
 
+## NFTのメタデータ情報
+
+### 共通 URI
+
+https://chocolate-nice-gazelle-823.mypinata.cloud/ipfs/bafybeicqgesjwbsbs6kfe5mduz56o7ooeh7ynonjozel3lc5t2jer7v52a
+
+### 各NFTまでのメタデータ情報
+
+- `bronze`
+
+  共通URI/bronze
+
+- `silver`
+
+  共通URI/silver
+
+- `gold`
+
+  共通URI/gold
+
+- `diamond`
+
+  共通URI/diamond
+
 ## Performance Considerations
 
 ### 最適化戦略
@@ -561,7 +768,7 @@ pizza-roulette-game/
 
 ### ハッカソン制約への対応
 
-1. **開発時間短縮**: 既存ライブラリの最大活用
+1. **開発時間短縮**: 既存コード及びライブラリの最大活用
 2. **デプロイ簡素化**: Vercel + Base Sepolia
 3. **機能絞り込み**: コア機能に集中
 4. **エラー処理**: 基本的なケースのみ対応
